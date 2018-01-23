@@ -15,7 +15,7 @@
 
 // ignore_for_file: public_member_api_docs
 
-import 'dart:ui' show Locale;
+import 'package:flutter/ui.dart' show Locale;
 
 class TranslationBundle {
   const TranslationBundle(this.parent);

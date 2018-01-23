@@ -640,6 +640,18 @@ class RenderConstrainedOverflowBox extends RenderAligningShiftedBox {
 ///    overflow.
 class RenderUnconstrainedBox extends RenderAligningShiftedBox
     with DebugOverflowIndicatorMixin {
+
+  // Dart2js: Manually added from DebugOverflowIndicatorMixin
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Users expect error messages to be shown again after hot reload.
+    assert(() {
+      overflowReportNeeded = true;
+      return true;
+    }());
+  }
+
   /// Create a render object that sizes itself to the child but does not
   /// pass the [constraints] down to that child.
   ///

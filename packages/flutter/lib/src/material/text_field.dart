@@ -284,8 +284,7 @@ class TextField extends StatefulWidget {
   }
 }
 
-class _TextFieldState extends State<TextField>
-    with AutomaticKeepAliveClientMixin<TextField> {
+class _TextFieldState extends AutomaticKeepAliveClientMixin<TextField> {
   final GlobalKey<EditableTextState> _editableTextKey =
       new GlobalKey<EditableTextState>();
 

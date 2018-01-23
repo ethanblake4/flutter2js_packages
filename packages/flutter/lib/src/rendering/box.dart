@@ -625,7 +625,14 @@ class BoxParentData extends ParentData {
 /// This is a convenience class that mixes in the relevant classes with
 /// the relevant type arguments.
 abstract class ContainerBoxParentData<ChildType extends RenderObject>
-    extends BoxParentData with ContainerParentDataMixin<ChildType> {}
+    extends BoxParentData with ContainerParentDataMixin<ChildType> {
+  // Dart2js: Must be manually added
+  @override
+  void detach() {
+    super.detach();
+    detach_ContainerParentDataMixin();
+  }
+}
 
 enum _IntrinsicDimension { minWidth, maxWidth, minHeight, maxHeight }
 

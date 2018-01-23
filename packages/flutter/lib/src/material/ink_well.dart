@@ -371,8 +371,7 @@ class InkResponse extends StatefulWidget {
   }
 }
 
-class _InkResponseState<T extends InkResponse> extends State<T>
-    with AutomaticKeepAliveClientMixin<T> {
+class _InkResponseState<T extends InkResponse> extends AutomaticKeepAliveClientMixin<T> {
   Set<InteractiveInkFeature> _splashes;
   InteractiveInkFeature _currentSplash;
   InkHighlight _lastHighlight;

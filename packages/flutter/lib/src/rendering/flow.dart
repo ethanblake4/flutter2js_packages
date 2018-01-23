@@ -172,9 +172,7 @@ class FlowParentData extends ContainerBoxParentData<RenderBox> {
 ///
 ///  * [FlowDelegate]
 ///  * [RenderStack]
-class RenderFlow extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, FlowParentData>,
+class RenderFlow extends RenderBoxContainerRenderObjectMixin<RenderBox, FlowParentData> with
         RenderBoxContainerDefaultsMixin<RenderBox, FlowParentData>
     implements FlowPaintingContext {
   /// Creates a render object for a flow layout.

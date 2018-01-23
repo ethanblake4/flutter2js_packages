@@ -68,7 +68,7 @@ class GlobalMaterialLocalizations implements MaterialLocalizations {
   /// [LocalizationsDelegate] implementations typically call the static [load]
   /// function, rather than constructing this class directly.
   GlobalMaterialLocalizations(this.locale)
-      : assert(locale != null),
+      :
         _localeName = _computeLocaleName(locale) {
     _loadDateIntlDataIfNotLoaded();
 

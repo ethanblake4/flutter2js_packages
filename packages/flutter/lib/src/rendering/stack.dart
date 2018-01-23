@@ -327,9 +327,7 @@ enum Overflow {
 /// See also:
 ///
 ///  * [RenderFlow]
-class RenderStack extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, StackParentData>,
+class RenderStack extends RenderBoxContainerRenderObjectMixin<RenderBox, StackParentData> with
         RenderBoxContainerDefaultsMixin<RenderBox, StackParentData> {
   /// Creates a stack render object.
   ///

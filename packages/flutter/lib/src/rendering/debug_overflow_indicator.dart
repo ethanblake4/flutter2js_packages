@@ -121,7 +121,7 @@ abstract class DebugOverflowIndicatorMixin implements RenderObject {
 
   // Set to true to trigger a debug message in the console upon
   // the next paint call.  Will be reset after each paint.
-  bool _overflowReportNeeded = true;
+  bool overflowReportNeeded = true;
 
   String _formatPixels(double value) {
     assert(value > 0.0);
@@ -309,19 +309,22 @@ abstract class DebugOverflowIndicatorMixin implements RenderObject {
       context.canvas.restore();
     }
 
-    if (_overflowReportNeeded) {
-      _overflowReportNeeded = false;
+    if (overflowReportNeeded) {
+      overflowReportNeeded = false;
       _reportOverflow(overflow, overflowHints);
     }
   }
 
-  @override
-  void reassemble() {
-    super.reassemble();
-    // Users expect error messages to be shown again after hot reload.
-    assert(() {
-      _overflowReportNeeded = true;
-      return true;
-    }());
-  }
+  //
+  // Flutter2js: This must be manually added until Dart2js supports mixins
+  //
+//  @override
+//  void reassemble() {
+//    super.reassemble();
+//    // Users expect error messages to be shown again after hot reload.
+//    assert(() {
+//      _overflowReportNeeded = true;
+//      return true;
+//    }());
+//  }
 }

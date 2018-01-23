@@ -15,6 +15,7 @@ import 'package:vector_math/vector_math_64.dart';
 import 'binding.dart';
 import 'debug.dart';
 import 'layer.dart';
+import 'box.dart';
 
 export 'package:flutter/foundation.dart'
     show
@@ -2670,10 +2671,9 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject>
   /// The next sibling in the parent's child list.
   ChildType nextSibling;
 
+  // Dart2js: Must be manually added
   /// Clear the sibling pointers.
-  @override
-  void detach() {
-    super.detach();
+  void detach_ContainerParentDataMixin() {
     if (previousSibling != null) {
       final ContainerParentDataMixin<ChildType> previousSiblingParentData =
           previousSibling.parentData;
@@ -2693,6 +2693,33 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject>
   }
 }
 
+// Dart2js: A helper
+abstract class RenderBoxContainerRenderObjectMixin<ChildType extends RenderObject, ParentDataType extends ContainerParentDataMixin<ChildType>> extends RenderBox with ContainerRenderObjectMixin<ChildType, ParentDataType> {
+  // Flutter2js: This must be manually added until Dart2js supports mixins.
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    ChildType child = _firstChild;
+    while (child != null) {
+      child.attach(owner);
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  // Flutter2js: This must be manually added until Dart2js supports mixins.
+  @override
+  void detach() {
+    super.detach();
+    ChildType child = _firstChild;
+    while (child != null) {
+      child.detach();
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+}
+
 /// Generic mixin for render objects with a list of children.
 ///
 /// Provides a child model for a render object subclass that has a doubly-linked
@@ -2700,9 +2727,6 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject>
 abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
         ParentDataType extends ContainerParentDataMixin<ChildType>>
     implements RenderObject {
-  // This class is intended to be used as a mixin, and should not be
-  // extended directly.
-  factory ContainerRenderObjectMixin._() => null;
 
   bool _debugUltimatePreviousSiblingOf(ChildType child, {ChildType equals}) {
     ParentDataType childParentData = child.parentData;
@@ -2899,27 +2923,30 @@ abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
     markNeedsLayout();
   }
 
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    ChildType child = _firstChild;
-    while (child != null) {
-      child.attach(owner);
-      final ParentDataType childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
-
-  @override
-  void detach() {
-    super.detach();
-    ChildType child = _firstChild;
-    while (child != null) {
-      child.detach();
-      final ParentDataType childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
+  //
+  // Flutter2js: This must be manually added until Dart2js supports mixins.
+  //
+//  @override
+//  void attach(PipelineOwner owner) {
+//    super.attach(owner);
+//    ChildType child = _firstChild;
+//    while (child != null) {
+//      child.attach(owner);
+//      final ParentDataType childParentData = child.parentData;
+//      child = childParentData.nextSibling;
+//    }
+//  }
+//
+//  @override
+//  void detach() {
+//    super.detach();
+//    ChildType child = _firstChild;
+//    while (child != null) {
+//      child.detach();
+//      final ParentDataType childParentData = child.parentData;
+//      child = childParentData.nextSibling;
+//    }
+//  }
 
   @override
   void redepthChildren() {

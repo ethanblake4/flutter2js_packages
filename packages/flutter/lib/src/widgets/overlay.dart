@@ -511,6 +511,29 @@ class _TheatreElement extends RenderObjectElement {
 // of zombie children without changing their parent data objects.
 class _RenderTheatre extends RenderProxyBoxMixin
     with ContainerRenderObjectMixin<RenderBox, StackParentData> {
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    RenderBox child = this.firstChild;
+    while (child != null) {
+      child.attach(owner);
+      final StackParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    RenderBox child = this.firstChild;
+    while (child != null) {
+      child.detach();
+      final StackParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
   @override
   void setupParentData(RenderObject child) {
     if (child.parentData is! StackParentData)

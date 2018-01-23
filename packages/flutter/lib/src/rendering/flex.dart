@@ -262,11 +262,21 @@ typedef double _ChildSizingFunction(RenderBox child, double extent);
 ///
 ///  * [Flex], the widget equivalent.
 ///  * [Row] and [Column], direction-specific variants of [Flex].
-class RenderFlex extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, FlexParentData>,
+class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexParentData> with
         RenderBoxContainerDefaultsMixin<RenderBox, FlexParentData>,
         DebugOverflowIndicatorMixin {
+
+  // Dart2js: Manually added from DebugOverflowIndicatorMixin
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Users expect error messages to be shown again after hot reload.
+    assert(() {
+      overflowReportNeeded = true;
+      return true;
+    }());
+  }
+
   /// Creates a flex render object.
   ///
   /// By default, the flex layout is horizontal and children are aligned to the

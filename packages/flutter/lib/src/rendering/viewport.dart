@@ -75,9 +75,9 @@ abstract class RenderAbstractViewport extends RenderObject {
 ///    placed inside a [RenderSliver] (the opposite of this class).
 abstract class RenderViewportBase<
         ParentDataClass extends ContainerParentDataMixin<RenderSliver>>
-    extends RenderBox
-    with ContainerRenderObjectMixin<RenderSliver, ParentDataClass>
+    extends RenderBoxContainerRenderObjectMixin<RenderSliver, ParentDataClass>
     implements RenderAbstractViewport {
+
   /// Initializes fields for subclasses.
   RenderViewportBase({
     AxisDirection axisDirection: AxisDirection.down,

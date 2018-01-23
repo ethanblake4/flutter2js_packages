@@ -22,9 +22,7 @@ typedef double _ChildSizingFunction(RenderBox child);
 /// its children. Because [RenderListBody] boxes expand in the main axis, they
 /// must be given unlimited space in the main axis, typically by being contained
 /// in a viewport with a scrolling direction that matches the box's main axis.
-class RenderListBody extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, ListBodyParentData>,
+class RenderListBody extends RenderBoxContainerRenderObjectMixin<RenderBox, ListBodyParentData> with
         RenderBoxContainerDefaultsMixin<RenderBox, ListBodyParentData> {
   /// Creates a render object that arranges its children sequentially along a
   /// given axis.

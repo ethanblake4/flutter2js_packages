@@ -317,8 +317,7 @@ class EditableText extends StatefulWidget {
 }
 
 /// State for a [EditableText].
-class EditableTextState extends State<EditableText>
-    with AutomaticKeepAliveClientMixin<EditableText>
+class EditableTextState extends AutomaticKeepAliveClientMixin<EditableText>
     implements TextInputClient {
   Timer _cursorTimer;
   final ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);

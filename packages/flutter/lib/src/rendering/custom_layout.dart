@@ -250,9 +250,7 @@ abstract class MultiChildLayoutDelegate {
 /// decide where to position each child. The delegate can also determine the
 /// size of the parent, but the size of the parent cannot depend on the sizes of
 /// the children.
-class RenderCustomMultiChildLayoutBox extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, MultiChildLayoutParentData>,
+class RenderCustomMultiChildLayoutBox extends RenderBoxContainerRenderObjectMixin<RenderBox, MultiChildLayoutParentData> with
         RenderBoxContainerDefaultsMixin<RenderBox, MultiChildLayoutParentData> {
   /// Creates a render object that customizes the layout of multiple children.
   ///

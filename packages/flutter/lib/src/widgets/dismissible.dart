@@ -176,8 +176,39 @@ class _DismissibleClipper extends CustomClipper<Rect> {
 
 enum _FlingGestureKind { none, forward, reverse }
 
-class _DismissibleState extends TickerProviderStateMixin<Dismissible>
-    with AutomaticKeepAliveClientMixin<Dismissible> {
+class _DismissibleState extends TickerProviderStateMixin<Dismissible> implements AutomaticKeepAliveClientMixin<Dismissible> {
+
+  KeepAliveHandle _keepAliveHandle;
+
+  void _ensureKeepAlive() {
+    assert(_keepAliveHandle == null);
+    _keepAliveHandle = new KeepAliveHandle();
+    new KeepAliveNotification(_keepAliveHandle).dispatch(context);
+  }
+
+  void _releaseKeepAlive() {
+    _keepAliveHandle.release();
+    _keepAliveHandle = null;
+  }
+
+  /// Ensures that any [AutomaticKeepAlive] ancestors are in a good state, by
+  /// firing a [KeepAliveNotification] or triggering the [KeepAliveHandle] as
+  /// appropriate.
+  @protected
+  void updateKeepAlive() {
+    if (wantKeepAlive) {
+      if (_keepAliveHandle == null) _ensureKeepAlive();
+    } else {
+      if (_keepAliveHandle != null) _releaseKeepAlive();
+    }
+  }
+
+  @override
+  void deactivate() {
+    if (_keepAliveHandle != null) _releaseKeepAlive();
+    super.deactivate();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -185,6 +216,7 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
         new AnimationController(duration: _kDismissDuration, vsync: this)
           ..addStatusListener(_handleDismissStatusChanged);
     _updateMoveAnimation();
+    if (wantKeepAlive) _ensureKeepAlive();
   }
 
   AnimationController _moveController;
@@ -442,7 +474,7 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // See AutomaticKeepAliveClientMixin.
+    if (wantKeepAlive && _keepAliveHandle == null) _ensureKeepAlive();
 
     assert(!_directionIsXAxis || debugCheckHasDirectionality(context));
 

@@ -101,9 +101,7 @@ class WrapParentData extends ContainerBoxParentData<RenderBox> {
 ///
 /// The runs themselves are then positioned in the cross axis according to the
 /// [runSpacing] and [runAlignment].
-class RenderWrap extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, WrapParentData>,
+class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapParentData> with
         RenderBoxContainerDefaultsMixin<RenderBox, WrapParentData> {
   /// Creates a wrap render object.
   ///

@@ -674,7 +674,14 @@ class SliverLogicalParentData extends ParentData {
 /// Parent data for slivers that have multiple children and that position their
 /// children using layout offsets.
 class SliverLogicalContainerParentData extends SliverLogicalParentData
-    with ContainerParentDataMixin<RenderSliver> {}
+    with ContainerParentDataMixin<RenderSliver> {
+  // Dart2js: Must be manually added
+  @override
+  void detach() {
+    super.detach();
+    detach_ContainerParentDataMixin();
+  }
+}
 
 /// Parent data structure used by parents of slivers that position their
 /// children using absolute coordinates.
@@ -707,7 +714,14 @@ class SliverPhysicalParentData extends ParentData {
 /// Parent data for slivers that have multiple children and that position their
 /// children using absolute coordinates.
 class SliverPhysicalContainerParentData extends SliverPhysicalParentData
-    with ContainerParentDataMixin<RenderSliver> {}
+    with ContainerParentDataMixin<RenderSliver> {
+  // Dart2js: Must be manually added
+  @override
+  void detach() {
+    super.detach();
+    detach_ContainerParentDataMixin();
+  }
+}
 
 String _debugCompareFloats(
     String labelA, double valueA, String labelB, double valueB) {
