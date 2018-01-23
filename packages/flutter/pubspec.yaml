@@ -18,6 +18,11 @@ dependencies:
   meta: '^1.1.1'
   vector_math: '^2.0.5'
 
+dependency_overrides:
+  flutter2js:
+    git:
+      url: git://github.com/jban332/flutter2js
+
 dev_dependencies:
-  mockito: ^2.2.0
-  test: ^0.12.0
+  mockito: '^2.2.0'
+  test: '^0.12.26'
