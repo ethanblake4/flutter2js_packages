@@ -70,6 +70,7 @@ class RenderImage extends RenderBox {
   /// The image to display.
   ui.Image get image => _image;
   ui.Image _image;
+
   set image(ui.Image value) {
     if (value == _image) return;
     _image = value;
@@ -83,6 +84,7 @@ class RenderImage extends RenderBox {
   /// aspect ratio.
   double get width => _width;
   double _width;
+
   set width(double value) {
     if (value == _width) return;
     _width = value;
@@ -95,6 +97,7 @@ class RenderImage extends RenderBox {
   /// aspect ratio.
   double get height => _height;
   double _height;
+
   set height(double value) {
     if (value == _height) return;
     _height = value;
@@ -106,6 +109,7 @@ class RenderImage extends RenderBox {
   /// Used when determining the best display size for the image.
   double get scale => _scale;
   double _scale;
+
   set scale(double value) {
     assert(value != null);
     if (value == _scale) return;
@@ -126,6 +130,7 @@ class RenderImage extends RenderBox {
   /// If non-null, this color is blended with each image pixel using [colorBlendMode].
   Color get color => _color;
   Color _color;
+
   set color(Color value) {
     if (value == _color) return;
     _color = value;
@@ -143,6 +148,7 @@ class RenderImage extends RenderBox {
   ///  * [BlendMode], which includes an illustration of the effect of each blend mode.
   BlendMode get colorBlendMode => _colorBlendMode;
   BlendMode _colorBlendMode;
+
   set colorBlendMode(BlendMode value) {
     if (value == _colorBlendMode) return;
     _colorBlendMode = value;
@@ -156,6 +162,7 @@ class RenderImage extends RenderBox {
   /// [paintImage].
   BoxFit get fit => _fit;
   BoxFit _fit;
+
   set fit(BoxFit value) {
     if (value == _fit) return;
     _fit = value;
@@ -168,6 +175,7 @@ class RenderImage extends RenderBox {
   /// not be null.
   AlignmentGeometry get alignment => _alignment;
   AlignmentGeometry _alignment;
+
   set alignment(AlignmentGeometry value) {
     assert(value != null);
     if (value == _alignment) return;
@@ -178,6 +186,7 @@ class RenderImage extends RenderBox {
   /// How to repeat this image if it doesn't fill its layout bounds.
   ImageRepeat get repeat => _repeat;
   ImageRepeat _repeat;
+
   set repeat(ImageRepeat value) {
     assert(value != null);
     if (value == _repeat) return;
@@ -194,6 +203,7 @@ class RenderImage extends RenderBox {
   /// the center slice will be stretched only vertically.
   Rect get centerSlice => _centerSlice;
   Rect _centerSlice;
+
   set centerSlice(Rect value) {
     if (value == _centerSlice) return;
     _centerSlice = value;
@@ -216,6 +226,7 @@ class RenderImage extends RenderBox {
   /// If this is set to true, [textDirection] must not be null.
   bool get matchTextDirection => _matchTextDirection;
   bool _matchTextDirection;
+
   set matchTextDirection(bool value) {
     assert(value != null);
     if (value == _matchTextDirection) return;
@@ -230,6 +241,7 @@ class RenderImage extends RenderBox {
   /// depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;

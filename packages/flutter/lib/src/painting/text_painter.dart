@@ -67,6 +67,7 @@ class TextPainter {
   /// This and [textDirection] must be non-null before you call [layout].
   TextSpan get text => _text;
   TextSpan _text;
+
   set text(TextSpan value) {
     assert(value == null || value.debugAssertIsValid());
     if (_text == value) return;
@@ -83,6 +84,7 @@ class TextPainter {
   /// The [textAlign] property must not be null. It defaults to [TextAlign.start].
   TextAlign get textAlign => _textAlign;
   TextAlign _textAlign;
+
   set textAlign(TextAlign value) {
     assert(value != null);
     if (_textAlign == value) return;
@@ -108,6 +110,7 @@ class TextPainter {
   /// This and [text] must be non-null before you call [layout].
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
@@ -125,6 +128,7 @@ class TextPainter {
   /// After this is set, you must call [layout] before the next call to [paint].
   double get textScaleFactor => _textScaleFactor;
   double _textScaleFactor;
+
   set textScaleFactor(double value) {
     assert(value != null);
     if (_textScaleFactor == value) return;
@@ -152,6 +156,7 @@ class TextPainter {
   /// U+2026 HORIZONTAL ELLIPSIS (…).
   String get ellipsis => _ellipsis;
   String _ellipsis;
+
   set ellipsis(String value) {
     assert(value == null || value.isNotEmpty);
     if (_ellipsis == value) return;

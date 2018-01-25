@@ -31,6 +31,7 @@ class _TextSelectionToolbar extends StatelessWidget {
       : super(key: key);
 
   final TextSelectionDelegate delegate;
+
   TextEditingValue get value => delegate.textEditingValue;
 
   final VoidCallback handleCut;

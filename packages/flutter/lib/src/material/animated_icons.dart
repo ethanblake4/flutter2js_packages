@@ -17,10 +17,12 @@ import 'package:flutter/widgets.dart';
 
 // Public API.
 part 'animated_icons/animated_icons.dart';
+
 // Provides a public interface for referring to the private icon
 // implementations.
 part 'animated_icons/animated_icons_data.dart';
 
 // Animated icons data files.
 part 'animated_icons/data/arrow_menu.g.dart';
+
 part 'animated_icons/data/menu_arrow.g.dart';

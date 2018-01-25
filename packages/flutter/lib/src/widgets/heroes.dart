@@ -226,7 +226,8 @@ class _HeroFlightManifest {
 
   @override
   String toString() {
-    return '_HeroFlightManifest($type hero: $tag from: ${fromRoute.settings} to: ${toRoute.settings})';
+    return '_HeroFlightManifest($type hero: $tag from: ${fromRoute
+        .settings} to: ${toRoute.settings})';
   }
 }
 
@@ -432,7 +433,8 @@ class _HeroFlight {
     final RouteSettings from = manifest.fromRoute.settings;
     final RouteSettings to = manifest.toRoute.settings;
     final Object tag = manifest.tag;
-    return 'HeroFlight(for: $tag, from: $from, to: $to ${_proxyAnimation.parent})';
+    return 'HeroFlight(for: $tag, from: $from, to: $to ${_proxyAnimation
+        .parent})';
   }
 }
 

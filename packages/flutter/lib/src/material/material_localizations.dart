@@ -416,7 +416,8 @@ class DefaultMaterialLocalizations implements MaterialLocalizations {
   @override
   String formatFullDate(DateTime date) {
     final String month = _months[date.month - DateTime.JANUARY];
-    return '${_weekdays[date.weekday - DateTime.MONDAY]}, $month ${date.day}, ${date.year}';
+    return '${_weekdays[date.weekday - DateTime.MONDAY]}, $month ${date
+        .day}, ${date.year}';
   }
 
   @override

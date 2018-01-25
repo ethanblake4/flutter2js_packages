@@ -39,20 +39,6 @@ class RenderSliverPadding extends RenderSliver
     this.child = child;
   }
 
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
-  }
-
   EdgeInsets _resolvedPadding;
 
   void _resolve() {
@@ -72,6 +58,7 @@ class RenderSliverPadding extends RenderSliver
   /// must not be null.
   EdgeInsetsGeometry get padding => _padding;
   EdgeInsetsGeometry _padding;
+
   set padding(EdgeInsetsGeometry value) {
     assert(value != null);
     assert(padding.isNonNegative);
@@ -86,6 +73,7 @@ class RenderSliverPadding extends RenderSliver
   /// to a value that does not depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;

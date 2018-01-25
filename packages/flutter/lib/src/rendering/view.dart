@@ -47,7 +47,8 @@ class ViewConfiguration {
 /// The view represents the total output surface of the render tree and handles
 /// bootstrapping the rendering pipeline. The view has a unique child
 /// [RenderBox], which is required to fill the entire output surface.
-class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox> {
+class RenderView extends RenderObject
+    with RenderObjectWithChildMixin<RenderBox> {
   /// Creates the root of the render tree.
   ///
   /// Typically created by the binding (e.g., [RendererBinding]).
@@ -60,20 +61,6 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
   })
       : _configuration = configuration {
     this.child = child;
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
   }
 
   /// The amount of time the screen rotation animation should last (aspirational).

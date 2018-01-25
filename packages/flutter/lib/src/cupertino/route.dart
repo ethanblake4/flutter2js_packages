@@ -310,6 +310,7 @@ class CupertinoPageTransition extends StatelessWidget {
 
   // When this page is coming in to cover another page.
   final Animation<Offset> _primaryPositionAnimation;
+
   // When this page is becoming covered by another page.
   final Animation<Offset> _secondaryPositionAnimation;
   final Animation<Decoration> _primaryShadowAnimation;

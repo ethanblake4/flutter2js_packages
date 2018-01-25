@@ -65,5 +65,6 @@ class IconData {
 
   @override
   String toString() =>
-      'IconData(U+${codePoint.toRadixString(16).toUpperCase().padLeft(5, '0')})';
+      'IconData(U+${codePoint.toRadixString(16).toUpperCase().padLeft(
+          5, '0')})';
 }

@@ -536,6 +536,7 @@ class SemanticsNode extends AbstractNode with DiagnosticableTreeMixin {
   }
 
   static int _lastIdentifier = 0;
+
   static int _generateNewId() {
     _lastIdentifier += 1;
     return _lastIdentifier;
@@ -564,6 +565,7 @@ class SemanticsNode extends AbstractNode with DiagnosticableTreeMixin {
   /// parent).
   Matrix4 get transform => _transform;
   Matrix4 _transform;
+
   set transform(Matrix4 value) {
     if (!MatrixUtils.matrixEquals(_transform, value)) {
       _transform = MatrixUtils.isIdentity(value) ? null : value;
@@ -574,6 +576,7 @@ class SemanticsNode extends AbstractNode with DiagnosticableTreeMixin {
   /// The bounding box for this node in its coordinate system.
   Rect get rect => _rect;
   Rect _rect = Rect.zero;
+
   set rect(Rect value) {
     assert(value != null);
     if (_rect != value) {
@@ -605,6 +608,7 @@ class SemanticsNode extends AbstractNode with DiagnosticableTreeMixin {
   /// Whether this node merges its semantic information into an ancestor node.
   bool get isMergedIntoParent => _isMergedIntoParent;
   bool _isMergedIntoParent = false;
+
   set isMergedIntoParent(bool value) {
     assert(value != null);
     if (_isMergedIntoParent == value) return;
@@ -646,7 +650,8 @@ class SemanticsNode extends AbstractNode with DiagnosticableTreeMixin {
         final StringBuffer mutationErrors = new StringBuffer();
         if (newChildren.length != _debugPreviousSnapshot.length) {
           mutationErrors.writeln(
-              'The list\'s length has changed from ${_debugPreviousSnapshot.length} '
+              'The list\'s length has changed from ${_debugPreviousSnapshot
+                  .length} '
               'to ${newChildren.length}.');
         } else {
           for (int i = 0; i < newChildren.length; i++) {
@@ -825,6 +830,7 @@ class SemanticsNode extends AbstractNode with DiagnosticableTreeMixin {
   // DIRTY MANAGEMENT
 
   bool _dirty = false;
+
   void _markDirty() {
     if (_dirty) return;
     _dirty = true;
@@ -1351,6 +1357,7 @@ class SemanticsConfiguration {
   /// This has to be true if [isMergingDescendantsIntoOneNode] is also true.
   bool get isSemanticBoundary => _isSemanticBoundary;
   bool _isSemanticBoundary = false;
+
   set isSemanticBoundary(bool value) {
     assert(!isMergingSemanticsOfDescendants || value);
     _isSemanticBoundary = value;
@@ -1456,6 +1463,7 @@ class SemanticsConfiguration {
   /// own semantic [onTap] handler that follows this principle.
   VoidCallback get onTap => _onTap;
   VoidCallback _onTap;
+
   set onTap(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.tap, value);
     _onTap = value;
@@ -1471,6 +1479,7 @@ class SemanticsConfiguration {
   /// second tap.
   VoidCallback get onLongPress => _onLongPress;
   VoidCallback _onLongPress;
+
   set onLongPress(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.longPress, value);
     _onLongPress = value;
@@ -1489,6 +1498,7 @@ class SemanticsConfiguration {
   /// be provided.
   VoidCallback get onScrollLeft => _onScrollLeft;
   VoidCallback _onScrollLeft;
+
   set onScrollLeft(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.scrollLeft, value);
     _onScrollLeft = value;
@@ -1507,6 +1517,7 @@ class SemanticsConfiguration {
   /// be provided.
   VoidCallback get onScrollRight => _onScrollRight;
   VoidCallback _onScrollRight;
+
   set onScrollRight(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.scrollRight, value);
     _onScrollRight = value;
@@ -1525,6 +1536,7 @@ class SemanticsConfiguration {
   /// be provided.
   VoidCallback get onScrollUp => _onScrollUp;
   VoidCallback _onScrollUp;
+
   set onScrollUp(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.scrollUp, value);
     _onScrollUp = value;
@@ -1543,6 +1555,7 @@ class SemanticsConfiguration {
   /// be provided.
   VoidCallback get onScrollDown => _onScrollDown;
   VoidCallback _onScrollDown;
+
   set onScrollDown(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.scrollDown, value);
     _onScrollDown = value;
@@ -1561,6 +1574,7 @@ class SemanticsConfiguration {
   /// volume up button.
   VoidCallback get onIncrease => _onIncrease;
   VoidCallback _onIncrease;
+
   set onIncrease(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.increase, value);
     _onIncrease = value;
@@ -1579,6 +1593,7 @@ class SemanticsConfiguration {
   /// volume down button.
   VoidCallback get onDecrease => _onDecrease;
   VoidCallback _onDecrease;
+
   set onDecrease(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.decrease, value);
     _onDecrease = value;
@@ -1595,6 +1610,7 @@ class SemanticsConfiguration {
   /// custom one via this setter.
   VoidCallback get onShowOnScreen => _onShowOnScreen;
   VoidCallback _onShowOnScreen;
+
   set onShowOnScreen(VoidCallback value) {
     _addArgumentlessAction(SemanticsAction.showOnScreen, value);
     _onShowOnScreen = value;
@@ -1610,6 +1626,7 @@ class SemanticsConfiguration {
   MoveCursorHandler get onMoveCursorForwardByCharacter =>
       _onMoveCursorForwardByCharacter;
   MoveCursorHandler _onMoveCursorForwardByCharacter;
+
   set onMoveCursorForwardByCharacter(MoveCursorHandler value) {
     assert(value != null);
     _addAction(SemanticsAction.moveCursorForwardByCharacter, (dynamic args) {
@@ -1630,6 +1647,7 @@ class SemanticsConfiguration {
   MoveCursorHandler get onMoveCursorBackwardByCharacter =>
       _onMoveCursorBackwardByCharacter;
   MoveCursorHandler _onMoveCursorBackwardByCharacter;
+
   set onMoveCursorBackwardByCharacter(MoveCursorHandler value) {
     assert(value != null);
     _addAction(SemanticsAction.moveCursorBackwardByCharacter, (dynamic args) {
@@ -1659,6 +1677,7 @@ class SemanticsConfiguration {
   /// Setting this to true requires that [isSemanticBoundary] is also true.
   bool get isMergingSemanticsOfDescendants => _isMergingSemanticsOfDescendants;
   bool _isMergingSemanticsOfDescendants = false;
+
   set isMergingSemanticsOfDescendants(bool value) {
     assert(isSemanticBoundary);
     _isMergingSemanticsOfDescendants = value;
@@ -1675,6 +1694,7 @@ class SemanticsConfiguration {
   /// The reading direction is given by [textDirection].
   String get label => _label;
   String _label = '';
+
   set label(String label) {
     assert(label != null);
     _label = label;
@@ -1698,6 +1718,7 @@ class SemanticsConfiguration {
   ///    [SemanticsAction.increase]
   String get value => _value;
   String _value = '';
+
   set value(String value) {
     assert(value != null);
     _value = value;
@@ -1713,6 +1734,7 @@ class SemanticsConfiguration {
   /// The reading direction is given by [textDirection].
   String get decreasedValue => _decreasedValue;
   String _decreasedValue = '';
+
   set decreasedValue(String decreasedValue) {
     assert(decreasedValue != null);
     _decreasedValue = decreasedValue;
@@ -1728,6 +1750,7 @@ class SemanticsConfiguration {
   /// The reading direction is given by [textDirection].
   String get increasedValue => _increasedValue;
   String _increasedValue = '';
+
   set increasedValue(String increasedValue) {
     assert(increasedValue != null);
     _increasedValue = increasedValue;
@@ -1744,6 +1767,7 @@ class SemanticsConfiguration {
   /// The reading direction is given by [textDirection].
   String get hint => _hint;
   String _hint = '';
+
   set hint(String hint) {
     assert(hint != null);
     _hint = hint;
@@ -1754,6 +1778,7 @@ class SemanticsConfiguration {
   /// [increasedValue], and [decreasedValue].
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection textDirection) {
     _textDirection = textDirection;
     _hasBeenAnnotated = true;
@@ -1761,6 +1786,7 @@ class SemanticsConfiguration {
 
   /// Whether the owning [RenderObject] is selected (true) or not (false).
   bool get isSelected => _hasFlag(SemanticsFlag.isSelected);
+
   set isSelected(bool value) {
     _setFlag(SemanticsFlag.isSelected, value);
   }
@@ -1779,6 +1805,7 @@ class SemanticsConfiguration {
   bool get isEnabled => _hasFlag(SemanticsFlag.hasEnabledState)
       ? _hasFlag(SemanticsFlag.isEnabled)
       : null;
+
   set isEnabled(bool value) {
     _setFlag(SemanticsFlag.hasEnabledState, true);
     _setFlag(SemanticsFlag.isEnabled, value);
@@ -1795,6 +1822,7 @@ class SemanticsConfiguration {
   bool get isChecked => _hasFlag(SemanticsFlag.hasCheckedState)
       ? _hasFlag(SemanticsFlag.isChecked)
       : null;
+
   set isChecked(bool value) {
     _setFlag(SemanticsFlag.hasCheckedState, true);
     _setFlag(SemanticsFlag.isChecked, value);
@@ -1807,24 +1835,28 @@ class SemanticsConfiguration {
   /// only one radio button in that group can be marked as [isChecked].
   bool get isInMutuallyExclusiveGroup =>
       _hasFlag(SemanticsFlag.isInMutuallyExclusiveGroup);
+
   set isInMutuallyExclusiveGroup(bool value) {
     _setFlag(SemanticsFlag.isInMutuallyExclusiveGroup, value);
   }
 
   /// Whether the owning [RenderObject] currently holds the user's focus.
   bool get isFocused => _hasFlag(SemanticsFlag.isFocused);
+
   set isFocused(bool value) {
     _setFlag(SemanticsFlag.isFocused, value);
   }
 
   /// Whether the owning [RenderObject] is a button (true) or not (false).
   bool get isButton => _hasFlag(SemanticsFlag.isButton);
+
   set isButton(bool value) {
     _setFlag(SemanticsFlag.isButton, value);
   }
 
   /// Whether the owning [RenderObject] is a text field.
   bool get isTextField => _hasFlag(SemanticsFlag.isTextField);
+
   set isTextField(bool value) {
     _setFlag(SemanticsFlag.isTextField, value);
   }
@@ -1864,6 +1896,7 @@ class SemanticsConfiguration {
   // INTERNAL FLAG MANAGEMENT
 
   int _flags = 0;
+
   void _setFlag(SemanticsFlag flag, bool value) {
     if (value) {
       _flags |= flag.index;

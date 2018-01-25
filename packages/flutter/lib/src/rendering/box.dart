@@ -506,8 +506,9 @@ class BoxConstraints extends Constraints {
         } else {
           whichFields = affectedFieldsList.single;
         }
-        throwError(
-            'BoxConstraints has ${affectedFieldsList.length == 1 ? 'a NaN value' : 'NaN values' } in $whichFields.');
+        throwError('BoxConstraints has ${affectedFieldsList.length == 1
+            ? 'a NaN value'
+            : 'NaN values' } in $whichFields.');
       }
       if (minWidth < 0.0 && minHeight < 0.0)
         throwError(
@@ -625,12 +626,36 @@ class BoxParentData extends ParentData {
 /// This is a convenience class that mixes in the relevant classes with
 /// the relevant type arguments.
 abstract class ContainerBoxParentData<ChildType extends RenderObject>
-    extends BoxParentData with ContainerParentDataMixin<ChildType> {
-  // Dart2js: Must be manually added
+    extends BoxParentData implements ContainerParentDataMixin<ChildType> {
+  //
+  // Flutter2js: Copy-pasted from ContainerParentDataMixin
+  //
+  /// The previous sibling in the parent's child list.
+  ChildType previousSibling;
+
+  /// The next sibling in the parent's child list.
+  ChildType nextSibling;
+
+  /// Clear the sibling pointers.
   @override
   void detach() {
     super.detach();
-    detach_ContainerParentDataMixin();
+    if (previousSibling != null) {
+      final ContainerParentDataMixin<ChildType> previousSiblingParentData =
+          previousSibling.parentData;
+      assert(previousSibling != this);
+      assert(previousSiblingParentData.nextSibling == this);
+      previousSiblingParentData.nextSibling = nextSibling;
+    }
+    if (nextSibling != null) {
+      final ContainerParentDataMixin<ChildType> nextSiblingParentData =
+          nextSibling.parentData;
+      assert(nextSibling != this);
+      assert(nextSiblingParentData.previousSibling == this);
+      nextSiblingParentData.previousSibling = previousSibling;
+    }
+    previousSibling = null;
+    nextSibling = null;
   }
 }
 
@@ -1487,6 +1512,7 @@ abstract class RenderBox extends RenderObject {
   }
 
   Size _size;
+
   @protected
 
   /// Setting the size, in checked mode, triggers some analysis of the render box,
@@ -1608,6 +1634,7 @@ abstract class RenderBox extends RenderObject {
 
   Map<TextBaseline, double> _cachedBaselines;
   static bool _debugDoingBaseline = false;
+
   static bool _debugSetDoingBaseline(bool value) {
     _debugDoingBaseline = value;
     return true;
@@ -1800,7 +1827,9 @@ abstract class RenderBox extends RenderObject {
           assert(failureCount > 0);
           throw new FlutterError(
               'The intrinsic dimension methods of the $runtimeType class returned values that violate the intrinsic protocol contract.\n'
-              'The following ${failureCount > 1 ? "failures" : "failure"} was detected:\n'
+              'The following ${failureCount > 1
+                  ? "failures"
+                  : "failure"} was detected:\n'
               '$failures'
               'If you are not writing your own RenderBox subclass, then this is not\n'
               'your fault. Contact support: https://github.com/flutter/flutter/issues/new');
@@ -1950,7 +1979,8 @@ abstract class RenderBox extends RenderObject {
             'children all use BoxParentData objects for their parentData field. '
             'Since $runtimeType does not in fact use that ParentData class for its children, it must '
             'provide an implementation of applyPaintTransform that supports the specific ParentData '
-            'subclass used by its children (which apparently is ${child.parentData.runtimeType}).');
+            'subclass used by its children (which apparently is ${child
+                .parentData.runtimeType}).');
       }
       return true;
     }());

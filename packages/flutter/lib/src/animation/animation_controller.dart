@@ -525,6 +525,7 @@ class AnimationController extends Animation<double>
   }
 
   AnimationStatus _lastReportedStatus = AnimationStatus.dismissed;
+
   void _checkStatusChanged() {
     final AnimationStatus newStatus = status;
     if (_lastReportedStatus != newStatus) {

@@ -162,7 +162,7 @@ class ImageConfiguration {
 /// The type argument does not have to be specified when using the type as an
 /// argument (where any image provider is acceptable).
 ///
-/// The following image formats are supported: {@macro flutter.dart:ui.imageFormats}
+/// The following image formats are supported: {@macro flutter.package:flutter/ui.dart.imageFormats}
 ///
 /// ## Sample code
 ///
@@ -232,7 +232,7 @@ class ImageConfiguration {
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return new RawImage(
-///       image: _imageInfo?.image, // this is a dart:ui Image object
+///       image: _imageInfo?.image, // this is a package:flutter/ui.dart Image object
 ///       scale: _imageInfo?.scale ?? 1.0,
 ///     );
 ///   }
@@ -255,7 +255,7 @@ abstract class ImageProvider<T> {
     assert(configuration != null);
     final ImageStream stream = new ImageStream();
     T obtainedKey;
-    obtainKey(configuration).then<Null>((T key) {
+    obtainKey(configuration).then((T key) {
       obtainedKey = key;
       stream.setCompleter(PaintingBinding.instance.imageCache
           .putIfAbsent(key, () => load(key)));
@@ -265,7 +265,8 @@ abstract class ImageProvider<T> {
           stack: stack,
           library: 'services library',
           context: 'while resolving an image',
-          silent: true, // could be a network error or whatnot
+          silent: true,
+          // could be a network error or whatnot
           informationCollector: (StringBuffer information) {
             information.writeln('Image provider: $this');
             information.writeln('Image configuration: $configuration');
@@ -424,8 +425,8 @@ class NetworkImage extends ImageProvider<NetworkImage> {
     final http.Response response =
         await _httpClient.get(resolved, headers: headers);
     if (response == null || response.statusCode != 200)
-      throw new Exception(
-          'HTTP request failed, statusCode: ${response?.statusCode}, $resolved');
+      throw new Exception('HTTP request failed, statusCode: ${response
+          ?.statusCode}, $resolved');
 
     final Uint8List bytes = response.bodyBytes;
     if (bytes.lengthInBytes == 0)

@@ -216,6 +216,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
 
   bool get value => _value;
   bool _value;
+
   set value(bool value) {
     assert(value != null);
     if (value == _value) return;
@@ -232,6 +233,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
 
   TickerProvider get vsync => _vsync;
   TickerProvider _vsync;
+
   set vsync(TickerProvider value) {
     assert(value != null);
     if (value == _vsync) return;
@@ -242,6 +244,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
 
   Color get activeColor => _activeColor;
   Color _activeColor;
+
   set activeColor(Color value) {
     assert(value != null);
     if (value == _activeColor) return;
@@ -251,6 +254,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
 
   ValueChanged<bool> get onChanged => _onChanged;
   ValueChanged<bool> _onChanged;
+
   set onChanged(ValueChanged<bool> value) {
     if (value == _onChanged) return;
     final bool wasInteractive = isInteractive;
@@ -263,6 +267,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (_textDirection == value) return;

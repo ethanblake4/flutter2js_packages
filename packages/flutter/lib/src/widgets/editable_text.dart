@@ -422,11 +422,13 @@ class EditableTextState extends AutomaticKeepAliveClientMixin<EditableText>
   }
 
   TextEditingValue get _value => widget.controller.value;
+
   set _value(TextEditingValue value) {
     widget.controller.value = value;
   }
 
   bool get _hasFocus => widget.focusNode.hasFocus;
+
   bool get _isMultiline => widget.maxLines != 1;
 
   // Calculate the new scroll offset so the cursor remains visible.
@@ -630,7 +632,9 @@ class EditableTextState extends AutomaticKeepAliveClientMixin<EditableText>
     _textChangedSinceLastCaretUpdate = true;
     // TODO(abarth): Teach RenderEditable about ValueNotifier<TextEditingValue>
     // to avoid this setState().
-    setState(() {/* We use widget.controller.value in build(). */});
+    setState(() {
+      /* We use widget.controller.value in build(). */
+    });
   }
 
   void _handleFocusChanged() {

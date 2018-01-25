@@ -17,7 +17,7 @@ part of dart.ui;
 // which can not be rendered by Skia.
 
 // Update this list when changing the list of supported codecs.
-/// {@template flutter.dart:ui.imageFormats}
+/// {@template flutter.package:flutter/ui.dart.imageFormats}
 /// JPEG, PNG, GIF, Animated GIF, WebP, Animated WebP, BMP, and WBMP
 /// {@endtemplate}
 
@@ -1006,6 +1006,7 @@ typedef void ImageDecoderCallback(Image result);
 abstract class FrameInfo {
   /// The duration this frame should be shown.
   Duration get duration => new Duration(milliseconds: _durationMillis);
+
   int get _durationMillis;
 
   /// The [Image] object for this frame.
@@ -1084,6 +1085,7 @@ abstract class Path {
   ///
   /// Defaults to the non-zero winding rule, [PathFillType.nonZero].
   PathFillType get fillType;
+
   set fillType(PathFillType value);
 
   /// Starts a new subpath at the given coordinate.
@@ -1393,7 +1395,7 @@ abstract class Shader {}
 ///    [RadialGradient], as used by [BoxDecoration] et al, which works in
 ///    relative coordinates and can create a [Shader] representing the gradient
 ///    for a particular [Rect] on demand.
-///  * [dart:ui.Gradient], the low-level class used when dealing with the
+///  * [package:flutter/ui.dart.Gradient], the low-level class used when dealing with the
 ///    [Paint.shader] property directly, with its [new Gradient.linear] and [new
 ///    Gradient.radial] constructors.
 // These enum values must be kept in sync with SkShader::TileMode.
@@ -1917,7 +1919,8 @@ abstract class PictureRecorder {
   /// Creates a new idle PictureRecorder. To associate it with a
   /// [Canvas] and begin recording, pass this [PictureRecorder] to the
   /// [Canvas] constructor.
-  factory PictureRecorder() => flutter2js.PlatformPlugin.current.newPictureRecorder();
+  factory PictureRecorder() =>
+      flutter2js.PlatformPlugin.current.newPictureRecorder();
 
   /// Whether this object is currently recording commands.
   ///

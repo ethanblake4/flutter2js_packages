@@ -83,6 +83,7 @@ class _IsolateConfiguration<Q, R> {
     this.debugLabel,
     this.flowId,
   );
+
   final ComputeCallback<Q, R> callback;
   final Q message;
   final SendPort resultPort;

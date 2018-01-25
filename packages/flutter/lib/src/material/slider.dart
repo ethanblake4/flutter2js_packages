@@ -354,6 +354,7 @@ class _RenderSlider extends RenderBox {
 
   double get value => _value;
   double _value;
+
   set value(double newValue) {
     assert(newValue != null && newValue >= 0.0 && newValue <= 1.0);
     if (newValue == _value) return;
@@ -366,6 +367,7 @@ class _RenderSlider extends RenderBox {
 
   int get divisions => _divisions;
   int _divisions;
+
   set divisions(int value) {
     if (value == _divisions) return;
     _divisions = value;
@@ -374,6 +376,7 @@ class _RenderSlider extends RenderBox {
 
   String get label => _label;
   String _label;
+
   set label(String value) {
     if (value == _label) return;
     _label = value;
@@ -382,6 +385,7 @@ class _RenderSlider extends RenderBox {
 
   Color get activeColor => _activeColor;
   Color _activeColor;
+
   set activeColor(Color value) {
     if (value == _activeColor) return;
     _activeColor = value;
@@ -390,6 +394,7 @@ class _RenderSlider extends RenderBox {
 
   Color get inactiveColor => _inactiveColor;
   Color _inactiveColor;
+
   set inactiveColor(Color value) {
     if (value == _inactiveColor) return;
     _inactiveColor = value;
@@ -398,6 +403,7 @@ class _RenderSlider extends RenderBox {
 
   bool get thumbOpenAtMin => _thumbOpenAtMin;
   bool _thumbOpenAtMin;
+
   set thumbOpenAtMin(bool value) {
     if (value == _thumbOpenAtMin) return;
     _thumbOpenAtMin = value;
@@ -406,6 +412,7 @@ class _RenderSlider extends RenderBox {
 
   TextTheme get textTheme => _textTheme;
   TextTheme _textTheme;
+
   set textTheme(TextTheme value) {
     if (value == _textTheme) return;
     _textTheme = value;
@@ -414,6 +421,7 @@ class _RenderSlider extends RenderBox {
 
   double get textScaleFactor => _textScaleFactor;
   double _textScaleFactor;
+
   set textScaleFactor(double value) {
     if (value == _textScaleFactor) return;
     _textScaleFactor = value;
@@ -423,6 +431,7 @@ class _RenderSlider extends RenderBox {
 
   ValueChanged<double> get onChanged => _onChanged;
   ValueChanged<double> _onChanged;
+
   set onChanged(ValueChanged<double> value) {
     if (value == _onChanged) return;
     final bool wasInteractive = isInteractive;
@@ -435,6 +444,7 @@ class _RenderSlider extends RenderBox {
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (value == _textDirection) return;

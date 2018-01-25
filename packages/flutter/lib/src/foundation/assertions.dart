@@ -349,7 +349,8 @@ class FlutterError extends AssertionError {
       debugPrint(footer);
     } else {
       debugPrint(
-          'Another exception was thrown: ${details.exceptionAsString().split("\n")[0].trimLeft()}');
+          'Another exception was thrown: ${details.exceptionAsString().split(
+              "\n")[0].trimLeft()}');
     }
     _errorCount += 1;
   }
@@ -388,8 +389,8 @@ class FlutterError extends AssertionError {
         if (filteredPackages.contains(match.group(2))) {
           final Match packageMatch = packageParser.firstMatch(match.group(2));
           if (packageMatch != null && packageMatch.group(1) == 'package') {
-            skipped.add(
-                'package ${packageMatch.group(2)}'); // avoid "package package:foo"
+            skipped.add('package ${packageMatch.group(
+                    2)}'); // avoid "package package:foo"
           } else {
             skipped.add('package ${match.group(2)}');
           }

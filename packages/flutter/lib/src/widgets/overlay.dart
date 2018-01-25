@@ -79,6 +79,7 @@ class OverlayEntry {
   /// set.
   bool get opaque => _opaque;
   bool _opaque;
+
   set opaque(bool value) {
     if (_opaque == value) return;
     _opaque = value;
@@ -102,6 +103,7 @@ class OverlayEntry {
   /// from subsequent routes will be handled properly when they complete.
   bool get maintainState => _maintainState;
   bool _maintainState;
+
   set maintainState(bool value) {
     assert(_maintainState != null);
     if (_maintainState == value) return;
@@ -147,8 +149,8 @@ class OverlayEntry {
   }
 
   @override
-  String toString() =>
-      '${describeIdentity(this)}(opaque: $opaque; maintainState: $maintainState)';
+  String toString() => '${describeIdentity(
+          this)}(opaque: $opaque; maintainState: $maintainState)';
 }
 
 class _OverlayEntry extends StatefulWidget {
@@ -167,7 +169,9 @@ class _OverlayEntryState extends State<_OverlayEntry> {
   }
 
   void _markNeedsBuild() {
-    setState(() {/* the state that changed is in the builder */});
+    setState(() {
+      /* the state that changed is in the builder */
+    });
   }
 }
 
@@ -236,7 +240,8 @@ class Overlay extends StatefulWidget {
             ? '\nThe context from which that widget was searching for an overlay was:\n  $context'
             : '';
         throw new FlutterError('No Overlay widget found.\n'
-            '${debugRequiredFor.runtimeType} widgets require an Overlay widget ancestor for correct operation.\n'
+            '${debugRequiredFor
+            .runtimeType} widgets require an Overlay widget ancestor for correct operation.\n'
             'The most common way to add an Overlay to an application is to include a MaterialApp or Navigator widget in the runApp() call.\n'
             'The specific widget that failed to find an overlay was:\n'
             '  $debugRequiredFor'
@@ -302,7 +307,9 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
   void _remove(OverlayEntry entry) {
     if (mounted) {
       _entries.remove(entry);
-      setState(() {/* entry was removed */});
+      setState(() {
+        /* entry was removed */
+      });
     }
   }
 
@@ -509,9 +516,9 @@ class _TheatreElement extends RenderObjectElement {
 // This class uses [StackParentData] objects for its parent data so that the
 // children of its primary subtree's stack can be moved to this object's list
 // of zombie children without changing their parent data objects.
-class _RenderTheatre extends RenderProxyBoxMixin
-    with ContainerRenderObjectMixin<RenderBox, StackParentData> {
-
+class _RenderTheatre
+    extends RenderBoxContainerRenderObjectMixin<RenderBox, StackParentData>
+    with RenderObjectWithChildMixin<RenderStack>, RenderProxyBoxMixin {
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);

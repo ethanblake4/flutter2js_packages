@@ -100,6 +100,7 @@ abstract class RenderToggleable extends RenderConstrainedBox {
   /// The [TickerProvider] for the [AnimationController]s that run the animations.
   TickerProvider get vsync => _vsync;
   TickerProvider _vsync;
+
   set vsync(TickerProvider value) {
     assert(value != null);
     if (value == _vsync) return;
@@ -115,6 +116,7 @@ abstract class RenderToggleable extends RenderConstrainedBox {
   /// the new value.
   bool get value => _value;
   bool _value;
+
   set value(bool value) {
     assert(value != null);
     if (value == _value) return;
@@ -134,6 +136,7 @@ abstract class RenderToggleable extends RenderConstrainedBox {
   /// For example, a checkbox should use this color when checked.
   Color get activeColor => _activeColor;
   Color _activeColor;
+
   set activeColor(Color value) {
     assert(value != null);
     if (value == _activeColor) return;
@@ -146,6 +149,7 @@ abstract class RenderToggleable extends RenderConstrainedBox {
   /// For example, a checkbox should use this color when unchecked.
   Color get inactiveColor => _inactiveColor;
   Color _inactiveColor;
+
   set inactiveColor(Color value) {
     assert(value != null);
     if (value == _inactiveColor) return;
@@ -166,6 +170,7 @@ abstract class RenderToggleable extends RenderConstrainedBox {
   /// displayed using a grey color and its value cannot be changed.
   ValueChanged<bool> get onChanged => _onChanged;
   ValueChanged<bool> _onChanged;
+
   set onChanged(ValueChanged<bool> value) {
     if (value == _onChanged) return;
     final bool wasInteractive = isInteractive;

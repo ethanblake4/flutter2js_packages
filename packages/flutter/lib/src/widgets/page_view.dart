@@ -209,6 +209,7 @@ class _PagePosition extends ScrollPositionWithSingleContext {
 
   double get viewportFraction => _viewportFraction;
   double _viewportFraction;
+
   set viewportFraction(double value) {
     if (_viewportFraction == value) return;
     final double oldPage = page;

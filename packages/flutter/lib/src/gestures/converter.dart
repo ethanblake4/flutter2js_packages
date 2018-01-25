@@ -37,7 +37,7 @@ class _PointerState {
 /// Converts from engine pointer data to framework pointer events.
 ///
 /// This takes [PointerDataPacket] objects, as received from the engine via
-/// [dart:ui.Window.onPointerDataPacket], and converts them to [PointerEvent]
+/// [package:flutter/ui.dart.Window.onPointerDataPacket], and converts them to [PointerEvent]
 /// objects.
 class PointerEventConverter {
   // Map from platform pointer identifiers to PointerEvent pointer identifiers.
@@ -52,7 +52,7 @@ class PointerEventConverter {
   /// Expand the given packet of pointer data into a sequence of framework pointer events.
   ///
   /// The `devicePixelRatio` argument (usually given the value from
-  /// [dart:ui.Window.devicePixelRatio]) is used to convert the incoming data
+  /// [package:flutter/ui.dart.Window.devicePixelRatio]) is used to convert the incoming data
   /// from physical coordinates to logical pixels. See the discussion at
   /// [PointerEvent] for more details on the [PointerEvent] coordinate space.
   static Iterable<PointerEvent> expand(

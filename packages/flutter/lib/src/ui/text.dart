@@ -297,18 +297,18 @@ class TextStyle {
   @override
   String toString() {
     return 'TextStyle('
-        'color: ${          color                  ?? "unspecified"}, '
-        'decoration: ${     decoration      ?? "unspecified"}, '
-        'decorationColor: ${ decorationColor??           "unspecified"}, '
+        'color: ${ color ?? "unspecified"}, '
+        'decoration: ${ decoration ?? "unspecified"}, '
+        'decorationColor: ${ decorationColor ?? "unspecified"}, '
         'decorationStyle: ${ decorationStyle ?? "unspecified"}, '
-        'fontWeight: ${     fontWeight ?? "unspecified"}, '
-        'fontStyle: ${      fontStyle ?? "unspecified"}, '
-        'textBaseline: ${   textBaseline ?? "unspecified"}, '
-        'fontFamily: ${     fontFamily ?? "unspecified"}, '
-        'fontSize: ${       fontSize ?? "unspecified"}, '
-        'letterSpacing: ${  letterSpacing ?? "unspecified"}, '
-        'wordSpacing: ${    wordSpacing ?? "unspecified"}, '
-        'height: ${         height ?? "unspecified"}'
+        'fontWeight: ${ fontWeight ?? "unspecified"}, '
+        'fontStyle: ${ fontStyle ?? "unspecified"}, '
+        'textBaseline: ${ textBaseline ?? "unspecified"}, '
+        'fontFamily: ${ fontFamily ?? "unspecified"}, '
+        'fontSize: ${ fontSize ?? "unspecified"}, '
+        'letterSpacing: ${ letterSpacing ?? "unspecified"}, '
+        'wordSpacing: ${ wordSpacing ?? "unspecified"}, '
+        'height: ${ height ?? "unspecified"}'
         ')';
   }
 }
@@ -403,15 +403,15 @@ class ParagraphStyle {
   @override
   String toString() {
     return '$runtimeType('
-        'textAlign: ${     textAlign ?? "unspecified"}, '
+        'textAlign: ${ textAlign ?? "unspecified"}, '
         'textDirection: ${ textDirection ?? "unspecified"}, '
-        'fontWeight: ${    fontWeight ?? "unspecified"}, '
-        'fontStyle: ${     fontStyle ?? "unspecified"}, '
-        'maxLines: ${      maxLines ?? "unspecified"}, '
-        'fontFamily: ${    fontFamily ?? "unspecified"}, '
-        'fontSize: ${      fontSize ?? "unspecified"}, '
-        'lineHeight: ${    lineHeight ?? "unspecified"}, '
-        'ellipsis: ${      ellipsis ?? "unspecified"}'
+        'fontWeight: ${ fontWeight ?? "unspecified"}, '
+        'fontStyle: ${ fontStyle ?? "unspecified"}, '
+        'maxLines: ${ maxLines ?? "unspecified"}, '
+        'fontFamily: ${ fontFamily ?? "unspecified"}, '
+        'fontSize: ${ fontSize ?? "unspecified"}, '
+        'lineHeight: ${ lineHeight ?? "unspecified"}, '
+        'ellipsis: ${ ellipsis ?? "unspecified"}'
         ')';
   }
 }
@@ -588,7 +588,9 @@ class TextBox {
 
   @override
   String toString() =>
-      'TextBox.fromLTRBD(${left.toStringAsFixed(1)}, ${top.toStringAsFixed(1)}, ${right.toStringAsFixed(1)}, ${bottom.toStringAsFixed(1)}, $direction)';
+      'TextBox.fromLTRBD(${left.toStringAsFixed(1)}, ${top.toStringAsFixed(
+          1)}, ${right.toStringAsFixed(1)}, ${bottom.toStringAsFixed(
+          1)}, $direction)';
 }
 
 /// Whether a [TextPosition] is visually upstream or downstream of its offset.

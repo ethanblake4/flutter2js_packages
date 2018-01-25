@@ -72,6 +72,7 @@ class TableRow {
 
 class _TableElementRow {
   const _TableElementRow({this.key, this.children});
+
   final LocalKey key;
   final List<Element> children;
 }

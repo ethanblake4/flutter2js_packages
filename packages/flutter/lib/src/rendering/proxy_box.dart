@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/ui.dart' as ui show ImageFilter, Gradient;
+
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/semantics.dart';
-import 'package:flutter/ui.dart' as ui show ImageFilter, Gradient;
+
 import 'package:vector_math/vector_math_64.dart';
 
 import 'box.dart';
@@ -33,7 +35,8 @@ export 'package:flutter/gestures.dart'
 /// the proxy box with its child. However, RenderProxyBox is a useful base class
 /// for render objects that wish to mimic most, but not all, of the properties
 /// of their child.
-class RenderProxyBox extends RenderProxyBoxMixin<RenderBox> {
+class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox>
+    implements RenderProxyBoxMixin {
   /// Creates a proxy render box.
   ///
   /// Proxy render boxes are rarely created directly because they simply proxy
@@ -44,6 +47,66 @@ class RenderProxyBox extends RenderProxyBoxMixin<RenderBox> {
     //ignore: avoid_init_to_null
     this.child = child;
   }
+
+  @override
+  void setupParentData(RenderObject child) {
+    // We don't actually use the offset argument in BoxParentData, so let's
+    // avoid allocating it at all.
+    if (child.parentData is! ParentData) child.parentData = new ParentData();
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    if (child != null) return child.getMinIntrinsicWidth(height);
+    return 0.0;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    if (child != null) return child.getMaxIntrinsicWidth(height);
+    return 0.0;
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    if (child != null) return child.getMinIntrinsicHeight(width);
+    return 0.0;
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    if (child != null) return child.getMaxIntrinsicHeight(width);
+    return 0.0;
+  }
+
+  @override
+  double computeDistanceToActualBaseline(TextBaseline baseline) {
+    if (child != null) return child.getDistanceToActualBaseline(baseline);
+    return super.computeDistanceToActualBaseline(baseline);
+  }
+
+  @override
+  void performLayout() {
+    if (child != null) {
+      child.layout(constraints, parentUsesSize: true);
+      size = child.size;
+    } else {
+      performResize();
+    }
+  }
+
+  @override
+  bool hitTestChildren(HitTestResult result, {Offset position}) {
+    return child?.hitTest(result, position: position) ?? false;
+  }
+
+  @override
+  void applyPaintTransform(RenderObject child, Matrix4 transform) {}
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child != null) context.paintChild(child, offset);
+  }
 }
 
 /// Implementation of [RenderProxyBox].
@@ -52,23 +115,11 @@ class RenderProxyBox extends RenderProxyBoxMixin<RenderBox> {
 /// of [RenderProxyBox] is desired but inheriting from [RenderProxyBox] is
 /// impractical (e.g. because you want to mix in other classes as well).
 // TODO(ianh): Remove this class once https://github.com/dart-lang/sdk/issues/15101 is fixed
-@optionalTypeArgs
-abstract class RenderProxyBoxMixin<T extends RenderBox> extends RenderBox
-    with RenderObjectWithChildMixin<RenderBox> {
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
-  }
+abstract class RenderProxyBoxMixin
+    implements RenderBox, RenderObjectWithChildMixin<RenderBox> {
+  // This class is intended to be used as a mixin, and should not be
+  // extended directly.
+  factory RenderProxyBoxMixin._() => null;
 
   @override
   void setupParentData(RenderObject child) {
@@ -207,6 +258,7 @@ class RenderConstrainedBox extends RenderProxyBox {
   /// Additional constraints to apply to [child] during layout
   BoxConstraints get additionalConstraints => _additionalConstraints;
   BoxConstraints _additionalConstraints;
+
   set additionalConstraints(BoxConstraints value) {
     assert(value != null);
     assert(value.debugAssertIsValid());
@@ -320,6 +372,7 @@ class RenderLimitedBox extends RenderProxyBox {
   /// The value to use for maxWidth if the incoming maxWidth constraint is infinite.
   double get maxWidth => _maxWidth;
   double _maxWidth;
+
   set maxWidth(double value) {
     assert(value != null && value >= 0.0);
     if (_maxWidth == value) return;
@@ -330,6 +383,7 @@ class RenderLimitedBox extends RenderProxyBox {
   /// The value to use for maxHeight if the incoming maxHeight constraint is infinite.
   double get maxHeight => _maxHeight;
   double _maxHeight;
+
   set maxHeight(double value) {
     assert(value != null && value >= 0.0);
     if (_maxHeight == value) return;
@@ -412,6 +466,7 @@ class RenderAspectRatio extends RenderProxyBox {
   /// a 16:9 width:height aspect ratio would have a value of 16.0/9.0.
   double get aspectRatio => _aspectRatio;
   double _aspectRatio;
+
   set aspectRatio(double value) {
     assert(value != null);
     assert(value > 0.0);
@@ -543,6 +598,7 @@ class RenderIntrinsicWidth extends RenderProxyBox {
   /// If non-null, force the child's width to be a multiple of this value.
   double get stepWidth => _stepWidth;
   double _stepWidth;
+
   set stepWidth(double value) {
     if (value == _stepWidth) return;
     _stepWidth = value;
@@ -552,6 +608,7 @@ class RenderIntrinsicWidth extends RenderProxyBox {
   /// If non-null, force the child's height to be a multiple of this value.
   double get stepHeight => _stepHeight;
   double _stepHeight;
+
   set stepHeight(double value) {
     if (value == _stepHeight) return;
     _stepHeight = value;
@@ -716,6 +773,7 @@ class RenderOpacity extends RenderProxyBox {
   /// expensive.
   double get opacity => _opacity;
   double _opacity;
+
   set opacity(double value) {
     assert(value != null);
     assert(value >= 0.0 && value <= 1.0);
@@ -786,6 +844,7 @@ class RenderAnimatedOpacity extends RenderProxyBox {
   /// consider [RenderOpacity] instead.
   Animation<double> get opacity => _opacity;
   Animation<double> _opacity;
+
   set opacity(Animation<double> value) {
     assert(value != null);
     if (_opacity == value) return;
@@ -877,6 +936,7 @@ class RenderShaderMask extends RenderProxyBox {
   // repaints when the ShaderCallback changes identity.
   ShaderCallback get shaderCallback => _shaderCallback;
   ShaderCallback _shaderCallback;
+
   set shaderCallback(ShaderCallback value) {
     assert(value != null);
     if (_shaderCallback == value) return;
@@ -890,6 +950,7 @@ class RenderShaderMask extends RenderProxyBox {
   /// to the child. Other blend modes can be used to create other effects.
   BlendMode get blendMode => _blendMode;
   BlendMode _blendMode;
+
   set blendMode(BlendMode value) {
     assert(value != null);
     if (_blendMode == value) return;
@@ -936,6 +997,7 @@ class RenderBackdropFilter extends RenderProxyBox {
   /// blur effect.
   ui.ImageFilter get filter => _filter;
   ui.ImageFilter _filter;
+
   set filter(ui.ImageFilter value) {
     assert(value != null);
     if (_filter == value) return;
@@ -1066,6 +1128,7 @@ abstract class _RenderCustomClip<T> extends RenderProxyBox {
   /// If non-null, determines which clip to use on the child.
   CustomClipper<T> get clipper => _clipper;
   CustomClipper<T> _clipper;
+
   set clipper(CustomClipper<T> newClipper) {
     if (_clipper == newClipper) return;
     final CustomClipper<T> oldClipper = _clipper;
@@ -1102,6 +1165,7 @@ abstract class _RenderCustomClip<T> extends RenderProxyBox {
   }
 
   T get _defaultClip;
+
   T _clip;
 
   @override
@@ -1122,6 +1186,7 @@ abstract class _RenderCustomClip<T> extends RenderProxyBox {
 
   Paint _debugPaint;
   TextPainter _debugText;
+
   @override
   void debugPaintSize(PaintingContext context, Offset offset) {
     assert(() {
@@ -1236,6 +1301,7 @@ class RenderClipRRect extends _RenderCustomClip<RRect> {
   /// This value is ignored if [clipper] is non-null.
   BorderRadius get borderRadius => _borderRadius;
   BorderRadius _borderRadius;
+
   set borderRadius(BorderRadius value) {
     assert(value != null);
     if (_borderRadius == value) return;
@@ -1426,6 +1492,7 @@ abstract class _RenderPhysicalModelBase<T> extends _RenderCustomClip<T> {
   /// The z-coordinate at which to place this material.
   double get elevation => _elevation;
   double _elevation;
+
   set elevation(double value) {
     assert(value != null);
     if (elevation == value) return;
@@ -1439,6 +1506,7 @@ abstract class _RenderPhysicalModelBase<T> extends _RenderCustomClip<T> {
   /// The shadow color.
   Color get shadowColor => _shadowColor;
   Color _shadowColor;
+
   set shadowColor(Color value) {
     assert(value != null);
     if (shadowColor == value) return;
@@ -1449,6 +1517,7 @@ abstract class _RenderPhysicalModelBase<T> extends _RenderCustomClip<T> {
   /// The background color.
   Color get color => _color;
   Color _color;
+
   set color(Color value) {
     assert(value != null);
     if (color == value) return;
@@ -1506,6 +1575,7 @@ class RenderPhysicalModel extends _RenderPhysicalModelBase<RRect> {
   /// of the rectangle.
   BoxShape get shape => _shape;
   BoxShape _shape;
+
   set shape(BoxShape value) {
     assert(value != null);
     if (shape == value) return;
@@ -1523,6 +1593,7 @@ class RenderPhysicalModel extends _RenderPhysicalModelBase<RRect> {
   /// The value null is treated like [BorderRadius.zero].
   BorderRadius get borderRadius => _borderRadius;
   BorderRadius _borderRadius;
+
   set borderRadius(BorderRadius value) {
     if (borderRadius == value) return;
     _borderRadius = value;
@@ -1750,6 +1821,7 @@ class RenderDecoratedBox extends RenderProxyBox {
   /// Commonly a [BoxDecoration].
   Decoration get decoration => _decoration;
   Decoration _decoration;
+
   set decoration(Decoration value) {
     assert(value != null);
     if (value == _decoration) return;
@@ -1762,6 +1834,7 @@ class RenderDecoratedBox extends RenderProxyBox {
   /// Whether to paint the box decoration behind or in front of the child.
   DecorationPosition get position => _position;
   DecorationPosition _position;
+
   set position(DecorationPosition value) {
     assert(value != null);
     if (value == _position) return;
@@ -1777,6 +1850,7 @@ class RenderDecoratedBox extends RenderProxyBox {
   /// direction-sensitive [Decoration]s for painting and hit-testing.
   ImageConfiguration get configuration => _configuration;
   ImageConfiguration _configuration;
+
   set configuration(ImageConfiguration value) {
     assert(value != null);
     if (value == _configuration) return;
@@ -1819,10 +1893,11 @@ class RenderDecoratedBox extends RenderProxyBox {
       _painter.paint(context.canvas, offset, filledConfiguration);
       assert(() {
         if (debugSaveCount != context.canvas.getSaveCount()) {
-          throw new FlutterError(
-              '${_decoration.runtimeType} painter had mismatching save and restore calls.\n'
+          throw new FlutterError('${_decoration
+                  .runtimeType} painter had mismatching save and restore calls.\n'
               'Before painting the decoration, the canvas save count was $debugSaveCount. '
-              'After painting it, the canvas save count was ${context.canvas.getSaveCount()}. '
+              'After painting it, the canvas save count was ${context.canvas
+                  .getSaveCount()}. '
               'Every call to save() or saveLayer() must be matched by a call to restore().\n'
               'The decoration was:\n'
               '  $decoration\n'
@@ -1875,6 +1950,7 @@ class RenderTransform extends RenderProxyBox {
   /// translation. This property is provided just for convenience.
   Offset get origin => _origin;
   Offset _origin;
+
   set origin(Offset value) {
     if (_origin == value) return;
     _origin = value;
@@ -1894,6 +1970,7 @@ class RenderTransform extends RenderProxyBox {
   /// [TextDirection.ltr], and `-1.0` if [textDirection] is [TextDirection.rtl].
   AlignmentGeometry get alignment => _alignment;
   AlignmentGeometry _alignment;
+
   set alignment(AlignmentGeometry value) {
     if (_alignment == value) return;
     _alignment = value;
@@ -1906,6 +1983,7 @@ class RenderTransform extends RenderProxyBox {
   /// to a value that does not depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
@@ -2062,6 +2140,7 @@ class RenderFittedBox extends RenderProxyBox {
   /// How to inscribe the child into the space allocated during layout.
   BoxFit get fit => _fit;
   BoxFit _fit;
+
   set fit(BoxFit value) {
     assert(value != null);
     if (_fit == value) return;
@@ -2080,6 +2159,7 @@ class RenderFittedBox extends RenderProxyBox {
   /// [textDirection] must not be null.
   AlignmentGeometry get alignment => _alignment;
   AlignmentGeometry _alignment;
+
   set alignment(AlignmentGeometry value) {
     assert(value != null);
     if (_alignment == value) return;
@@ -2094,6 +2174,7 @@ class RenderFittedBox extends RenderProxyBox {
   /// to a value that does not depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
@@ -2232,6 +2313,7 @@ class RenderFractionalTranslation extends RenderProxyBox {
   /// translation of one quarter the width of the child.
   Offset get translation => _translation;
   Offset _translation;
+
   set translation(Offset value) {
     assert(value != null);
     if (_translation == value) return;
@@ -2542,6 +2624,7 @@ class RenderIgnorePointer extends RenderProxyBox {
   /// will still consume space during layout and be visible during painting.
   bool get ignoring => _ignoring;
   bool _ignoring;
+
   set ignoring(bool value) {
     assert(value != null);
     if (value == _ignoring) return;
@@ -2556,6 +2639,7 @@ class RenderIgnorePointer extends RenderProxyBox {
   /// See [SemanticsNode] for additional information about the semantics tree.
   bool get ignoringSemantics => _ignoringSemantics;
   bool _ignoringSemantics;
+
   set ignoringSemantics(bool value) {
     if (value == _ignoringSemantics) return;
     final bool oldEffectiveValue = _effectiveIgnoringSemantics;
@@ -2612,6 +2696,7 @@ class RenderOffstage extends RenderProxyBox {
   /// If false, the child is included in the tree as normal.
   bool get offstage => _offstage;
   bool _offstage;
+
   set offstage(bool value) {
     assert(value != null);
     if (value == _offstage) return;
@@ -2801,6 +2886,7 @@ class RenderSemanticsGestureHandler extends RenderProxyBox {
   /// action will be omitted.
   Set<SemanticsAction> get validActions => _validActions;
   Set<SemanticsAction> _validActions;
+
   set validActions(Set<SemanticsAction> value) {
     if (setEquals<SemanticsAction>(value, _validActions)) return;
     _validActions = value;
@@ -2810,6 +2896,7 @@ class RenderSemanticsGestureHandler extends RenderProxyBox {
   /// Called when the user taps on the render object.
   GestureTapCallback get onTap => _onTap;
   GestureTapCallback _onTap;
+
   set onTap(GestureTapCallback value) {
     if (_onTap == value) return;
     final bool hadHandler = _onTap != null;
@@ -2820,6 +2907,7 @@ class RenderSemanticsGestureHandler extends RenderProxyBox {
   /// Called when the user presses on the render object for a long period of time.
   GestureLongPressCallback get onLongPress => _onLongPress;
   GestureLongPressCallback _onLongPress;
+
   set onLongPress(GestureLongPressCallback value) {
     if (_onLongPress == value) return;
     final bool hadHandler = _onLongPress != null;
@@ -2831,6 +2919,7 @@ class RenderSemanticsGestureHandler extends RenderProxyBox {
   GestureDragUpdateCallback get onHorizontalDragUpdate =>
       _onHorizontalDragUpdate;
   GestureDragUpdateCallback _onHorizontalDragUpdate;
+
   set onHorizontalDragUpdate(GestureDragUpdateCallback value) {
     if (_onHorizontalDragUpdate == value) return;
     final bool hadHandler = _onHorizontalDragUpdate != null;
@@ -2841,6 +2930,7 @@ class RenderSemanticsGestureHandler extends RenderProxyBox {
   /// Called when the user scrolls up or down.
   GestureDragUpdateCallback get onVerticalDragUpdate => _onVerticalDragUpdate;
   GestureDragUpdateCallback _onVerticalDragUpdate;
+
   set onVerticalDragUpdate(GestureDragUpdateCallback value) {
     if (_onVerticalDragUpdate == value) return;
     final bool hadHandler = _onVerticalDragUpdate != null;
@@ -3003,6 +3093,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// [explicitChildNodes].
   bool get container => _container;
   bool _container;
+
   set container(bool value) {
     assert(value != null);
     if (container == value) return;
@@ -3024,6 +3115,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// create semantic boundaries that are either writable or not for children.
   bool get explicitChildNodes => _explicitChildNodes;
   bool _explicitChildNodes;
+
   set explicitChildNodes(bool value) {
     assert(value != null);
     if (_explicitChildNodes == value) return;
@@ -3035,6 +3127,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// the [SemanticsNode.isChecked] semantic to the given value.
   bool get checked => _checked;
   bool _checked;
+
   set checked(bool value) {
     if (checked == value) return;
     _checked = value;
@@ -3045,6 +3138,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// the [SemanticsNode.isEnabled] semantic to the given value.
   bool get enabled => _enabled;
   bool _enabled;
+
   set enabled(bool value) {
     if (enabled == value) return;
     _enabled = value;
@@ -3055,6 +3149,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// value.
   bool get selected => _selected;
   bool _selected;
+
   set selected(bool value) {
     if (selected == value) return;
     _selected = value;
@@ -3064,6 +3159,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// If non-null, sets the [SemanticsNode.isButton] semantic to the given value.
   bool get button => _button;
   bool _button;
+
   set button(bool value) {
     if (button == value) return;
     _button = value;
@@ -3075,6 +3171,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// The reading direction is given by [textDirection].
   String get label => _label;
   String _label;
+
   set label(String value) {
     if (_label == value) return;
     _label = value;
@@ -3086,6 +3183,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// The reading direction is given by [textDirection].
   String get value => _value;
   String _value;
+
   set value(String value) {
     if (_value == value) return;
     _value = value;
@@ -3098,6 +3196,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// The reading direction is given by [textDirection].
   String get increasedValue => _increasedValue;
   String _increasedValue;
+
   set increasedValue(String value) {
     if (_increasedValue == value) return;
     _increasedValue = value;
@@ -3110,6 +3209,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// The reading direction is given by [textDirection].
   String get decreasedValue => _decreasedValue;
   String _decreasedValue;
+
   set decreasedValue(String value) {
     if (_decreasedValue == value) return;
     _decreasedValue = value;
@@ -3121,6 +3221,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// The reading direction is given by [textDirection].
   String get hint => _hint;
   String _hint;
+
   set hint(String value) {
     if (_hint == value) return;
     _hint = value;
@@ -3133,6 +3234,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// [decreasedValue] are not null.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (textDirection == value) return;
     _textDirection = value;
@@ -3149,6 +3251,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// action by double-tapping the screen while an element is focused.
   VoidCallback get onTap => _onTap;
   VoidCallback _onTap;
+
   set onTap(VoidCallback handler) {
     if (_onTap == handler) return;
     final bool hadValue = _onTap != null;
@@ -3166,6 +3269,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// second tap.
   VoidCallback get onLongPress => _onLongPress;
   VoidCallback _onLongPress;
+
   set onLongPress(VoidCallback handler) {
     if (_onLongPress == handler) return;
     final bool hadValue = _onLongPress != null;
@@ -3186,6 +3290,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// be provided.
   VoidCallback get onScrollLeft => _onScrollLeft;
   VoidCallback _onScrollLeft;
+
   set onScrollLeft(VoidCallback handler) {
     if (_onScrollLeft == handler) return;
     final bool hadValue = _onScrollLeft != null;
@@ -3206,6 +3311,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// be provided.
   VoidCallback get onScrollRight => _onScrollRight;
   VoidCallback _onScrollRight;
+
   set onScrollRight(VoidCallback handler) {
     if (_onScrollRight == handler) return;
     final bool hadValue = _onScrollRight != null;
@@ -3226,6 +3332,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// be provided.
   VoidCallback get onScrollUp => _onScrollUp;
   VoidCallback _onScrollUp;
+
   set onScrollUp(VoidCallback handler) {
     if (_onScrollUp == handler) return;
     final bool hadValue = _onScrollUp != null;
@@ -3246,6 +3353,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// be provided.
   VoidCallback get onScrollDown => _onScrollDown;
   VoidCallback _onScrollDown;
+
   set onScrollDown(VoidCallback handler) {
     if (_onScrollDown == handler) return;
     final bool hadValue = _onScrollDown != null;
@@ -3263,6 +3371,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// volume up button.
   VoidCallback get onIncrease => _onIncrease;
   VoidCallback _onIncrease;
+
   set onIncrease(VoidCallback handler) {
     if (_onIncrease == handler) return;
     final bool hadValue = _onIncrease != null;
@@ -3280,6 +3389,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   /// volume down button.
   VoidCallback get onDecrease => _onDecrease;
   VoidCallback _onDecrease;
+
   set onDecrease(VoidCallback handler) {
     if (_onDecrease == handler) return;
     final bool hadValue = _onDecrease != null;
@@ -3297,6 +3407,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   MoveCursorHandler get onMoveCursorForwardByCharacter =>
       _onMoveCursorForwardByCharacter;
   MoveCursorHandler _onMoveCursorForwardByCharacter;
+
   set onMoveCursorForwardByCharacter(MoveCursorHandler handler) {
     if (_onMoveCursorForwardByCharacter == handler) return;
     final bool hadValue = _onMoveCursorForwardByCharacter != null;
@@ -3314,6 +3425,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   MoveCursorHandler get onMoveCursorBackwardByCharacter =>
       _onMoveCursorBackwardByCharacter;
   MoveCursorHandler _onMoveCursorBackwardByCharacter;
+
   set onMoveCursorBackwardByCharacter(MoveCursorHandler handler) {
     if (_onMoveCursorBackwardByCharacter == handler) return;
     final bool hadValue = _onMoveCursorBackwardByCharacter != null;
@@ -3418,6 +3530,7 @@ class RenderBlockSemantics extends RenderProxyBox {
   /// [RenderObject]s below a common semantics boundary from the semantic tree.
   bool get blocking => _blocking;
   bool _blocking;
+
   set blocking(bool value) {
     assert(value != null);
     if (value == _blocking) return;
@@ -3479,6 +3592,7 @@ class RenderExcludeSemantics extends RenderProxyBox {
   /// Whether this render object is excluded from the semantic tree.
   bool get excluding => _excluding;
   bool _excluding;
+
   set excluding(bool value) {
     assert(value != null);
     if (value == _excluding) return;
@@ -3524,6 +3638,7 @@ class RenderLeaderLayer extends RenderProxyBox {
   /// another [RenderLeaderLayer] that is also being painted.
   LayerLink get link => _link;
   LayerLink _link;
+
   set link(LayerLink value) {
     assert(value != null);
     if (_link == value) return;
@@ -3580,6 +3695,7 @@ class RenderFollowerLayer extends RenderProxyBox {
   /// [RenderLeaderLayer] earlier in the paint order.
   LayerLink get link => _link;
   LayerLink _link;
+
   set link(LayerLink value) {
     assert(value != null);
     if (_link == value) return;
@@ -3598,6 +3714,7 @@ class RenderFollowerLayer extends RenderProxyBox {
   /// hidden.
   bool get showWhenUnlinked => _showWhenUnlinked;
   bool _showWhenUnlinked;
+
   set showWhenUnlinked(bool value) {
     assert(value != null);
     if (_showWhenUnlinked == value) return;
@@ -3609,6 +3726,7 @@ class RenderFollowerLayer extends RenderProxyBox {
   /// obtain this render object's origin.
   Offset get offset => _offset;
   Offset _offset;
+
   set offset(Offset value) {
     assert(value != null);
     if (_offset == value) return;

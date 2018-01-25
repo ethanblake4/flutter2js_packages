@@ -76,6 +76,7 @@ class RenderPerformanceOverlay extends RenderBox {
   /// [PerformanceOverlayOption] to enable.
   int get optionsMask => _optionsMask;
   int _optionsMask;
+
   set optionsMask(int value) {
     assert(value != null);
     if (value == _optionsMask) return;
@@ -88,6 +89,7 @@ class RenderPerformanceOverlay extends RenderBox {
   /// is suitable for capturing an SkPicture trace for further analysis.
   int get rasterizerThreshold => _rasterizerThreshold;
   int _rasterizerThreshold;
+
   set rasterizerThreshold(int value) {
     assert(value != null);
     if (value == _rasterizerThreshold) return;
@@ -98,6 +100,7 @@ class RenderPerformanceOverlay extends RenderBox {
   /// Whether the raster cache should checkerboard cached entries.
   bool get checkerboardRasterCacheImages => _checkerboardRasterCacheImages;
   bool _checkerboardRasterCacheImages;
+
   set checkerboardRasterCacheImages(bool value) {
     assert(value != null);
     if (value == _checkerboardRasterCacheImages) return;
@@ -108,6 +111,7 @@ class RenderPerformanceOverlay extends RenderBox {
   /// Whether the compositor should checkerboard layers rendered to offscreen bitmaps.
   bool get checkerboardOffscreenLayers => _checkerboardOffscreenLayers;
   bool _checkerboardOffscreenLayers;
+
   set checkerboardOffscreenLayers(bool value) {
     assert(value != null);
     if (value == _checkerboardOffscreenLayers) return;

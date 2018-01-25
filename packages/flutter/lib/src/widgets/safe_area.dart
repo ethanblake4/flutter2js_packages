@@ -22,7 +22,7 @@ import 'media_query.dart';
 ///
 ///  * [Padding], for insetting widgets in general.
 ///  * [MediaQuery], from which the window padding is obtained.
-///  * [dart:ui.Window.padding], which reports the padding from the operating
+///  * [package:flutter/ui.dart.Window.padding], which reports the padding from the operating
 ///    system.
 class SafeArea extends StatelessWidget {
   /// Creates a widget that avoids operating system interfaces.

@@ -668,7 +668,8 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   String toString() {
-    return '${describeIdentity(this)}(topPadding: ${topPadding.toStringAsFixed(1)}, bottomHeight: ${_bottomHeight.toStringAsFixed(1)}, ...)';
+    return '${describeIdentity(this)}(topPadding: ${topPadding.toStringAsFixed(
+        1)}, bottomHeight: ${_bottomHeight.toStringAsFixed(1)}, ...)';
   }
 }
 

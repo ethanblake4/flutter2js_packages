@@ -468,7 +468,8 @@ class TextStyle extends Diagnosticable {
     assert(() {
       if (other.debugLabel != null || debugLabel != null)
         mergedDebugLabel =
-            '(${debugLabel ?? _kDefaultDebugLabel}).merge(${other.debugLabel ?? _kDefaultDebugLabel})';
+            '(${debugLabel ?? _kDefaultDebugLabel}).merge(${other.debugLabel ??
+            _kDefaultDebugLabel})';
       return true;
     }());
 
@@ -513,7 +514,8 @@ class TextStyle extends Diagnosticable {
     String lerpDebugLabel;
     assert(() {
       lerpDebugLabel =
-          'lerp(${a.debugLabel ?? _kDefaultDebugLabel} ⎯${t.toStringAsFixed(1)}→ ${b.debugLabel ?? _kDefaultDebugLabel})';
+          'lerp(${a.debugLabel ?? _kDefaultDebugLabel} ⎯${t.toStringAsFixed(1)}→ ${b
+          .debugLabel ?? _kDefaultDebugLabel})';
       return true;
     }());
 
@@ -538,7 +540,7 @@ class TextStyle extends Diagnosticable {
     );
   }
 
-  /// The style information for text runs, encoded for use by `dart:ui`.
+  /// The style information for text runs, encoded for use by `package:flutter/ui.dart`.
   ui.TextStyle getTextStyle({double textScaleFactor: 1.0}) {
     return new ui.TextStyle(
         color: color,
@@ -555,7 +557,7 @@ class TextStyle extends Diagnosticable {
         height: height);
   }
 
-  /// The style information for paragraphs, encoded for use by `dart:ui`.
+  /// The style information for paragraphs, encoded for use by `package:flutter/ui.dart`.
   ///
   /// The `textScaleFactor` argument must not be null. If omitted, it defaults
   /// to 1.0. The other arguments may be null. The `maxLines` argument, if

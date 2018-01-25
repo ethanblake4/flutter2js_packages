@@ -283,8 +283,8 @@ class Text extends StatelessWidget {
       effectiveTextStyle = defaultTextStyle.style.merge(style);
     return new RichText(
         textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-        textDirection:
-            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        textDirection: textDirection,
+        // RichText uses Directionality.of to obtain a default if this is null.
         softWrap: softWrap ?? defaultTextStyle.softWrap,
         overflow: overflow ?? defaultTextStyle.overflow,
         textScaleFactor: textScaleFactor ??

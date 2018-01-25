@@ -322,9 +322,8 @@ class PaginatedDataTableState extends State<PaginatedDataTable> {
             value: value, child: new Text('$value'));
       }).toList();
       footerWidgets.addAll(<Widget>[
-        new Container(
-            width:
-                14.0), // to match trailing padding in case we overflow and end up scrolling
+        new Container(width: 14.0),
+        // to match trailing padding in case we overflow and end up scrolling
         new Text(localizations.rowsPerPageTitle),
         new ConstrainedBox(
           constraints: const BoxConstraints(

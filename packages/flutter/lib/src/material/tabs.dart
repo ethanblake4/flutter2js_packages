@@ -613,7 +613,8 @@ class _TabBarState extends State<TabBar> {
     assert(() {
       if (newController == null) {
         throw new FlutterError('No TabController for ${widget.runtimeType}.\n'
-            'When creating a ${widget.runtimeType}, you must either provide an explicit '
+            'When creating a ${widget
+            .runtimeType}, you must either provide an explicit '
             'TabController using the "controller" property, or you must ensure that there '
             'is a DefaultTabController above the ${widget.runtimeType}.\n'
             'In this case, there was neither an explicit controller nor a default controller.');
@@ -944,7 +945,8 @@ class _TabBarViewState extends State<TabBarView> {
     assert(() {
       if (newController == null) {
         throw new FlutterError('No TabController for ${widget.runtimeType}.\n'
-            'When creating a ${widget.runtimeType}, you must either provide an explicit '
+            'When creating a ${widget
+            .runtimeType}, you must either provide an explicit '
             'TabController using the "controller" property, or you must ensure that there '
             'is a DefaultTabController above the ${widget.runtimeType}.\n'
             'In this case, there was neither an explicit controller nor a default controller.');

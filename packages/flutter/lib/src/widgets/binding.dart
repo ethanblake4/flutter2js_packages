@@ -234,18 +234,23 @@ abstract class WidgetsBindingObserver {
 /// The glue between the widgets layer and the Flutter engine.
 abstract class WidgetsBinding extends BindingBase
     implements SchedulerBinding, GestureBinding, RendererBinding {
-
   WidgetsBinding() : super();
 
   @override
   void unlocked() {
     super.unlocked();
-    unlocked_SchedulerBinding();
-    unlocked_GestureBinding();
+    SchedulerBindingMixin.doUnlocked(this);
+    GestureBindingMixin.doUnlocked(this);
   }
 
-  void initInstances_WidgetsBinding() {
-    _instance = this;
+  @override
+  void initInstances() {
+    super.initInstances();
+    ServicesBindingMixin.doInitInstances(this);
+    SchedulerBindingMixin.doInitInstances(this);
+    GestureBindingMixin.doInitInstances(this);
+    RendererBindingMixin.doInitInstances(this);
+    WidgetsBinding._instance = this;
     buildOwner.onBuildScheduled = _handleBuildScheduled;
     ui.window.onLocaleChanged = handleLocaleChanged;
     SystemChannels.navigation.setMethodCallHandler(_handleNavigationInvocation);
@@ -260,7 +265,13 @@ abstract class WidgetsBinding extends BindingBase
   static WidgetsBinding get instance => _instance;
   static WidgetsBinding _instance;
 
-  void initServiceExtensions_WidgetsBinding() {
+  @override
+  void initServiceExtensions() {
+    super.initServiceExtensions();
+    ServicesBindingMixin.doInitServiceExtensions(this);
+    SchedulerBindingMixin.doInitServiceExtensions(this);
+    // GestureBindingMixin.doInitServiceExtensions(this);
+    RendererBindingMixin.doInitServiceExtensions(this);
     registerSignalServiceExtension(
         name: 'debugDumpApp',
         callback: () {
@@ -477,6 +488,7 @@ abstract class WidgetsBinding extends BindingBase
 
   bool _needToReportFirstFrame = true;
   int _deferFirstFrameReportCount = 0;
+
   bool get _reportFirstFrame => _deferFirstFrameReportCount == 0;
 
   /// Whether the first frame has finished rendering.
@@ -896,11 +908,11 @@ class RenderObjectToWidgetElement<T extends RenderObject>
 /// This is the glue that binds the framework to the Flutter engine.
 abstract class WidgetsFlutterBinding extends WidgetsBinding
     with
-        RendererBinding,
-        GestureBinding,
-        ServicesBinding,
-        SchedulerBinding,
-        PaintingBinding,
+        RendererBindingMixin,
+        GestureBindingMixin,
+        ServicesBindingMixin,
+        SchedulerBindingMixin,
+        PaintingBindingMixin,
         HitTestable,
         HitTestDispatcher,
         HitTestTarget {
@@ -912,26 +924,17 @@ abstract class WidgetsFlutterBinding extends WidgetsBinding
   @override
   void evict(String asset) {
     super.evict(asset);
-    evict_PaintingBinding(asset);
+    PaintingBindingMixin.doEvict(this, asset);
   }
 
   @override
   void initInstances() {
-    initInstances_PaintingBinding();
-    initInstances_SchedulerBinding();
-    initInstances_GestureBinding();
-    initInstances_ServicesBinding();
-    initInstances_RendererBinding();
-    initInstances_WidgetsBinding();
     super.initInstances();
+    PaintingBindingMixin.doInitInstances(this);
   }
 
   @override
   void initServiceExtensions() {
-    initServiceExtensions_SchedulerBinding();
-    initServiceExtensions_RendererBinding();
-    initServiceExtensions_ServicesBinding();
-    initServiceExtensions_WidgetsBinding();
     super.initServiceExtensions();
   }
 
@@ -951,11 +954,11 @@ abstract class WidgetsFlutterBinding extends WidgetsBinding
       // Weird dart2js bug:
       // we need to do something else here than just call constructor
       final instance = new WidgetsFlutterBinding();
-      if (WidgetsBinding.instance==null) {
+      if (WidgetsBinding.instance == null) {
         WidgetsBinding._instance = instance;
       }
     }
-    if (WidgetsBinding.instance==null) {
+    if (WidgetsBinding.instance == null) {
       throw new Exception("Terrible error");
     }
     return WidgetsBinding.instance;

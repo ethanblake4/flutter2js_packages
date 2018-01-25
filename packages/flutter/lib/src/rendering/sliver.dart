@@ -647,8 +647,8 @@ class SliverHitTestEntry extends HitTestEntry {
   final double crossAxisPosition;
 
   @override
-  String toString() =>
-      '${target.runtimeType}@(mainAxis: $mainAxisPosition, crossAxis: $crossAxisPosition)';
+  String toString() => '${target
+      .runtimeType}@(mainAxis: $mainAxisPosition, crossAxis: $crossAxisPosition)';
 }
 
 /// Parent data structure used by parents of slivers that position their
@@ -674,12 +674,36 @@ class SliverLogicalParentData extends ParentData {
 /// Parent data for slivers that have multiple children and that position their
 /// children using layout offsets.
 class SliverLogicalContainerParentData extends SliverLogicalParentData
-    with ContainerParentDataMixin<RenderSliver> {
-  // Dart2js: Must be manually added
+    implements ContainerParentDataMixin<RenderSliver> {
+  //
+  // Dart2js: Copy-pasted from ContainerParentDataMixin
+  //
+  /// The previous sibling in the parent's child list.
+  RenderSliver previousSibling;
+
+  /// The next sibling in the parent's child list.
+  RenderSliver nextSibling;
+
+  /// Clear the sibling pointers.
   @override
   void detach() {
     super.detach();
-    detach_ContainerParentDataMixin();
+    if (previousSibling != null) {
+      final ContainerParentDataMixin<RenderSliver> previousSiblingParentData =
+          previousSibling.parentData;
+      // ignore: unrelated_type_equality_checks
+      assert(previousSiblingParentData.nextSibling == this);
+      previousSiblingParentData.nextSibling = nextSibling;
+    }
+    if (nextSibling != null) {
+      final ContainerParentDataMixin<RenderSliver> nextSiblingParentData =
+          nextSibling.parentData;
+      // ignore: unrelated_type_equality_checks
+      assert(nextSiblingParentData.previousSibling == this);
+      nextSiblingParentData.previousSibling = previousSibling;
+    }
+    previousSibling = null;
+    nextSibling = null;
   }
 }
 
@@ -714,12 +738,37 @@ class SliverPhysicalParentData extends ParentData {
 /// Parent data for slivers that have multiple children and that position their
 /// children using absolute coordinates.
 class SliverPhysicalContainerParentData extends SliverPhysicalParentData
-    with ContainerParentDataMixin<RenderSliver> {
-  // Dart2js: Must be manually added
+    implements ContainerParentDataMixin<RenderSliver> {
+  /// The previous sibling in the parent's child list.
+  RenderSliver previousSibling;
+
+  /// The next sibling in the parent's child list.
+  RenderSliver nextSibling;
+
+  /// Clear the sibling pointers.
   @override
   void detach() {
     super.detach();
-    detach_ContainerParentDataMixin();
+    if (previousSibling != null) {
+      final ContainerParentDataMixin<RenderSliver> previousSiblingParentData =
+          previousSibling.parentData;
+      // ignore: unrelated_type_equality_checks
+      assert(previousSibling != this);
+      // ignore: unrelated_type_equality_checks
+      assert(previousSiblingParentData.nextSibling == this);
+      previousSiblingParentData.nextSibling = nextSibling;
+    }
+    if (nextSibling != null) {
+      final ContainerParentDataMixin<RenderSliver> nextSiblingParentData =
+          nextSibling.parentData;
+      // ignore: unrelated_type_equality_checks
+      assert(nextSibling != this);
+      // ignore: unrelated_type_equality_checks
+      assert(nextSiblingParentData.previousSibling == this);
+      nextSiblingParentData.previousSibling = previousSibling;
+    }
+    previousSibling = null;
+    nextSibling = null;
   }
 }
 
@@ -886,6 +935,7 @@ abstract class RenderSliver extends RenderObject {
   /// instead to schedule a layout of the sliver.
   SliverGeometry get geometry => _geometry;
   SliverGeometry _geometry;
+
   set geometry(SliverGeometry value) {
     assert(!(debugDoingThisResize && debugDoingThisLayout));
     assert(sizedByParent || !debugDoingThisResize);
@@ -1438,20 +1488,6 @@ abstract class RenderSliverSingleBoxAdapter extends RenderSliver
     RenderBox child,
   }) {
     this.child = child;
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
   }
 
   @override

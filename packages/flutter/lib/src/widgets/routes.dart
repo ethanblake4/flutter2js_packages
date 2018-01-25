@@ -827,6 +827,7 @@ abstract class ModalRoute<T> extends TransitionRoute<T>
   /// [barrierColor]).
   bool get offstage => _offstage;
   bool _offstage = false;
+
   set offstage(bool value) {
     if (_offstage == value) return;
     setState(() {
@@ -979,13 +980,17 @@ abstract class ModalRoute<T> extends TransitionRoute<T>
   @override
   @mustCallSuper
   void changedInternalState() {
-    setState(() {/* internal state already changed */});
+    setState(() {
+      /* internal state already changed */
+    });
   }
 
   @override
   void didChangePrevious(Route<dynamic> route) {
     super.didChangePrevious(route);
-    setState(() {/* this might affect canPop */});
+    setState(() {
+      /* this might affect canPop */
+    });
   }
 
   /// Whether this route can be popped.

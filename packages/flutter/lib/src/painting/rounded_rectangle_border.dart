@@ -295,6 +295,7 @@ class _RoundedRectangleToCircleBorder extends ShapeBorder {
 
   @override
   String toString() {
-    return 'RoundedRectangleBorder($side, $borderRadius, ${(circleness * 100).toStringAsFixed(1)}% of the way to being a CircleBorder)';
+    return 'RoundedRectangleBorder($side, $borderRadius, ${(circleness * 100)
+        .toStringAsFixed(1)}% of the way to being a CircleBorder)';
   }
 }

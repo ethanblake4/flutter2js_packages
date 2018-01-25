@@ -109,7 +109,7 @@ abstract class RenderSliverBoxChildManager {
 
 /// Parent data structure used by [RenderSliverMultiBoxAdaptor].
 class SliverMultiBoxAdaptorParentData extends SliverLogicalParentData
-    with ContainerParentDataMixin<RenderBox> {
+    implements ContainerParentDataMixin<RenderBox> {
   /// The index of this child according to the [RenderSliverBoxChildManager].
   int index;
 
@@ -122,13 +122,36 @@ class SliverMultiBoxAdaptorParentData extends SliverLogicalParentData
 
   @override
   String toString() =>
-      'index=$index; ${keepAlive == true ? "keepAlive; " : ""}${super.toString()}';
+      'index=$index; ${keepAlive == true ? "keepAlive; " : ""}${super
+          .toString()}';
 
-  // Dart2js: Must be manually added
+  //
+  // Flutter2js: Copy-pasted from ContainerParentDataMixin
+  //
+  /// The previous sibling in the parent's child list.
+  RenderBox previousSibling;
+
+  /// The next sibling in the parent's child list.
+  RenderBox nextSibling;
+
+  /// Clear the sibling pointers.
   @override
   void detach() {
     super.detach();
-    detach_ContainerParentDataMixin();
+    if (previousSibling != null) {
+      final ContainerParentDataMixin<RenderBox> previousSiblingParentData =
+          previousSibling.parentData;
+//      assert(previousSiblingParentData.nextSibling == this);
+      previousSiblingParentData.nextSibling = nextSibling;
+    }
+    if (nextSibling != null) {
+      final ContainerParentDataMixin<RenderBox> nextSiblingParentData =
+          nextSibling.parentData;
+//      assert(nextSiblingParentData.previousSibling == this);
+      nextSiblingParentData.previousSibling = previousSibling;
+    }
+    previousSibling = null;
+    nextSibling = null;
   }
 }
 
@@ -161,39 +184,6 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
     with
         ContainerRenderObjectMixin<RenderBox, SliverMultiBoxAdaptorParentData>,
         RenderSliverHelpers {
-
-  // Flutter2js: This must be manually added until Dart2js supports mixins.
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    RenderBox child = this.firstChild;
-    while (child != null) {
-      child.attach(owner);
-      final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-
-    // Original
-    // super.attach(owner);
-    for (RenderBox child in _keepAliveBucket.values) child.attach(owner);
-  }
-
-  // Flutter2js: This must be manually added until Dart2js supports mixins.
-  @override
-  void detach() {
-    super.detach();
-    RenderBox child = this.firstChild;
-    while (child != null) {
-      child.detach();
-      final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-
-    // Original
-    // super.detach();
-    for (RenderBox child in _keepAliveBucket.values) child.detach();
-  }
-
   /// Creates a sliver with multiple box children.
   ///
   /// The [childManager] argument must not be null.
@@ -297,6 +287,18 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
       _childManager.removeChild(child);
       assert(child.parent == null);
     }
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    for (RenderBox child in _keepAliveBucket.values) child.attach(owner);
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    for (RenderBox child in _keepAliveBucket.values) child.detach();
   }
 
   @override
@@ -590,7 +592,8 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
     description.add(new DiagnosticsNode.message(firstChild != null
-        ? 'currently live children: ${indexOf(firstChild)} to ${indexOf(lastChild)}'
+        ? 'currently live children: ${indexOf(firstChild)} to ${indexOf(
+        lastChild)}'
         : 'no children current live'));
   }
 

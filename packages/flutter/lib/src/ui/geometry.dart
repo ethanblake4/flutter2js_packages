@@ -869,7 +869,8 @@ class Rect {
 
   @override
   String toString() =>
-      'Rect.fromLTRB(${left.toStringAsFixed(1)}, ${top.toStringAsFixed(1)}, ${right.toStringAsFixed(1)}, ${bottom.toStringAsFixed(1)})';
+      'Rect.fromLTRB(${left.toStringAsFixed(1)}, ${top.toStringAsFixed(
+          1)}, ${right.toStringAsFixed(1)}, ${bottom.toStringAsFixed(1)})';
 }
 
 /// A radius for either circular or elliptical shapes.
@@ -1472,7 +1473,8 @@ class RRect {
     if (tlRadius == trRadius && trRadius == brRadius && brRadius == blRadius) {
       if (tlRadius.x == tlRadius.y)
         return 'RRect.fromLTRBR($rect, ${tlRadius.x.toStringAsFixed(1)})';
-      return 'RRect.fromLTRBXY($rect, ${tlRadius.x.toStringAsFixed(1)}, ${tlRadius.y.toStringAsFixed(1)})';
+      return 'RRect.fromLTRBXY($rect, ${tlRadius.x.toStringAsFixed(
+          1)}, ${tlRadius.y.toStringAsFixed(1)})';
     }
     return 'RRect.fromLTRBAndCorners('
         '$rect, '

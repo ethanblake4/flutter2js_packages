@@ -487,6 +487,7 @@ class RenderSliverGrid extends RenderSliverMultiBoxAdaptor {
   /// The delegate that controls the size and position of the children.
   SliverGridDelegate get gridDelegate => _gridDelegate;
   SliverGridDelegate _gridDelegate;
+
   set gridDelegate(SliverGridDelegate value) {
     assert(value != null);
     if (_gridDelegate == value) return;

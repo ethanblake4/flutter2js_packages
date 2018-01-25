@@ -172,8 +172,9 @@ class FlowParentData extends ContainerBoxParentData<RenderBox> {
 ///
 ///  * [FlowDelegate]
 ///  * [RenderStack]
-class RenderFlow extends RenderBoxContainerRenderObjectMixin<RenderBox, FlowParentData> with
-        RenderBoxContainerDefaultsMixin<RenderBox, FlowParentData>
+class RenderFlow
+    extends RenderBoxContainerRenderObjectMixin<RenderBox, FlowParentData>
+    with RenderBoxContainerDefaultsMixin<RenderBox, FlowParentData>
     implements FlowPaintingContext {
   /// Creates a render object for a flow layout.
   ///
@@ -318,7 +319,8 @@ class RenderFlow extends RenderBoxContainerRenderObjectMixin<RenderBox, FlowPare
       if (childParentData._transform != null) {
         throw new FlutterError(
             'Cannot call paintChild twice for the same child.\n'
-            'The flow delegate of type ${_delegate.runtimeType} attempted to '
+            'The flow delegate of type ${_delegate
+                .runtimeType} attempted to '
             'paint child $i multiple times, which is not permitted.');
       }
       return true;

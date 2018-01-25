@@ -485,7 +485,7 @@ class Navigator extends StatefulWidget {
 
   /// The name of the first route to show.
   ///
-  /// By default, this defers to [dart:ui.Window.defaultRouteName].
+  /// By default, this defers to [package:flutter/ui.dart.Window.defaultRouteName].
   ///
   /// If this string contains any `/` characters, then the string is split on
   /// those characters and substrings from the start of the string up to each
@@ -517,7 +517,7 @@ class Navigator extends StatefulWidget {
   ///
   /// See also:
   ///
-  ///  * [dart:ui.Window.defaultRouteName], which reflects the route that the
+  ///  * [package:flutter/ui.dart.Window.defaultRouteName], which reflects the route that the
   ///    application was started with.
   static const String defaultRouteName = '/';
 
@@ -788,7 +788,8 @@ class NavigatorState extends TickerProviderStateMixin<Navigator> {
                     'This resulted in the following objects:\n'
                     ' * ${plannedInitialRoutes.join("\n * ")}\n'
                     'One or more of those objects was null, and therefore the initial route specified will be '
-                    'ignored and "${Navigator.defaultRouteName}" will be used instead.'),
+                    'ignored and "${Navigator
+                    .defaultRouteName}" will be used instead.'),
           );
           return true;
         }());

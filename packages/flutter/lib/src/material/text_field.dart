@@ -292,10 +292,12 @@ class _TextFieldState extends AutomaticKeepAliveClientMixin<TextField> {
   InteractiveInkFeature _currentSplash;
 
   TextEditingController _controller;
+
   TextEditingController get _effectiveController =>
       widget.controller ?? _controller;
 
   FocusNode _focusNode;
+
   FocusNode get _effectiveFocusNode =>
       widget.focusNode ?? (_focusNode ??= new FocusNode());
 

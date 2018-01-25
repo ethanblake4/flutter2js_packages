@@ -18,6 +18,7 @@ const double _kSizeMini = 40.0;
 
 class _DefaultHeroTag {
   const _DefaultHeroTag();
+
   @override
   String toString() => '<default FloatingActionButton tag>';
 }

@@ -49,11 +49,8 @@ class FlutterLogoDecoration extends Decoration {
     this.style: FlutterLogoStyle.markOnly,
     this.margin: EdgeInsets.zero,
   })
-      : _position = identical(style, FlutterLogoStyle.markOnly)
-            ? 0.0
-            : identical(style, FlutterLogoStyle.horizontal)
-                ? 1.0
-                : -1.0, // ignore: CONST_EVAL_TYPE_BOOL_NUM_STRING
+      : _position = 0.0,
+        // ignore: CONST_EVAL_TYPE_BOOL_NUM_STRING
         // (see https://github.com/dart-lang/sdk/issues/26980 for details about that ignore statement)
         _opacity = 1.0;
 
@@ -269,9 +266,8 @@ class _FlutterLogoPainter extends BoxPainter {
         style: new TextStyle(
           color: _config.textColor,
           fontFamily: 'Roboto',
-          fontSize: 100.0 *
-              350.0 /
-              247.0, // 247 is the height of the F when the fontSize is 350, assuming device pixel ratio 1.0
+          fontSize: 100.0 * 350.0 / 247.0,
+          // 247 is the height of the F when the fontSize is 350, assuming device pixel ratio 1.0
           fontWeight: FontWeight.w300,
           textBaseline: TextBaseline.alphabetic,
         ),

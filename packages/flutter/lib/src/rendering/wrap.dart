@@ -101,7 +101,9 @@ class WrapParentData extends ContainerBoxParentData<RenderBox> {
 ///
 /// The runs themselves are then positioned in the cross axis according to the
 /// [runSpacing] and [runAlignment].
-class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapParentData> with
+class RenderWrap extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, WrapParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, WrapParentData> {
   /// Creates a wrap render object.
   ///
@@ -137,6 +139,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   /// children are placed in a new run vertically adjacent to the previous run.
   Axis get direction => _direction;
   Axis _direction;
+
   set direction(Axis value) {
     assert(value != null);
     if (_direction == value) return;
@@ -159,6 +162,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   ///    are placed relative to each other in the cross axis.
   WrapAlignment get alignment => _alignment;
   WrapAlignment _alignment;
+
   set alignment(WrapAlignment value) {
     assert(value != null);
     if (_alignment == value) return;
@@ -179,6 +183,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   /// Defaults to 0.0.
   double get spacing => _spacing;
   double _spacing;
+
   set spacing(double value) {
     assert(value != null);
     if (_spacing == value) return;
@@ -202,6 +207,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   ///    are placed relative to each other in the cross axis.
   WrapAlignment get runAlignment => _runAlignment;
   WrapAlignment _runAlignment;
+
   set runAlignment(WrapAlignment value) {
     assert(value != null);
     if (_runAlignment == value) return;
@@ -221,6 +227,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   /// Defaults to 0.0.
   double get runSpacing => _runSpacing;
   double _runSpacing;
+
   set runSpacing(double value) {
     assert(value != null);
     if (_runSpacing == value) return;
@@ -245,6 +252,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   ///    other in the cross axis.
   WrapCrossAlignment get crossAxisAlignment => _crossAxisAlignment;
   WrapCrossAlignment _crossAxisAlignment;
+
   set crossAxisAlignment(WrapCrossAlignment value) {
     assert(value != null);
     if (_crossAxisAlignment == value) return;
@@ -277,6 +285,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   /// [textDirection] must not be null.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection != value) {
       _textDirection = value;
@@ -308,6 +317,7 @@ class RenderWrap extends RenderBoxContainerRenderObjectMixin<RenderBox, WrapPare
   /// [verticalDirection] must not be null.
   VerticalDirection get verticalDirection => _verticalDirection;
   VerticalDirection _verticalDirection;
+
   set verticalDirection(VerticalDirection value) {
     if (_verticalDirection != value) {
       _verticalDirection = value;

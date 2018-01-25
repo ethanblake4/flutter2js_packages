@@ -172,7 +172,7 @@ class AssetImage extends AssetBundleImageProvider {
     chosenBundle
         .loadStructuredData<Map<String, List<String>>>(
             _kAssetManifestFileName, _manifestParser)
-        .then<Null>((Map<String, List<String>> manifest) {
+        .then((Map<String, List<String>> manifest) {
       final String chosenName = _chooseVariant(
           keyName, configuration, manifest == null ? null : manifest[keyName]);
       final double chosenScale = _parseScale(chosenName);

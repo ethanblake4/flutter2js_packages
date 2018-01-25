@@ -36,21 +36,6 @@ import 'viewport_offset.dart';
 /// typically also will implement [updateChild].
 abstract class RenderSliverPersistentHeader extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
-  }
-
   /// Creates a sliver that changes its size when scrolled to the start of the
   /// viewport.
   ///
@@ -241,6 +226,7 @@ abstract class RenderSliverPersistentHeader extends RenderSliver
   @protected
   bool get excludeFromSemanticsScrolling => _excludeFromSemanticsScrolling;
   bool _excludeFromSemanticsScrolling = false;
+
   set excludeFromSemanticsScrolling(bool value) {
     if (_excludeFromSemanticsScrolling == value) return;
     _excludeFromSemanticsScrolling = value;
@@ -424,6 +410,7 @@ abstract class RenderSliverFloatingPersistentHeader
   ///    and snapped into view via the corresponding parameters.
   FloatingHeaderSnapConfiguration get snapConfiguration => _snapConfiguration;
   FloatingHeaderSnapConfiguration _snapConfiguration;
+
   set snapConfiguration(FloatingHeaderSnapConfiguration value) {
     if (value == _snapConfiguration) return;
     if (value == null) {

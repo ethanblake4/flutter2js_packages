@@ -21,20 +21,6 @@ abstract class RenderShiftedBox extends RenderBox
     this.child = child;
   }
 
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
-  }
-
   @override
   double computeMinIntrinsicWidth(double height) {
     if (child != null) return child.getMinIntrinsicWidth(height);
@@ -129,6 +115,7 @@ class RenderPadding extends RenderShiftedBox {
   /// must not be null.
   EdgeInsetsGeometry get padding => _padding;
   EdgeInsetsGeometry _padding;
+
   set padding(EdgeInsetsGeometry value) {
     assert(value != null);
     assert(value.isNonNegative);
@@ -143,6 +130,7 @@ class RenderPadding extends RenderShiftedBox {
   /// to a value that does not depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
@@ -313,6 +301,7 @@ abstract class RenderAligningShiftedBox extends RenderShiftedBox {
   /// to a value that does not depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
@@ -377,6 +366,7 @@ class RenderPositionedBox extends RenderAligningShiftedBox {
   /// Can be both greater and less than 1.0 but must be positive.
   double get widthFactor => _widthFactor;
   double _widthFactor;
+
   set widthFactor(double value) {
     assert(value == null || value >= 0.0);
     if (_widthFactor == value) return;
@@ -389,6 +379,7 @@ class RenderPositionedBox extends RenderAligningShiftedBox {
   /// Can be both greater and less than 1.0 but must be positive.
   double get heightFactor => _heightFactor;
   double _heightFactor;
+
   set heightFactor(double value) {
     assert(value == null || value >= 0.0);
     if (_heightFactor == value) return;
@@ -541,6 +532,7 @@ class RenderConstrainedOverflowBox extends RenderAligningShiftedBox {
   /// default) to use the constraint from the parent instead.
   double get minWidth => _minWidth;
   double _minWidth;
+
   set minWidth(double value) {
     if (_minWidth == value) return;
     _minWidth = value;
@@ -551,6 +543,7 @@ class RenderConstrainedOverflowBox extends RenderAligningShiftedBox {
   /// default) to use the constraint from the parent instead.
   double get maxWidth => _maxWidth;
   double _maxWidth;
+
   set maxWidth(double value) {
     if (_maxWidth == value) return;
     _maxWidth = value;
@@ -561,6 +554,7 @@ class RenderConstrainedOverflowBox extends RenderAligningShiftedBox {
   /// default) to use the constraint from the parent instead.
   double get minHeight => _minHeight;
   double _minHeight;
+
   set minHeight(double value) {
     if (_minHeight == value) return;
     _minHeight = value;
@@ -571,6 +565,7 @@ class RenderConstrainedOverflowBox extends RenderAligningShiftedBox {
   /// default) to use the constraint from the parent instead.
   double get maxHeight => _maxHeight;
   double _maxHeight;
+
   set maxHeight(double value) {
     if (_maxHeight == value) return;
     _maxHeight = value;
@@ -639,19 +634,7 @@ class RenderConstrainedOverflowBox extends RenderAligningShiftedBox {
 ///    passes its original constraints through to its child, which it allows to
 ///    overflow.
 class RenderUnconstrainedBox extends RenderAligningShiftedBox
-    with DebugOverflowIndicatorMixin {
-
-  // Dart2js: Manually added from DebugOverflowIndicatorMixin
-  @override
-  void reassemble() {
-    super.reassemble();
-    // Users expect error messages to be shown again after hot reload.
-    assert(() {
-      overflowReportNeeded = true;
-      return true;
-    }());
-  }
-
+    with DebugOverflowIndicatorMixinHelper {
   /// Create a render object that sizes itself to the child but does not
   /// pass the [constraints] down to that child.
   ///
@@ -665,6 +648,16 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox
       : _constrainedAxis = constrainedAxis,
         super.mixin(alignment, textDirection, child);
 
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Users expect error messages to be shown again after hot reload.
+    assert(() {
+      overflowReportNeeded = true;
+      return true;
+    }());
+  }
+
   /// The axis to retain constraints on, if any.
   ///
   /// If not set, or set to null (the default), neither axis will retain its
@@ -673,6 +666,7 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox
   /// will be retained.
   Axis get constrainedAxis => _constrainedAxis;
   Axis _constrainedAxis;
+
   set constrainedAxis(Axis value) {
     assert(value != null);
     if (_constrainedAxis == value) return;
@@ -792,6 +786,7 @@ class RenderSizedOverflowBox extends RenderAligningShiftedBox {
   /// The size this render box should attempt to be.
   Size get requestedSize => _requestedSize;
   Size _requestedSize;
+
   set requestedSize(Size value) {
     assert(value != null);
     if (_requestedSize == value) return;
@@ -871,6 +866,7 @@ class RenderFractionallySizedOverflowBox extends RenderAligningShiftedBox {
   /// given the incoming width constraints.
   double get widthFactor => _widthFactor;
   double _widthFactor;
+
   set widthFactor(double value) {
     assert(value == null || value >= 0.0);
     if (_widthFactor == value) return;
@@ -885,6 +881,7 @@ class RenderFractionallySizedOverflowBox extends RenderAligningShiftedBox {
   /// given the incoming width constraints.
   double get heightFactor => _heightFactor;
   double _heightFactor;
+
   set heightFactor(double value) {
     assert(value == null || value >= 0.0);
     if (_heightFactor == value) return;
@@ -1087,6 +1084,7 @@ class RenderCustomSingleChildLayoutBox extends RenderShiftedBox {
   /// A delegate that controls this object's layout.
   SingleChildLayoutDelegate get delegate => _delegate;
   SingleChildLayoutDelegate _delegate;
+
   set delegate(SingleChildLayoutDelegate newDelegate) {
     assert(newDelegate != null);
     if (_delegate == newDelegate) return;
@@ -1199,6 +1197,7 @@ class RenderBaseline extends RenderShiftedBox {
   /// the child's baseline.
   double get baseline => _baseline;
   double _baseline;
+
   set baseline(double value) {
     assert(value != null);
     if (_baseline == value) return;
@@ -1209,6 +1208,7 @@ class RenderBaseline extends RenderShiftedBox {
   /// The type of baseline to use for positioning the child.
   TextBaseline get baselineType => _baselineType;
   TextBaseline _baselineType;
+
   set baselineType(TextBaseline value) {
     assert(value != null);
     if (_baselineType == value) return;

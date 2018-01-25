@@ -818,8 +818,9 @@ class LayerLink {
   LeaderLayer _leader;
 
   @override
-  String toString() =>
-      '${describeIdentity(this)}(${ _leader != null ? "<linked>" : "<dangling>" })';
+  String toString() => '${describeIdentity(this)}(${ _leader != null
+      ? "<linked>"
+      : "<dangling>" })';
 }
 
 /// A composited layer that can be followed by a [FollowerLayer].

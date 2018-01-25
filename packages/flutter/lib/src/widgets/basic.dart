@@ -222,13 +222,13 @@ class ShaderMask extends SingleChildRenderObjectWidget {
       Widget child})
       : super(key: key, child: child);
 
-  /// Called to create the [dart:ui.Shader] that generates the mask.
+  /// Called to create the [package:flutter/ui.dart.Shader] that generates the mask.
   ///
   /// The shader callback is called with the current size of the child so that
   /// it can customize the shader to the size and location of the child.
   ///
   /// Typically this will use a [LinearGradient] or [RadialGradient] to create
-  /// the [dart:ui.Shader], though the [dart:ui.ImageShader] class could also be
+  /// the [package:flutter/ui.dart.Shader], though the [package:flutter/ui.dart.ImageShader] class could also be
   /// used.
   final ShaderCallback shaderCallback;
 
@@ -4152,6 +4152,7 @@ class Flow extends MultiChildRenderObjectWidget {
     List<Widget> children: const <Widget>[],
   })
       : super(key: key, children: RepaintBoundary.wrapAll(children));
+
   // https://github.com/dart-lang/sdk/issues/29277
 
   /// Creates a flow layout.
@@ -4335,7 +4336,7 @@ class RichText extends LeafRenderObjectWidget {
   }
 }
 
-/// A widget that displays a [dart:ui.Image] directly.
+/// A widget that displays a [package:flutter/ui.dart.Image] directly.
 ///
 /// The image is painted using [paintImage], which describes the meanings of the
 /// various fields on this class in more detail.

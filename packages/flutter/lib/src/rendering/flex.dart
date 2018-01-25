@@ -262,21 +262,11 @@ typedef double _ChildSizingFunction(RenderBox child, double extent);
 ///
 ///  * [Flex], the widget equivalent.
 ///  * [Row] and [Column], direction-specific variants of [Flex].
-class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexParentData> with
+class RenderFlex
+    extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexParentData>
+    with
         RenderBoxContainerDefaultsMixin<RenderBox, FlexParentData>,
-        DebugOverflowIndicatorMixin {
-
-  // Dart2js: Manually added from DebugOverflowIndicatorMixin
-  @override
-  void reassemble() {
-    super.reassemble();
-    // Users expect error messages to be shown again after hot reload.
-    assert(() {
-      overflowReportNeeded = true;
-      return true;
-    }());
-  }
-
+        DebugOverflowIndicatorMixinHelper {
   /// Creates a flex render object.
   ///
   /// By default, the flex layout is horizontal and children are aligned to the
@@ -301,9 +291,20 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
     addAll(children);
   }
 
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Users expect error messages to be shown again after hot reload.
+    assert(() {
+      overflowReportNeeded = true;
+      return true;
+    }());
+  }
+
   /// The direction to use as the main axis.
   Axis get direction => _direction;
   Axis _direction;
+
   set direction(Axis value) {
     assert(value != null);
     if (_direction != value) {
@@ -323,6 +324,7 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
   /// [verticalDirection] must not be null.
   MainAxisAlignment get mainAxisAlignment => _mainAxisAlignment;
   MainAxisAlignment _mainAxisAlignment;
+
   set mainAxisAlignment(MainAxisAlignment value) {
     assert(value != null);
     if (_mainAxisAlignment != value) {
@@ -343,6 +345,7 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
   /// value irrelevant to the final layout.
   MainAxisSize get mainAxisSize => _mainAxisSize;
   MainAxisSize _mainAxisSize;
+
   set mainAxisSize(MainAxisSize value) {
     assert(value != null);
     if (_mainAxisSize != value) {
@@ -362,6 +365,7 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
   /// [textDirection] must not be null.
   CrossAxisAlignment get crossAxisAlignment => _crossAxisAlignment;
   CrossAxisAlignment _crossAxisAlignment;
+
   set crossAxisAlignment(CrossAxisAlignment value) {
     assert(value != null);
     if (_crossAxisAlignment != value) {
@@ -392,6 +396,7 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
   /// [textDirection] must not be null.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection != value) {
       _textDirection = value;
@@ -419,6 +424,7 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
   /// [verticalDirection] must not be null.
   VerticalDirection get verticalDirection => _verticalDirection;
   VerticalDirection _verticalDirection;
+
   set verticalDirection(VerticalDirection value) {
     if (_verticalDirection != value) {
       _verticalDirection = value;
@@ -431,6 +437,7 @@ class RenderFlex extends RenderBoxContainerRenderObjectMixin<RenderBox, FlexPare
   /// Must not be null if [crossAxisAlignment] is [CrossAxisAlignment.baseline].
   TextBaseline get textBaseline => _textBaseline;
   TextBaseline _textBaseline;
+
   set textBaseline(TextBaseline value) {
     assert(_crossAxisAlignment != CrossAxisAlignment.baseline || value != null);
     if (_textBaseline != value) {

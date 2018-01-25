@@ -661,8 +661,9 @@ class ThemeData {
   }
 
   @override
-  String toString() =>
-      '$runtimeType(${ platform != defaultTargetPlatform ? "$platform " : ''}$brightness $primaryColor etc...)';
+  String toString() => '$runtimeType(${ platform != defaultTargetPlatform
+          ? "$platform "
+          : ''}$brightness $primaryColor etc...)';
 }
 
 class _IdentityThemeDataCacheKey {

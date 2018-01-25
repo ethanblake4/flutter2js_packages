@@ -162,7 +162,7 @@ class ScrollPhysics {
   /// The default accuracy to which scrolling is computed.
   static final Tolerance _kDefaultTolerance = new Tolerance(
       // TODO(ianh): Handle the case of the device pixel ratio changing.
-      // TODO(ianh): Get this from the local MediaQuery not dart:ui's window object.
+      // TODO(ianh): Get this from the local MediaQuery not package:flutter/ui.dart's window object.
       velocity: 1.0 /
           (0.050 * ui.window.devicePixelRatio), // logical pixels per second
       distance: 1.0 / ui.window.devicePixelRatio // logical pixels

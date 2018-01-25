@@ -108,6 +108,7 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
 
   /// The duration of the animation.
   Duration get duration => _controller.duration;
+
   set duration(Duration value) {
     assert(value != null);
     if (value == _controller.duration) return;
@@ -116,6 +117,7 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
 
   /// The curve of the animation.
   Curve get curve => _animation.curve;
+
   set curve(Curve value) {
     assert(value != null);
     if (value == _animation.curve) return;
@@ -131,6 +133,7 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
   /// The [TickerProvider] for the [AnimationController] that runs the animation.
   TickerProvider get vsync => _vsync;
   TickerProvider _vsync;
+
   set vsync(TickerProvider value) {
     assert(value != null);
     if (value == _vsync) return;

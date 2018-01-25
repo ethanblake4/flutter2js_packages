@@ -75,9 +75,9 @@ abstract class RenderAbstractViewport extends RenderObject {
 ///    placed inside a [RenderSliver] (the opposite of this class).
 abstract class RenderViewportBase<
         ParentDataClass extends ContainerParentDataMixin<RenderSliver>>
-    extends RenderBoxContainerRenderObjectMixin<RenderSliver, ParentDataClass>
+    extends RenderBox
+    with ContainerRenderObjectMixin<RenderSliver, ParentDataClass>
     implements RenderAbstractViewport {
-
   /// Initializes fields for subclasses.
   RenderViewportBase({
     AxisDirection axisDirection: AxisDirection.down,
@@ -112,6 +112,7 @@ abstract class RenderViewportBase<
   /// bottom of the viewport.
   AxisDirection get axisDirection => _axisDirection;
   AxisDirection _axisDirection;
+
   set axisDirection(AxisDirection value) {
     assert(value != null);
     if (value == _axisDirection) return;
@@ -127,6 +128,7 @@ abstract class RenderViewportBase<
   /// [TextDirection] is [TextDirection.ltr].
   AxisDirection get crossAxisDirection => _crossAxisDirection;
   AxisDirection _crossAxisDirection;
+
   set crossAxisDirection(AxisDirection value) {
     assert(value != null);
     if (value == _crossAxisDirection) return;
@@ -148,6 +150,7 @@ abstract class RenderViewportBase<
   /// is displayed.
   ViewportOffset get offset => _offset;
   ViewportOffset _offset;
+
   set offset(ViewportOffset value) {
     assert(value != null);
     if (value == _offset) return;
@@ -807,6 +810,7 @@ class RenderViewport
   /// on the left edge of the viewport.
   double get anchor => _anchor;
   double _anchor;
+
   set anchor(double value) {
     assert(value != null);
     assert(value >= 0.0 && value <= 1.0);
@@ -824,6 +828,7 @@ class RenderViewport
   /// The [center] must be a child of the viewport.
   RenderSliver get center => _center;
   RenderSliver _center;
+
   set center(RenderSliver value) {
     if (value == _center) return;
     _center = value;

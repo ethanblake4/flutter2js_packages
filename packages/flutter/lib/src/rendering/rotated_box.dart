@@ -29,23 +29,10 @@ class RenderRotatedBox extends RenderBox
     this.child = child;
   }
 
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (child != null) child.attach(owner);
-  }
-
-  /// FLUTTER2JS-ONLY: Copy-pasted from RenderObjectWithChildMixin
-  @override
-  void detach() {
-    super.detach();
-    if (child != null) child.detach();
-  }
-
   /// The number of clockwise quarter turns the child should be rotated.
   int get quarterTurns => _quarterTurns;
   int _quarterTurns;
+
   set quarterTurns(int value) {
     assert(value != null);
     if (_quarterTurns == value) return;

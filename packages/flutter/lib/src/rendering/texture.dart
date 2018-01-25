@@ -41,6 +41,7 @@ class TextureBox extends RenderBox {
   /// The identity of the backend texture.
   int get textureId => _textureId;
   int _textureId;
+
   set textureId(int value) {
     assert(value != null);
     if (value != _textureId) {

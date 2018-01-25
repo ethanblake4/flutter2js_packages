@@ -315,6 +315,7 @@ class DataTable extends StatelessWidget {
   // Set by the constructor to the index of the only Column that is
   // non-numeric, if there is exactly one, otherwise null.
   final int _onlyTextColumn;
+
   static int _initOnlyTextColumn(List<DataColumn> columns) {
     int result;
     for (int index = 0; index < columns.length; index += 1) {

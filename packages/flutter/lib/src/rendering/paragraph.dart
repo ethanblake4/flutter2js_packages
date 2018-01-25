@@ -60,6 +60,7 @@ class RenderParagraph extends RenderBox {
 
   /// The text to display
   TextSpan get text => _textPainter.text;
+
   set text(TextSpan value) {
     assert(value != null);
     switch (_textPainter.text.compareTo(value)) {
@@ -80,6 +81,7 @@ class RenderParagraph extends RenderBox {
 
   /// How the text should be aligned horizontally.
   TextAlign get textAlign => _textPainter.textAlign;
+
   set textAlign(TextAlign value) {
     assert(value != null);
     if (_textPainter.textAlign == value) return;
@@ -101,6 +103,7 @@ class RenderParagraph extends RenderBox {
   ///
   /// This must not be null.
   TextDirection get textDirection => _textPainter.textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (_textPainter.textDirection == value) return;
@@ -117,6 +120,7 @@ class RenderParagraph extends RenderBox {
   /// effects.
   bool get softWrap => _softWrap;
   bool _softWrap;
+
   set softWrap(bool value) {
     assert(value != null);
     if (_softWrap == value) return;
@@ -127,6 +131,7 @@ class RenderParagraph extends RenderBox {
   /// How visual overflow should be handled.
   TextOverflow get overflow => _overflow;
   TextOverflow _overflow;
+
   set overflow(TextOverflow value) {
     assert(value != null);
     if (_overflow == value) return;
@@ -140,6 +145,7 @@ class RenderParagraph extends RenderBox {
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
   double get textScaleFactor => _textPainter.textScaleFactor;
+
   set textScaleFactor(double value) {
     assert(value != null);
     if (_textPainter.textScaleFactor == value) return;
@@ -226,7 +232,7 @@ class RenderParagraph extends RenderBox {
   bool _hasVisualOverflow = false;
   ui.Shader _overflowShader;
 
-  /// Whether this paragraph currently has a [dart:ui.Shader] for its overflow
+  /// Whether this paragraph currently has a [package:flutter/ui.dart.Shader] for its overflow
   /// effect.
   ///
   /// Used to test this object. Not for use in production.

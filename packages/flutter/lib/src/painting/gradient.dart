@@ -12,6 +12,7 @@ import 'basic_types.dart';
 
 class _ColorsAndStops {
   _ColorsAndStops(this.colors, this.stops);
+
   final List<Color> colors;
   final List<double> stops;
 }
@@ -46,7 +47,7 @@ _ColorsAndStops _interpolateColorsAndStops(List<Color> aColors,
 ///
 /// See also:
 ///
-///  * [dart:ui.Gradient], the class in the [dart:ui] library that is
+///  * [package:flutter/ui.dart.Gradient], the class in the [package:flutter/ui.dart] library that is
 ///    encapsulated by this class and its subclasses.
 @immutable
 abstract class Gradient {
@@ -214,7 +215,7 @@ abstract class Gradient {
 ///
 /// This class is used by [BoxDecoration] to represent gradients. This abstracts
 /// out the arguments to the [new ui.Gradient.linear] constructor from the
-/// `dart:ui` library.
+/// `package:flutter/ui.dart` library.
 ///
 /// A gradient has two anchor points, [begin] and [end]. The [begin] point
 /// corresponds to 0.0, and the [end] point corresponds to 1.0. These points are
@@ -436,7 +437,7 @@ class LinearGradient extends Gradient {
 ///
 /// This class is used by [BoxDecoration] to represent gradients. This abstracts
 /// out the arguments to the [new ui.Gradient.radial] constructor from the
-/// `dart:ui` library.
+/// `package:flutter/ui.dart` library.
 ///
 /// A gradient has a [center] and a [radius]. The [center] point corresponds to
 /// 0.0, and the ring at [radius] from the center corresponds to 1.0. These

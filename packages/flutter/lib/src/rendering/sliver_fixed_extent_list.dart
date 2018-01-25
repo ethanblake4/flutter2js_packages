@@ -282,6 +282,7 @@ class RenderSliverFixedExtentList extends RenderSliverFixedExtentBoxAdaptor {
   @override
   double get itemExtent => _itemExtent;
   double _itemExtent;
+
   set itemExtent(double value) {
     assert(value != null);
     if (_itemExtent == value) return;

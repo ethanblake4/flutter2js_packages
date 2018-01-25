@@ -175,6 +175,7 @@ enum _CornerId { topLeft, topRight, bottomLeft, bottomRight }
 
 class _Diagonal {
   const _Diagonal(this.beginId, this.endId);
+
   final _CornerId beginId;
   final _CornerId endId;
 }

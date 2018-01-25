@@ -31,7 +31,7 @@ abstract class Image {
 /// [list] is the binary image data (e.g a PNG or GIF binary data).
 /// The data can be for either static or animated images.
 ///
-/// The following image formats are supported: {@macro flutter.dart:ui.imageFormats}
+/// The following image formats are supported: {@macro flutter.package:flutter/ui.dart.imageFormats}
 ///
 /// The returned future can complete with an error if the image decoding has
 /// failed.

@@ -185,6 +185,7 @@ class RenderEditable extends RenderBox {
   /// The text to display.
   TextSpan get text => _textPainter.text;
   final TextPainter _textPainter;
+
   set text(TextSpan value) {
     if (_textPainter.text == value) return;
     _textPainter.text = value;
@@ -196,6 +197,7 @@ class RenderEditable extends RenderBox {
   ///
   /// This must not be null.
   TextAlign get textAlign => _textPainter.textAlign;
+
   set textAlign(TextAlign value) {
     assert(value != null);
     if (_textPainter.textAlign == value) return;
@@ -217,6 +219,7 @@ class RenderEditable extends RenderBox {
   ///
   /// This must not be null.
   TextDirection get textDirection => _textPainter.textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (_textPainter.textDirection == value) return;
@@ -228,6 +231,7 @@ class RenderEditable extends RenderBox {
   /// The color to use when painting the cursor.
   Color get cursorColor => _cursorColor;
   Color _cursorColor;
+
   set cursorColor(Color value) {
     if (_cursorColor == value) return;
     _cursorColor = value;
@@ -237,6 +241,7 @@ class RenderEditable extends RenderBox {
   /// Whether to paint the cursor.
   ValueNotifier<bool> get showCursor => _showCursor;
   ValueNotifier<bool> _showCursor;
+
   set showCursor(ValueNotifier<bool> value) {
     assert(value != null);
     if (_showCursor == value) return;
@@ -249,6 +254,7 @@ class RenderEditable extends RenderBox {
   /// Whether the editable is currently focused.
   bool get hasFocus => _hasFocus;
   bool _hasFocus;
+
   set hasFocus(bool value) {
     assert(value != null);
     if (_hasFocus == value) return;
@@ -280,6 +286,7 @@ class RenderEditable extends RenderBox {
   /// The color to use when painting the selection.
   Color get selectionColor => _selectionColor;
   Color _selectionColor;
+
   set selectionColor(Color value) {
     if (_selectionColor == value) return;
     _selectionColor = value;
@@ -291,6 +298,7 @@ class RenderEditable extends RenderBox {
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
   double get textScaleFactor => _textPainter.textScaleFactor;
+
   set textScaleFactor(double value) {
     assert(value != null);
     if (_textPainter.textScaleFactor == value) return;
@@ -303,6 +311,7 @@ class RenderEditable extends RenderBox {
   /// The region of text that is selected, if any.
   TextSelection get selection => _selection;
   TextSelection _selection;
+
   set selection(TextSelection value) {
     if (_selection == value) return;
     _selection = value;
@@ -318,6 +327,7 @@ class RenderEditable extends RenderBox {
   /// visible by shifting the text by the given offset before clipping.
   ViewportOffset get offset => _offset;
   ViewportOffset _offset;
+
   set offset(ViewportOffset value) {
     assert(value != null);
     if (_offset == value) return;

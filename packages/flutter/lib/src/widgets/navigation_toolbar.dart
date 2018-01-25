@@ -115,10 +115,10 @@ class _ToolbarLayout extends MultiChildLayoutDelegate {
     if (hasChild(_ToolbarSlot.leading)) {
       final BoxConstraints constraints = new BoxConstraints(
         minWidth: 0.0,
-        maxWidth: size.width /
-            3.0, // The leading widget shouldn't take up more than 1/3 of the space.
-        minHeight:
-            size.height, // The height should be exactly the height of the bar.
+        maxWidth: size.width / 3.0,
+        // The leading widget shouldn't take up more than 1/3 of the space.
+        minHeight: size.height,
+        // The height should be exactly the height of the bar.
         maxHeight: size.height,
       );
       leadingWidth = layoutChild(_ToolbarSlot.leading, constraints).width;

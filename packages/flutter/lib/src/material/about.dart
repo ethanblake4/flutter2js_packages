@@ -368,8 +368,8 @@ class _LicensePageState extends State<LicensePage> {
       setState(() {
         _licenses.add(const Padding(
             padding: const EdgeInsets.symmetric(vertical: 18.0),
-            child: const Text(
-                '🍀‬', // That's U+1F340. Could also use U+2766 (❦) if U+1F340 doesn't work everywhere.
+            child: const Text('🍀‬',
+                // That's U+1F340. Could also use U+2766 (❦) if U+1F340 doesn't work everywhere.
                 textAlign: TextAlign.center)));
         _licenses.add(new Container(
             decoration: const BoxDecoration(

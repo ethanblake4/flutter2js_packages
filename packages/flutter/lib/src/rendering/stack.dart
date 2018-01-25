@@ -173,8 +173,9 @@ class RelativeRect {
   int get hashCode => hashValues(left, top, right, bottom);
 
   @override
-  String toString() =>
-      'RelativeRect.fromLTRB(${left?.toStringAsFixed(1)}, ${top?.toStringAsFixed(1)}, ${right?.toStringAsFixed(1)}, ${bottom?.toStringAsFixed(1)})';
+  String toString() => 'RelativeRect.fromLTRB(${left?.toStringAsFixed(1)}, ${top
+      ?.toStringAsFixed(1)}, ${right?.toStringAsFixed(1)}, ${bottom
+      ?.toStringAsFixed(1)})';
 }
 
 /// Parent data for use with [RenderStack].
@@ -203,6 +204,7 @@ class StackParentData extends ContainerBoxParentData<RenderBox> {
 
   /// Get or set the current values in terms of a RelativeRect object.
   RelativeRect get rect => new RelativeRect.fromLTRB(left, top, right, bottom);
+
   set rect(RelativeRect value) {
     top = value.top;
     right = value.right;
@@ -327,7 +329,9 @@ enum Overflow {
 /// See also:
 ///
 ///  * [RenderFlow]
-class RenderStack extends RenderBoxContainerRenderObjectMixin<RenderBox, StackParentData> with
+class RenderStack extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, StackParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, StackParentData> {
   /// Creates a stack render object.
   ///
@@ -384,6 +388,7 @@ class RenderStack extends RenderBoxContainerRenderObjectMixin<RenderBox, StackPa
   /// must not be null.
   AlignmentGeometry get alignment => _alignment;
   AlignmentGeometry _alignment;
+
   set alignment(AlignmentGeometry value) {
     assert(value != null);
     if (_alignment == value) return;
@@ -397,6 +402,7 @@ class RenderStack extends RenderBoxContainerRenderObjectMixin<RenderBox, StackPa
   /// to a value that does not depend on the direction.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
@@ -410,6 +416,7 @@ class RenderStack extends RenderBoxContainerRenderObjectMixin<RenderBox, StackPa
   /// ([StackFit.expand]).
   StackFit get fit => _fit;
   StackFit _fit;
+
   set fit(StackFit value) {
     assert(value != null);
     if (_fit != value) {
@@ -424,6 +431,7 @@ class RenderStack extends RenderBoxContainerRenderObjectMixin<RenderBox, StackPa
   /// [Overflow.clip], children cannot paint outside of the stack's box.
   Overflow get overflow => _overflow;
   Overflow _overflow;
+
   set overflow(Overflow value) {
     assert(value != null);
     if (_overflow != value) {
@@ -656,6 +664,7 @@ class RenderIndexedStack extends RenderStack {
   /// The index of the child to show, null if nothing is to be displayed.
   int get index => _index;
   int _index;
+
   set index(int value) {
     if (_index != value) {
       _index = value;

@@ -23,8 +23,9 @@ class TableCellParentData extends BoxParentData {
   int y;
 
   @override
-  String toString() =>
-      '${super.toString()}; ${verticalAlignment == null ? "default vertical alignment" : "$verticalAlignment"}';
+  String toString() => '${super.toString()}; ${verticalAlignment == null
+      ? "default vertical alignment"
+      : "$verticalAlignment"}';
 }
 
 /// Base class to describe how wide a column in a [RenderTable] should be.
@@ -387,6 +388,7 @@ class RenderTable extends RenderBox {
   /// needs to rearrange its internal representation.
   int get columns => _columns;
   int _columns;
+
   set columns(int value) {
     assert(value != null);
     assert(value >= 0);
@@ -417,6 +419,7 @@ class RenderTable extends RenderBox {
   /// in the table.
   int get rows => _rows;
   int _rows;
+
   set rows(int value) {
     assert(value != null);
     assert(value >= 0);
@@ -443,6 +446,7 @@ class RenderTable extends RenderBox {
   Map<int, TableColumnWidth> get columnWidths =>
       new Map<int, TableColumnWidth>.unmodifiable(_columnWidths);
   Map<int, TableColumnWidth> _columnWidths;
+
   set columnWidths(Map<int, TableColumnWidth> value) {
     value ??= new HashMap<int, TableColumnWidth>();
     if (_columnWidths == value) return;
@@ -463,6 +467,7 @@ class RenderTable extends RenderBox {
   /// `columnWidths[i]` is null.
   TableColumnWidth get defaultColumnWidth => _defaultColumnWidth;
   TableColumnWidth _defaultColumnWidth;
+
   set defaultColumnWidth(TableColumnWidth value) {
     assert(value != null);
     if (defaultColumnWidth == value) return;
@@ -473,6 +478,7 @@ class RenderTable extends RenderBox {
   /// The direction in which the columns are ordered.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (_textDirection == value) return;
@@ -483,6 +489,7 @@ class RenderTable extends RenderBox {
   /// The style to use when painting the boundary and interior divisions of the table.
   TableBorder get border => _border;
   TableBorder _border;
+
   set border(TableBorder value) {
     if (border == value) return;
     _border = value;
@@ -498,6 +505,7 @@ class RenderTable extends RenderBox {
       _rowDecorations ?? const <Decoration>[]);
   List<Decoration> _rowDecorations;
   List<BoxPainter> _rowDecorationPainters;
+
   set rowDecorations(List<Decoration> value) {
     if (_rowDecorations == value) return;
     _rowDecorations = value;
@@ -514,6 +522,7 @@ class RenderTable extends RenderBox {
   /// [BoxPainter.paint].
   ImageConfiguration get configuration => _configuration;
   ImageConfiguration _configuration;
+
   set configuration(ImageConfiguration value) {
     assert(value != null);
     if (value == _configuration) return;
@@ -525,6 +534,7 @@ class RenderTable extends RenderBox {
   TableCellVerticalAlignment get defaultVerticalAlignment =>
       _defaultVerticalAlignment;
   TableCellVerticalAlignment _defaultVerticalAlignment;
+
   set defaultVerticalAlignment(TableCellVerticalAlignment value) {
     if (_defaultVerticalAlignment == value) return;
     _defaultVerticalAlignment = value;
@@ -534,6 +544,7 @@ class RenderTable extends RenderBox {
   /// The text baseline to use when aligning rows using [TableCellVerticalAlignment.baseline].
   TextBaseline get textBaseline => _textBaseline;
   TextBaseline _textBaseline;
+
   set textBaseline(TextBaseline value) {
     if (_textBaseline == value) return;
     _textBaseline = value;
@@ -742,6 +753,7 @@ class RenderTable extends RenderBox {
   }
 
   double _baselineDistance;
+
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     // returns the baseline of the first cell that has a baseline in the first row

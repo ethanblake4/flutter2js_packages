@@ -20,6 +20,7 @@ import 'framework.dart';
 // waiting for.
 class _Pending {
   _Pending(this.delegate, this.futureValue);
+
   final LocalizationsDelegate<dynamic> delegate;
   final Future<dynamic> futureValue;
 }

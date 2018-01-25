@@ -3972,5 +3972,5 @@ class Icons {
   /// <p><i class="material-icons md-36">zoom_out_map</i> &#x2014; material icon named "zoom out map".</p>
   static const IconData zoom_out_map =
       const IconData(0xe56b, fontFamily: 'MaterialIcons');
-  // END GENERATED
+// END GENERATED
 }

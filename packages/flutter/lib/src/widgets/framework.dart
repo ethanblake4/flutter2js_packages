@@ -2077,7 +2077,8 @@ class BuildOwner {
       if (debugPrintScheduleBuildForStacks)
         debugPrintStack(
             label:
-                'scheduleBuildFor() called for $element${_dirtyElements.contains(element) ? " (ALREADY IN LIST)" : ""}');
+                'scheduleBuildFor() called for $element${_dirtyElements.contains(
+                element) ? " (ALREADY IN LIST)" : ""}');
       if (!element.dirty) {
         throw new FlutterError(
             'scheduleBuildFor() called for a widget that is not marked as dirty.\n'
@@ -2122,6 +2123,7 @@ class BuildOwner {
   }
 
   int _debugStateLockLevel = 0;
+
   bool get _debugStateLocked => _debugStateLockLevel > 0;
 
   /// Whether this widget tree is in the build phase.
@@ -2842,8 +2844,8 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
     if (!Widget.canUpdate(element.widget, newWidget)) return null;
     assert(() {
       if (debugPrintGlobalKeyedWidgetLifecycle)
-        debugPrint(
-            'Attempting to take $element from ${element._parent ?? "inactive elements list"} to put in $this.');
+        debugPrint('Attempting to take $element from ${element._parent ??
+                "inactive elements list"} to put in $this.');
       return true;
     }());
     final Element parent = element._parent;
@@ -3153,7 +3155,8 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
         throw new FlutterError(
             'Cannot get size from a render object that is not a RenderBox.\n'
             'Instead of being a subtype of RenderBox, the render object associated '
-            'with this element is a ${renderObject.runtimeType}. If this type of '
+            'with this element is a ${renderObject
+                .runtimeType}. If this type of '
             'render object does have a size, consider calling findRenderObject '
             'and extracting its size manually.\n'
             'The size getter was called for the following element:\n'
@@ -3412,6 +3415,7 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
   // This flag ensures that this convenience is only allowed on the element
   // currently undergoing initState, didUpdateWidget, or build.
   bool _debugAllowIgnoredCallsToMarkNeedsBuild = false;
+
   bool _debugSetAllowIgnoredCallsToMarkNeedsBuild(bool value) {
     assert(_debugAllowIgnoredCallsToMarkNeedsBuild == !value);
     _debugAllowIgnoredCallsToMarkNeedsBuild = value;
@@ -3438,7 +3442,8 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
         if (!_debugAllowIgnoredCallsToMarkNeedsBuild) {
           throw new FlutterError(
               'setState() or markNeedsBuild() called during build.\n'
-              'This ${widget.runtimeType} widget cannot be marked as needing to build because the framework '
+              'This ${widget
+                  .runtimeType} widget cannot be marked as needing to build because the framework '
               'is already in the process of building widgets. A widget can be marked as '
               'needing to be built during the build phase only if one of its ancestors '
               'is currently building. This exception is allowed because the framework '
@@ -3447,7 +3452,10 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
               'widget during this build phase.\n'
               'The widget on which setState() or markNeedsBuild() was called was:\n'
               '  $this\n'
-              '${owner._debugCurrentBuildTarget == null ? "" : "The widget which was currently being built when the offending call was made was:\n  ${owner._debugCurrentBuildTarget}"}');
+              '${owner._debugCurrentBuildTarget == null
+                  ? ""
+                  : "The widget which was currently being built when the offending call was made was:\n  ${owner
+                  ._debugCurrentBuildTarget}"}');
         }
         assert(
             dirty); // can only get here if we're not in scope, but ignored calls are allowed, and our call would somehow be ignored (since we're already dirty)
@@ -3455,7 +3463,8 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
         assert(!_debugAllowIgnoredCallsToMarkNeedsBuild);
         throw new FlutterError(
             'setState() or markNeedsBuild() called when widget tree was locked.\n'
-            'This ${widget.runtimeType} widget cannot be marked as needing to build '
+            'This ${widget
+                .runtimeType} widget cannot be marked as needing to build '
             'because the framework is locked.\n'
             'The widget on which setState() or markNeedsBuild() was called was:\n'
             '  $this\n');
@@ -3707,10 +3716,13 @@ class StatefulElement extends ComponentElement {
     assert(() {
       if (!_state._debugTypesAreRight(widget)) {
         throw new FlutterError(
-            'StatefulWidget.createState must return a subtype of State<${widget.runtimeType}>\n'
-            'The createState function for ${widget.runtimeType} returned a state '
+            'StatefulWidget.createState must return a subtype of State<${widget
+                .runtimeType}>\n'
+            'The createState function for ${widget
+                .runtimeType} returned a state '
             'of type ${_state.runtimeType}, which is not a subtype of '
-            'State<${widget.runtimeType}>, violating the contract for createState.');
+            'State<${widget
+                .runtimeType}>, violating the contract for createState.');
       }
       return true;
     }());
@@ -3814,7 +3826,8 @@ class StatefulElement extends ComponentElement {
     assert(() {
       if (state._debugLifecycleState == _StateLifecycle.created) {
         throw new FlutterError(
-            'inheritFromWidgetOfExactType($targetType) was called before ${_state.runtimeType}.initState() completed.\n'
+            'inheritFromWidgetOfExactType($targetType) was called before ${_state
+                .runtimeType}.initState() completed.\n'
             'When an inherited widget changes, for example if the value of Theme.of() changes, '
             'its dependent widgets are rebuilt. If the dependent widget\'s reference to '
             'the inherited widget is in a constructor or an initState() method, '
@@ -4708,6 +4721,7 @@ class MultiChildRenderObjectElement extends RenderObjectElement {
       _children.where((Element child) => !_forgottenChildren.contains(child));
 
   List<Element> _children;
+
   // We keep a set of forgotten children to avoid O(n^2) work walking _children
   // repeatedly to remove children.
   final Set<Element> _forgottenChildren = new HashSet<Element>();
@@ -4780,7 +4794,9 @@ class MultiChildRenderObjectElement extends RenderObjectElement {
 
 class _DebugCreator {
   _DebugCreator(this.element);
+
   final RenderObjectElement element;
+
   @override
   String toString() => element.debugGetCreatorChain(12);
 }

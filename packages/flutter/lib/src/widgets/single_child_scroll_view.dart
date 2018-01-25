@@ -189,6 +189,7 @@ class _RenderSingleChildViewport extends RenderBox
 
   AxisDirection get axisDirection => _axisDirection;
   AxisDirection _axisDirection;
+
   set axisDirection(AxisDirection value) {
     assert(value != null);
     if (value == _axisDirection) return;
@@ -200,6 +201,7 @@ class _RenderSingleChildViewport extends RenderBox
 
   ViewportOffset get offset => _offset;
   ViewportOffset _offset;
+
   set offset(ViewportOffset value) {
     assert(value != null);
     if (value == _offset) return;

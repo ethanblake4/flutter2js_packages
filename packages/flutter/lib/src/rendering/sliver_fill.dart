@@ -49,6 +49,7 @@ class RenderSliverFillViewport extends RenderSliverFixedExtentBoxAdaptor {
   /// the viewport in the main axis.
   double get viewportFraction => _viewportFraction;
   double _viewportFraction;
+
   set viewportFraction(double value) {
     assert(value != null);
     if (_viewportFraction == value) return;

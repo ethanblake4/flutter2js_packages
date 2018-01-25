@@ -215,6 +215,7 @@ class _RenderCupertinoSlider extends RenderConstrainedBox {
 
   double get value => _value;
   double _value;
+
   set value(double newValue) {
     assert(newValue != null && newValue >= 0.0 && newValue <= 1.0);
     if (newValue == _value) return;
@@ -227,6 +228,7 @@ class _RenderCupertinoSlider extends RenderConstrainedBox {
 
   int get divisions => _divisions;
   int _divisions;
+
   set divisions(int value) {
     if (value == _divisions) return;
     _divisions = value;
@@ -235,6 +237,7 @@ class _RenderCupertinoSlider extends RenderConstrainedBox {
 
   Color get activeColor => _activeColor;
   Color _activeColor;
+
   set activeColor(Color value) {
     if (value == _activeColor) return;
     _activeColor = value;
@@ -243,6 +246,7 @@ class _RenderCupertinoSlider extends RenderConstrainedBox {
 
   ValueChanged<double> get onChanged => _onChanged;
   ValueChanged<double> _onChanged;
+
   set onChanged(ValueChanged<double> value) {
     if (value == _onChanged) return;
     final bool wasInteractive = isInteractive;
@@ -252,6 +256,7 @@ class _RenderCupertinoSlider extends RenderConstrainedBox {
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (_textDirection == value) return;
@@ -272,7 +277,9 @@ class _RenderCupertinoSlider extends RenderConstrainedBox {
   }
 
   double get _trackLeft => _kPadding;
+
   double get _trackRight => size.width - _kPadding;
+
   double get _thumbCenter {
     double visualPosition;
     switch (textDirection) {

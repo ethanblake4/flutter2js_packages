@@ -271,6 +271,7 @@ class _RenderSwitch extends RenderToggleable {
 
   ImageProvider get activeThumbImage => _activeThumbImage;
   ImageProvider _activeThumbImage;
+
   set activeThumbImage(ImageProvider value) {
     if (value == _activeThumbImage) return;
     _activeThumbImage = value;
@@ -279,6 +280,7 @@ class _RenderSwitch extends RenderToggleable {
 
   ImageProvider get inactiveThumbImage => _inactiveThumbImage;
   ImageProvider _inactiveThumbImage;
+
   set inactiveThumbImage(ImageProvider value) {
     if (value == _inactiveThumbImage) return;
     _inactiveThumbImage = value;
@@ -287,6 +289,7 @@ class _RenderSwitch extends RenderToggleable {
 
   Color get activeTrackColor => _activeTrackColor;
   Color _activeTrackColor;
+
   set activeTrackColor(Color value) {
     assert(value != null);
     if (value == _activeTrackColor) return;
@@ -296,6 +299,7 @@ class _RenderSwitch extends RenderToggleable {
 
   Color get inactiveTrackColor => _inactiveTrackColor;
   Color _inactiveTrackColor;
+
   set inactiveTrackColor(Color value) {
     assert(value != null);
     if (value == _inactiveTrackColor) return;
@@ -305,6 +309,7 @@ class _RenderSwitch extends RenderToggleable {
 
   ImageConfiguration get configuration => _configuration;
   ImageConfiguration _configuration;
+
   set configuration(ImageConfiguration value) {
     assert(value != null);
     if (value == _configuration) return;
@@ -314,6 +319,7 @@ class _RenderSwitch extends RenderToggleable {
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     assert(value != null);
     if (_textDirection == value) return;

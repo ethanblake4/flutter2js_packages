@@ -456,6 +456,7 @@ class RenderCustomPaint extends RenderProxyBox {
   /// instead.
   Size get preferredSize => _preferredSize;
   Size _preferredSize;
+
   set preferredSize(Size value) {
     assert(value != null);
     if (preferredSize == value) return;
@@ -529,8 +530,10 @@ class RenderCustomPaint extends RenderProxyBox {
       if (debugNewCanvasSaveCount > debugPreviousCanvasSaveCount) {
         throw new FlutterError(
             'The $painter custom painter called canvas.save() or canvas.saveLayer() at least '
-            '${debugNewCanvasSaveCount - debugPreviousCanvasSaveCount} more '
-            'time${debugNewCanvasSaveCount - debugPreviousCanvasSaveCount == 1 ? '' : 's' } '
+            '${debugNewCanvasSaveCount -
+                debugPreviousCanvasSaveCount} more '
+            'time${debugNewCanvasSaveCount - debugPreviousCanvasSaveCount ==
+                1 ? '' : 's' } '
             'than it called canvas.restore().\n'
             'This leaves the canvas in an inconsistent state and will probably result in a broken display.\n'
             'You must pair each call to save()/saveLayer() with a later matching call to restore().');
@@ -538,8 +541,10 @@ class RenderCustomPaint extends RenderProxyBox {
       if (debugNewCanvasSaveCount < debugPreviousCanvasSaveCount) {
         throw new FlutterError(
             'The $painter custom painter called canvas.restore() '
-            '${debugPreviousCanvasSaveCount - debugNewCanvasSaveCount} more '
-            'time${debugPreviousCanvasSaveCount - debugNewCanvasSaveCount == 1 ? '' : 's' } '
+            '${debugPreviousCanvasSaveCount -
+                debugNewCanvasSaveCount} more '
+            'time${debugPreviousCanvasSaveCount - debugNewCanvasSaveCount ==
+                1 ? '' : 's' } '
             'than it called canvas.save() or canvas.saveLayer().\n'
             'This leaves the canvas in an inconsistent state and will result in a broken display.\n'
             'You should only call restore() if you first called save() or saveLayer().');

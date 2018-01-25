@@ -310,6 +310,7 @@ class InkDecoration extends InkFeature {
   /// on the [Material] that owns the [controller].
   Decoration get decoration => _decoration;
   Decoration _decoration;
+
   set decoration(Decoration value) {
     if (value == _decoration) return;
     _decoration = value;
@@ -325,6 +326,7 @@ class InkDecoration extends InkFeature {
   /// of the [referenceBox], at paint time).
   ImageConfiguration get configuration => _configuration;
   ImageConfiguration _configuration;
+
   set configuration(ImageConfiguration value) {
     assert(value != null);
     if (value == _configuration) return;

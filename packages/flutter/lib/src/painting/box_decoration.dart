@@ -156,7 +156,8 @@ class BoxDecoration extends Decoration {
   BoxDecoration scale(double factor) {
     return new BoxDecoration(
       color: Color.lerp(null, color, factor),
-      image: image, // TODO(ianh): fade the image from transparent
+      image: image,
+      // TODO(ianh): fade the image from transparent
       border: BoxBorder.lerp(null, border, factor),
       borderRadius: BorderRadiusGeometry.lerp(null, borderRadius, factor),
       boxShadow: BoxShadow.lerpList(null, boxShadow, factor),
@@ -224,7 +225,8 @@ class BoxDecoration extends Decoration {
     if (t == 1.0) return b;
     return new BoxDecoration(
       color: Color.lerp(a.color, b.color, t),
-      image: t < 0.5 ? a.image : b.image, // TODO(ianh): cross-fade the image
+      image: t < 0.5 ? a.image : b.image,
+      // TODO(ianh): cross-fade the image
       border: BoxBorder.lerp(a.border, b.border, t),
       borderRadius:
           BorderRadiusGeometry.lerp(a.borderRadius, b.borderRadius, t),
@@ -323,6 +325,7 @@ class _BoxDecorationPainter extends BoxPainter {
 
   Paint _cachedBackgroundPaint;
   Rect _rectForCachedBackgroundPaint;
+
   Paint _getBackgroundPaint(Rect rect) {
     assert(rect != null);
     assert(
@@ -384,6 +387,7 @@ class _BoxDecorationPainter extends BoxPainter {
   }
 
   DecorationImagePainter _imagePainter;
+
   void _paintBackgroundImage(
       Canvas canvas, Rect rect, ImageConfiguration configuration) {
     if (_decoration.image == null) return;

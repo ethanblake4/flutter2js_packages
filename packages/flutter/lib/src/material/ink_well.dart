@@ -60,6 +60,7 @@ abstract class InteractiveInkFeature extends InkFeature {
   /// The ink's color.
   Color get color => _color;
   Color _color;
+
   set color(Color value) {
     if (value == _color) return;
     _color = value;
@@ -371,7 +372,8 @@ class InkResponse extends StatefulWidget {
   }
 }
 
-class _InkResponseState<T extends InkResponse> extends AutomaticKeepAliveClientMixin<T> {
+class _InkResponseState<T extends InkResponse>
+    extends AutomaticKeepAliveClientMixin<T> {
   Set<InteractiveInkFeature> _splashes;
   InteractiveInkFeature _currentSplash;
   InkHighlight _lastHighlight;

@@ -98,13 +98,13 @@ class FittedSizes {
 /// This method does not express an opinion regarding the alignment of the
 /// source and destination sizes within the input and output rectangles.
 /// Typically they are centered (this is what [BoxDecoration] does, for
-/// instance, and is how [BoxFit] is defined). The [Alignment] class
-/// provides a convenience function, [Alignment.inscribe], for resolving
-/// the sizes to rects, as shown in the example below.
+/// instance, and is how [BoxFit] is defined). The [Alignment] class provides a
+/// convenience function, [Alignment.inscribe], for resolving the sizes to
+/// rects, as shown in the example below.
 ///
 /// ## Sample code
 ///
-/// This function paints a [dart:ui.Image] `image` onto the [Rect] `outputRect` on a
+/// This function paints a [package:flutter/ui.dart.Image] `image` onto the [Rect] `outputRect` on a
 /// [Canvas] `canvas`, using a [Paint] `paint`, applying the [BoxFit] algorithm
 /// `fit`:
 ///

@@ -176,8 +176,8 @@ class _DismissibleClipper extends CustomClipper<Rect> {
 
 enum _FlingGestureKind { none, forward, reverse }
 
-class _DismissibleState extends TickerProviderStateMixin<Dismissible> implements AutomaticKeepAliveClientMixin<Dismissible> {
-
+class _DismissibleState extends TickerProviderStateMixin<Dismissible>
+    implements AutomaticKeepAliveClientMixin<Dismissible> {
   KeepAliveHandle _keepAliveHandle;
 
   void _ensureKeepAlive() {

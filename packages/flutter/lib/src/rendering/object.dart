@@ -677,6 +677,7 @@ class PipelineOwner {
   /// This object does not have to be a [RenderObject].
   AbstractNode get rootNode => _rootNode;
   AbstractNode _rootNode;
+
   set rootNode(AbstractNode value) {
     if (_rootNode == value) return;
     _rootNode?.detach();
@@ -1326,6 +1327,7 @@ abstract class RenderObject extends AbstractNode
   /// debugAssertDoesMeetConstraints(), and should not be checked in
   /// release mode (where it will always be false).
   static bool debugCheckingIntrinsics = false;
+
   bool _debugSubtreeRelayoutRootAlreadyMarkedNeedsLayout() {
     if (_relayoutBoundary == null)
       return true; // we haven't yet done layout even once, so there's nothing for us to do
@@ -1585,9 +1587,9 @@ abstract class RenderObject extends AbstractNode
     assert(!_doingThisLayoutWithCallback);
     assert(() {
       _debugMutationsLocked = true;
-      if (debugPrintLayouts)
-        debugPrint(
-            'Laying out (${sizedByParent ? "with separate resize" : "with resize allowed"}) $this');
+      if (debugPrintLayouts) debugPrint('Laying out (${sizedByParent
+            ? "with separate resize"
+            : "with resize allowed"}) $this');
       return true;
     }());
     if (sizedByParent) {
@@ -2597,10 +2599,9 @@ abstract class RenderObject extends AbstractNode
   }
 }
 
-/// Generic mixin for render objects with one child.
-///
-/// Provides a child model for a render object subclass that has a unique child.
-abstract class RenderObjectWithChildMixin<ChildType extends RenderObject> implements RenderObject {
+/// IMPORTANT: Dart2js-only.
+abstract class RenderBoxWithChildMixin<ChildType extends RenderObject>
+    extends RenderBox implements RenderObjectWithChildMixin<ChildType> {
   /// Checks whether the given render object has the correct [runtimeType] to be
   /// a child of this render object.
   ///
@@ -2621,7 +2622,8 @@ abstract class RenderObjectWithChildMixin<ChildType extends RenderObject> implem
             'The $runtimeType that expected a $ChildType child was created by:\n'
             '  $debugCreator\n'
             '\n'
-            'The ${child.runtimeType} that did not match the expected child type '
+            'The ${child
+                .runtimeType} that did not match the expected child type '
             'was created by:\n'
             '  ${child.debugCreator}\n');
       }
@@ -2634,10 +2636,103 @@ abstract class RenderObjectWithChildMixin<ChildType extends RenderObject> implem
 
   /// The render object's unique child
   ChildType get child => _child;
+
   set child(ChildType value) {
     if (_child != null) dropChild(_child);
     _child = value;
     if (_child != null) adoptChild(_child);
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (_child != null) _child.attach(owner);
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    if (_child != null) _child.detach();
+  }
+
+  @override
+  void redepthChildren() {
+    if (_child != null) redepthChild(_child);
+  }
+
+  @override
+  void visitChildren(RenderObjectVisitor visitor) {
+    if (_child != null) visitor(_child);
+  }
+
+  @override
+  List<DiagnosticsNode> debugDescribeChildren() {
+    return child != null
+        ? <DiagnosticsNode>[child.toDiagnosticsNode(name: 'child')]
+        : <DiagnosticsNode>[];
+  }
+}
+
+/// Generic mixin for render objects with one child.
+///
+/// Provides a child model for a render object subclass that has a unique child.
+abstract class RenderObjectWithChildMixin<ChildType extends RenderObject>
+    implements RenderObject {
+  // This class is intended to be used as a mixin, and should not be
+  // extended directly.
+  factory RenderObjectWithChildMixin._() => null;
+
+  /// Checks whether the given render object has the correct [runtimeType] to be
+  /// a child of this render object.
+  ///
+  /// Does nothing if assertions are disabled.
+  ///
+  /// Always returns true.
+  bool debugValidateChild(RenderObject child) {
+    assert(() {
+      if (child is! ChildType) {
+        throw new FlutterError(
+            'A $runtimeType expected a child of type $ChildType but received a '
+            'child of type ${child.runtimeType}.\n'
+            'RenderObjects expect specific types of children because they '
+            'coordinate with their children during layout and paint. For '
+            'example, a RenderSliver cannot be the child of a RenderBox because '
+            'a RenderSliver does not understand the RenderBox layout protocol.\n'
+            '\n'
+            'The $runtimeType that expected a $ChildType child was created by:\n'
+            '  $debugCreator\n'
+            '\n'
+            'The ${child
+                .runtimeType} that did not match the expected child type '
+            'was created by:\n'
+            '  ${child.debugCreator}\n');
+      }
+      return true;
+    }());
+    return true;
+  }
+
+  ChildType _child;
+
+  /// The render object's unique child
+  ChildType get child => _child;
+
+  set child(ChildType value) {
+    if (_child != null) dropChild(_child);
+    _child = value;
+    if (_child != null) adoptChild(_child);
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (_child != null) _child.attach(owner);
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    if (_child != null) _child.detach();
   }
 
   @override
@@ -2660,7 +2755,7 @@ abstract class RenderObjectWithChildMixin<ChildType extends RenderObject> implem
 
 /// Parent data to support a doubly-linked list of children.
 abstract class ContainerParentDataMixin<ChildType extends RenderObject>
-    implements ParentData {
+    extends ParentData {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory ContainerParentDataMixin._() => null;
@@ -2671,9 +2766,10 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject>
   /// The next sibling in the parent's child list.
   ChildType nextSibling;
 
-  // Dart2js: Must be manually added
   /// Clear the sibling pointers.
-  void detach_ContainerParentDataMixin() {
+  @override
+  void detach() {
+    super.detach();
     if (previousSibling != null) {
       final ContainerParentDataMixin<ChildType> previousSiblingParentData =
           previousSibling.parentData;
@@ -2693,41 +2789,11 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject>
   }
 }
 
-// Dart2js: A helper
-abstract class RenderBoxContainerRenderObjectMixin<ChildType extends RenderObject, ParentDataType extends ContainerParentDataMixin<ChildType>> extends RenderBox with ContainerRenderObjectMixin<ChildType, ParentDataType> {
-  // Flutter2js: This must be manually added until Dart2js supports mixins.
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    ChildType child = _firstChild;
-    while (child != null) {
-      child.attach(owner);
-      final ParentDataType childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
-
-  // Flutter2js: This must be manually added until Dart2js supports mixins.
-  @override
-  void detach() {
-    super.detach();
-    ChildType child = _firstChild;
-    while (child != null) {
-      child.detach();
-      final ParentDataType childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
-}
-
-/// Generic mixin for render objects with a list of children.
-///
-/// Provides a child model for a render object subclass that has a doubly-linked
-/// list of children.
-abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
+abstract class RenderBoxContainerRenderObjectMixin<
+        ChildType extends RenderObject,
         ParentDataType extends ContainerParentDataMixin<ChildType>>
-    implements RenderObject {
-
+    extends RenderBox
+    implements ContainerRenderObjectMixin<ChildType, ParentDataType> {
   bool _debugUltimatePreviousSiblingOf(ChildType child, {ChildType equals}) {
     ParentDataType childParentData = child.parentData;
     while (childParentData.previousSibling != null) {
@@ -2773,7 +2839,8 @@ abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
             'The $runtimeType that expected a $ChildType child was created by:\n'
             '  $debugCreator\n'
             '\n'
-            'The ${child.runtimeType} that did not match the expected child type '
+            'The ${child
+                .runtimeType} that did not match the expected child type '
             'was created by:\n'
             '  ${child.debugCreator}\n');
       }
@@ -2784,6 +2851,7 @@ abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
 
   ChildType _firstChild;
   ChildType _lastChild;
+
   void _insertIntoChildList(ChildType child, {ChildType after}) {
     final ParentDataType childParentData = child.parentData;
     assert(childParentData.nextSibling == null);
@@ -2923,30 +2991,317 @@ abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
     markNeedsLayout();
   }
 
-  //
-  // Flutter2js: This must be manually added until Dart2js supports mixins.
-  //
-//  @override
-//  void attach(PipelineOwner owner) {
-//    super.attach(owner);
-//    ChildType child = _firstChild;
-//    while (child != null) {
-//      child.attach(owner);
-//      final ParentDataType childParentData = child.parentData;
-//      child = childParentData.nextSibling;
-//    }
-//  }
-//
-//  @override
-//  void detach() {
-//    super.detach();
-//    ChildType child = _firstChild;
-//    while (child != null) {
-//      child.detach();
-//      final ParentDataType childParentData = child.parentData;
-//      child = childParentData.nextSibling;
-//    }
-//  }
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    ChildType child = _firstChild;
+    while (child != null) {
+      child.attach(owner);
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    ChildType child = _firstChild;
+    while (child != null) {
+      child.detach();
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  @override
+  void redepthChildren() {
+    ChildType child = _firstChild;
+    while (child != null) {
+      redepthChild(child);
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  @override
+  void visitChildren(RenderObjectVisitor visitor) {
+    ChildType child = _firstChild;
+    while (child != null) {
+      visitor(child);
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  /// The first child in the child list.
+  ChildType get firstChild => _firstChild;
+
+  /// The last child in the child list.
+  ChildType get lastChild => _lastChild;
+
+  /// The previous child before the given child in the child list.
+  ChildType childBefore(ChildType child) {
+    assert(child != null);
+    assert(child.parent == this);
+    final ParentDataType childParentData = child.parentData;
+    return childParentData.previousSibling;
+  }
+
+  /// The next child after the given child in the child list.
+  ChildType childAfter(ChildType child) {
+    assert(child != null);
+    assert(child.parent == this);
+    final ParentDataType childParentData = child.parentData;
+    return childParentData.nextSibling;
+  }
+
+  @override
+  List<DiagnosticsNode> debugDescribeChildren() {
+    final List<DiagnosticsNode> children = <DiagnosticsNode>[];
+    if (firstChild != null) {
+      ChildType child = firstChild;
+      int count = 1;
+      while (true) {
+        children.add(child.toDiagnosticsNode(name: 'child $count'));
+        if (child == lastChild) break;
+        count += 1;
+        final ParentDataType childParentData = child.parentData;
+        child = childParentData.nextSibling;
+      }
+    }
+    return children;
+  }
+}
+
+/// Generic mixin for render objects with a list of children.
+///
+/// Provides a child model for a render object subclass that has a doubly-linked
+/// list of children.
+abstract class ContainerRenderObjectMixin<ChildType extends RenderObject,
+        ParentDataType extends ContainerParentDataMixin<ChildType>>
+    implements RenderObject {
+  // This class is intended to be used as a mixin, and should not be
+  // extended directly.
+  factory ContainerRenderObjectMixin._() => null;
+
+  bool _debugUltimatePreviousSiblingOf(ChildType child, {ChildType equals}) {
+    ParentDataType childParentData = child.parentData;
+    while (childParentData.previousSibling != null) {
+      assert(childParentData.previousSibling != child);
+      child = childParentData.previousSibling;
+      childParentData = child.parentData;
+    }
+    return child == equals;
+  }
+
+  bool _debugUltimateNextSiblingOf(ChildType child, {ChildType equals}) {
+    ParentDataType childParentData = child.parentData;
+    while (childParentData.nextSibling != null) {
+      assert(childParentData.nextSibling != child);
+      child = childParentData.nextSibling;
+      childParentData = child.parentData;
+    }
+    return child == equals;
+  }
+
+  int _childCount = 0;
+
+  /// The number of children.
+  int get childCount => _childCount;
+
+  /// Checks whether the given render object has the correct [runtimeType] to be
+  /// a child of this render object.
+  ///
+  /// Does nothing if assertions are disabled.
+  ///
+  /// Always returns true.
+  bool debugValidateChild(RenderObject child) {
+    assert(() {
+      if (child is! ChildType) {
+        throw new FlutterError(
+            'A $runtimeType expected a child of type $ChildType but received a '
+            'child of type ${child.runtimeType}.\n'
+            'RenderObjects expect specific types of children because they '
+            'coordinate with their children during layout and paint. For '
+            'example, a RenderSliver cannot be the child of a RenderBox because '
+            'a RenderSliver does not understand the RenderBox layout protocol.\n'
+            '\n'
+            'The $runtimeType that expected a $ChildType child was created by:\n'
+            '  $debugCreator\n'
+            '\n'
+            'The ${child
+                .runtimeType} that did not match the expected child type '
+            'was created by:\n'
+            '  ${child.debugCreator}\n');
+      }
+      return true;
+    }());
+    return true;
+  }
+
+  ChildType _firstChild;
+  ChildType _lastChild;
+
+  void _insertIntoChildList(ChildType child, {ChildType after}) {
+    final ParentDataType childParentData = child.parentData;
+    assert(childParentData.nextSibling == null);
+    assert(childParentData.previousSibling == null);
+    _childCount += 1;
+    assert(_childCount > 0);
+    if (after == null) {
+      // insert at the start (_firstChild)
+      childParentData.nextSibling = _firstChild;
+      if (_firstChild != null) {
+        final ParentDataType _firstChildParentData = _firstChild.parentData;
+        _firstChildParentData.previousSibling = child;
+      }
+      _firstChild = child;
+      _lastChild ??= child;
+    } else {
+      assert(_firstChild != null);
+      assert(_lastChild != null);
+      assert(_debugUltimatePreviousSiblingOf(after, equals: _firstChild));
+      assert(_debugUltimateNextSiblingOf(after, equals: _lastChild));
+      final ParentDataType afterParentData = after.parentData;
+      if (afterParentData.nextSibling == null) {
+        // insert at the end (_lastChild); we'll end up with two or more children
+        assert(after == _lastChild);
+        childParentData.previousSibling = after;
+        afterParentData.nextSibling = child;
+        _lastChild = child;
+      } else {
+        // insert in the middle; we'll end up with three or more children
+        // set up links from child to siblings
+        childParentData.nextSibling = afterParentData.nextSibling;
+        childParentData.previousSibling = after;
+        // set up links from siblings to child
+        final ParentDataType childPreviousSiblingParentData =
+            childParentData.previousSibling.parentData;
+        final ParentDataType childNextSiblingParentData =
+            childParentData.nextSibling.parentData;
+        childPreviousSiblingParentData.nextSibling = child;
+        childNextSiblingParentData.previousSibling = child;
+        assert(afterParentData.nextSibling == child);
+      }
+    }
+  }
+
+  /// Insert child into this render object's child list after the given child.
+  ///
+  /// If `after` is null, then this inserts the child at the start of the list,
+  /// and the child becomes the new [firstChild].
+  void insert(ChildType child, {ChildType after}) {
+    assert(child != this, 'A RenderObject cannot be inserted into itself.');
+    assert(after != this,
+        'A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.');
+    assert(child != after, 'A RenderObject cannot be inserted after itself.');
+    assert(child != _firstChild);
+    assert(child != _lastChild);
+    adoptChild(child);
+    _insertIntoChildList(child, after: after);
+  }
+
+  /// Append child to the end of this render object's child list.
+  void add(ChildType child) {
+    insert(child, after: _lastChild);
+  }
+
+  /// Add all the children to the end of this render object's child list.
+  void addAll(List<ChildType> children) {
+    children?.forEach(add);
+  }
+
+  void _removeFromChildList(ChildType child) {
+    final ParentDataType childParentData = child.parentData;
+    assert(_debugUltimatePreviousSiblingOf(child, equals: _firstChild));
+    assert(_debugUltimateNextSiblingOf(child, equals: _lastChild));
+    assert(_childCount >= 0);
+    if (childParentData.previousSibling == null) {
+      assert(_firstChild == child);
+      _firstChild = childParentData.nextSibling;
+    } else {
+      final ParentDataType childPreviousSiblingParentData =
+          childParentData.previousSibling.parentData;
+      childPreviousSiblingParentData.nextSibling = childParentData.nextSibling;
+    }
+    if (childParentData.nextSibling == null) {
+      assert(_lastChild == child);
+      _lastChild = childParentData.previousSibling;
+    } else {
+      final ParentDataType childNextSiblingParentData =
+          childParentData.nextSibling.parentData;
+      childNextSiblingParentData.previousSibling =
+          childParentData.previousSibling;
+    }
+    childParentData.previousSibling = null;
+    childParentData.nextSibling = null;
+    _childCount -= 1;
+  }
+
+  /// Remove this child from the child list.
+  ///
+  /// Requires the child to be present in the child list.
+  void remove(ChildType child) {
+    _removeFromChildList(child);
+    dropChild(child);
+  }
+
+  /// Remove all their children from this render object's child list.
+  ///
+  /// More efficient than removing them individually.
+  void removeAll() {
+    ChildType child = _firstChild;
+    while (child != null) {
+      final ParentDataType childParentData = child.parentData;
+      final ChildType next = childParentData.nextSibling;
+      childParentData.previousSibling = null;
+      childParentData.nextSibling = null;
+      dropChild(child);
+      child = next;
+    }
+    _firstChild = null;
+    _lastChild = null;
+    _childCount = 0;
+  }
+
+  /// Move this child in the child list to be before the given child.
+  ///
+  /// More efficient than removing and re-adding the child. Requires the child
+  /// to already be in the child list at some position. Pass null for before to
+  /// move the child to the end of the child list.
+  void move(ChildType child, {ChildType after}) {
+    assert(child != this);
+    assert(after != this);
+    assert(child != after);
+    assert(child.parent == this);
+    final ParentDataType childParentData = child.parentData;
+    if (childParentData.previousSibling == after) return;
+    _removeFromChildList(child);
+    _insertIntoChildList(child, after: after);
+    markNeedsLayout();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    ChildType child = _firstChild;
+    while (child != null) {
+      child.attach(owner);
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    ChildType child = _firstChild;
+    while (child != null) {
+      child.detach();
+      final ParentDataType childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+  }
 
   @override
   void redepthChildren() {

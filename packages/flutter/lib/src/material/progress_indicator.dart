@@ -60,6 +60,7 @@ abstract class ProgressIndicator extends StatefulWidget {
 
   Color _getBackgroundColor(BuildContext context) =>
       backgroundColor ?? Theme.of(context).backgroundColor;
+
   Color _getValueColor(BuildContext context) =>
       valueColor?.value ?? Theme.of(context).accentColor;
 
@@ -225,8 +226,10 @@ class _LinearProgressIndicatorState
         painter: new _LinearProgressIndicatorPainter(
           backgroundColor: widget._getBackgroundColor(context),
           valueColor: widget._getValueColor(context),
-          value: widget.value, // may be null
-          animationValue: animationValue, // ignored if widget.value is not null
+          value: widget.value,
+          // may be null
+          animationValue: animationValue,
+          // ignored if widget.value is not null
           textDirection: textDirection,
         ),
       ),
@@ -252,6 +255,7 @@ class _LinearProgressIndicatorState
 class _CircularProgressIndicatorPainter extends CustomPainter {
   static const double _kTwoPI = math.PI * 2.0;
   static const double _kEpsilon = .001;
+
   // Canavs.drawArc(r, 0, 2*PI) doesn't draw anything, so just get close.
   static const double _kSweep = _kTwoPI - _kEpsilon;
   static const double _kStartAngle = -math.PI / 2.0;
@@ -407,9 +411,10 @@ class _CircularProgressIndicatorState
       child: new CustomPaint(
         painter: new _CircularProgressIndicatorPainter(
           valueColor: widget._getValueColor(context),
-          value: widget.value, // may be null
-          headValue:
-              headValue, // remaining arguments are ignored if widget.value is not null
+          value: widget.value,
+          // may be null
+          headValue: headValue,
+          // remaining arguments are ignored if widget.value is not null
           tailValue: tailValue,
           stepValue: stepValue,
           rotationValue: rotationValue,
@@ -570,7 +575,8 @@ class _RefreshProgressIndicatorState extends _CircularProgressIndicatorState {
           child: new CustomPaint(
             painter: new _RefreshProgressIndicatorPainter(
               valueColor: widget._getValueColor(context),
-              value: null, // Draw the indeterminate progress indicator.
+              value: null,
+              // Draw the indeterminate progress indicator.
               headValue: headValue,
               tailValue: tailValue,
               stepValue: stepValue,

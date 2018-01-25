@@ -144,6 +144,7 @@ class TabController extends ChangeNotifier {
   /// then [index] will also be zero.
   int get index => _index;
   int _index;
+
   set index(int value) {
     _changeIndex(value);
   }
@@ -175,6 +176,7 @@ class TabController extends ChangeNotifier {
   /// 0.0 and 1.0 implies that the TabBarView has been dragged to the right.
   double get offset =>
       length > 1 ? _animationController.value - _index.toDouble() : 0.0;
+
   set offset(double value) {
     assert(length > 1);
     assert(value != null);

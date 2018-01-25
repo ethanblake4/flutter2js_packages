@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/ui.dart' as ui show ParagraphBuilder;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/ui.dart' as ui show ParagraphBuilder;
 
 import 'basic_types.dart';
 import 'text_style.dart';
@@ -175,7 +176,7 @@ class TextSpan extends DiagnosticableTree {
     if (hasStyle) builder.pop();
   }
 
-  /// Walks this text span and its decendants in pre-order and calls [visitor]
+  /// Walks this text span and its descendants in pre-order and calls [visitor]
   /// for each span that has text.
   bool visitTextSpan(bool visitor(TextSpan span)) {
     if (text != null) {
@@ -266,7 +267,7 @@ class TextSpan extends DiagnosticableTree {
             '${toStringDeep(prefixLineOne: '  ')}');
       }
       return true;
-    });
+    }());
     return true;
   }
 

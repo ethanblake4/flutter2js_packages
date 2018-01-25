@@ -449,8 +449,8 @@ class DayPicker extends StatelessWidget {
               // day of month before the rest of the date, as they are looking
               // for the day of month. To do that we prepend day of month to the
               // formatted full date.
-              label:
-                  '${localizations.formatDecimal(day)}, ${localizations.formatFullDate(dayToBuild)}',
+              label: '${localizations.formatDecimal(day)}, ${localizations
+                  .formatFullDate(dayToBuild)}',
               selected: isSelectedDay,
               child: new ExcludeSemantics(
                 child: new Text(localizations.formatDecimal(day),
@@ -692,7 +692,8 @@ class _MonthPickerState extends State<MonthPicker> {
               icon: const Icon(Icons.chevron_left),
               tooltip: _isDisplayingFirstMonth
                   ? null
-                  : '${localizations.previousMonthTooltip} ${localizations.formatMonthYear(_previousMonthDate)}',
+                  : '${localizations.previousMonthTooltip} ${localizations
+                  .formatMonthYear(_previousMonthDate)}',
               onPressed: _isDisplayingFirstMonth ? null : _handlePreviousMonth,
             ),
           ),
@@ -703,7 +704,8 @@ class _MonthPickerState extends State<MonthPicker> {
               icon: const Icon(Icons.chevron_right),
               tooltip: _isDisplayingLastMonth
                   ? null
-                  : '${localizations.nextMonthTooltip} ${localizations.formatMonthYear(_nextMonthDate)}',
+                  : '${localizations.nextMonthTooltip} ${localizations
+                  .formatMonthYear(_nextMonthDate)}',
               onPressed: _isDisplayingLastMonth ? null : _handleNextMonth,
             ),
           ),

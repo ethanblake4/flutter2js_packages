@@ -190,12 +190,14 @@ abstract class MultiChildLayoutDelegate {
           if (_debugChildrenNeedingLayout.length > 1) {
             throw new FlutterError(
                 'The $this custom multichild layout delegate forgot to lay out the following children:\n'
-                '  ${_debugChildrenNeedingLayout.map(_debugDescribeChild).join("\n  ")}\n'
+                '  ${_debugChildrenNeedingLayout.map(_debugDescribeChild)
+                    .join("\n  ")}\n'
                 'Each child must be laid out exactly once.');
           } else {
             throw new FlutterError(
                 'The $this custom multichild layout delegate forgot to lay out the following child:\n'
-                '  ${_debugDescribeChild(_debugChildrenNeedingLayout.single)}\n'
+                '  ${_debugDescribeChild(
+                    _debugChildrenNeedingLayout.single)}\n'
                 'Each child must be laid out exactly once.');
           }
         }
@@ -250,7 +252,10 @@ abstract class MultiChildLayoutDelegate {
 /// decide where to position each child. The delegate can also determine the
 /// size of the parent, but the size of the parent cannot depend on the sizes of
 /// the children.
-class RenderCustomMultiChildLayoutBox extends RenderBoxContainerRenderObjectMixin<RenderBox, MultiChildLayoutParentData> with
+class RenderCustomMultiChildLayoutBox
+    extends RenderBoxContainerRenderObjectMixin<RenderBox,
+        MultiChildLayoutParentData>
+    with
         RenderBoxContainerDefaultsMixin<RenderBox, MultiChildLayoutParentData> {
   /// Creates a render object that customizes the layout of multiple children.
   ///
@@ -270,6 +275,7 @@ class RenderCustomMultiChildLayoutBox extends RenderBoxContainerRenderObjectMixi
   /// The delegate that controls the layout of the children.
   MultiChildLayoutDelegate get delegate => _delegate;
   MultiChildLayoutDelegate _delegate;
+
   set delegate(MultiChildLayoutDelegate value) {
     assert(value != null);
     if (_delegate == value) return;

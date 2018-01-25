@@ -21,12 +21,19 @@ abstract class BorderRadiusGeometry {
   const BorderRadiusGeometry();
 
   Radius get _topLeft;
+
   Radius get _topRight;
+
   Radius get _bottomLeft;
+
   Radius get _bottomRight;
+
   Radius get _topStart;
+
   Radius get _topEnd;
+
   Radius get _bottomStart;
+
   Radius get _bottomEnd;
 
   /// Returns the difference between two [BorderRadiusGeometry] objects.

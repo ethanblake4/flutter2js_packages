@@ -9,7 +9,7 @@ import 'package:flutter/ui.dart' show hashValues;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 
-/// A [dart:ui.Image] object with its corresponding scale.
+/// A [package:flutter/ui.dart.Image] object with its corresponding scale.
 ///
 /// ImageInfo objects are used by [ImageStream] objects to represent the
 /// actual data of the image once it has been obtained.
@@ -33,7 +33,7 @@ class ImageInfo {
   ///
   /// For example, if this is 2.0 it means that there are four image pixels for
   /// every one logical pixel, and the image's actual width and height (as given
-  /// by the [dart:ui.Image.width] and [dart:ui.Image.height] properties) are double the
+  /// by the [package:flutter/ui.dart.Image.width] and [package:flutter/ui.dart.Image.height] properties) are double the
   /// height and width that should be used when painting the image (e.g. in the
   /// arguments given to [Canvas.drawImage]).
   final double scale;
@@ -66,7 +66,7 @@ typedef void ImageListener(ImageInfo image, bool synchronousCall);
 
 /// A handle to an image resource.
 ///
-/// ImageStream represents a handle to a [dart:ui.Image] object and its scale
+/// ImageStream represents a handle to a [package:flutter/ui.dart.Image] object and its scale
 /// (together represented by an [ImageInfo] object). The underlying image object
 /// might change over time, either because the image is animating or because the
 /// underlying image resource was mutated.
@@ -161,8 +161,9 @@ class ImageStream extends Diagnosticable {
     properties.add(new ObjectFlagProperty<List<ImageListener>>(
       'listeners',
       _listeners,
-      ifPresent:
-          '${_listeners?.length} listener${_listeners?.length == 1 ? "" : "s" }',
+      ifPresent: '${_listeners?.length} listener${_listeners?.length == 1
+          ? ""
+          : "s" }',
       ifNull: 'no listeners',
       level: _completer != null ? DiagnosticLevel.hidden : DiagnosticLevel.info,
     ));
@@ -170,7 +171,7 @@ class ImageStream extends Diagnosticable {
   }
 }
 
-/// Base class for those that manage the loading of [dart:ui.Image] objects for
+/// Base class for those that manage the loading of [package:flutter/ui.dart.Image] objects for
 /// [ImageStream]s.
 ///
 /// [ImageStreamListener] objects are rarely constructed directly. Generally, an
@@ -242,13 +243,14 @@ abstract class ImageStreamCompleter extends Diagnosticable {
     description.add(new ObjectFlagProperty<List<ImageListener>>(
       'listeners',
       _listeners,
-      ifPresent:
-          '${_listeners?.length} listener${_listeners?.length == 1 ? "" : "s" }',
+      ifPresent: '${_listeners?.length} listener${_listeners?.length == 1
+          ? ""
+          : "s" }',
     ));
   }
 }
 
-/// Manages the loading of [dart:ui.Image] objects for static [ImageStream]s (those
+/// Manages the loading of [package:flutter/ui.dart.Image] objects for static [ImageStream]s (those
 /// with only one frame).
 class OneFrameImageStreamCompleter extends ImageStreamCompleter {
   /// Creates a manager for one-frame [ImageStream]s.
@@ -267,7 +269,7 @@ class OneFrameImageStreamCompleter extends ImageStreamCompleter {
   /// FlutterErrorDetails]).
   OneFrameImageStreamCompleter(Future<ImageInfo> image,
       {InformationCollector informationCollector}) {
-    image.then<Null>(setImage, onError: (dynamic error, StackTrace stack) {
+    image.then(setImage, onError: (dynamic error, StackTrace stack) {
       FlutterError.reportError(new FlutterErrorDetails(
         exception: error,
         stack: stack,
@@ -329,8 +331,7 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
         _scale = scale,
         _framesEmitted = 0,
         _timer = null {
-    codec.then<Null>(_handleCodecReady,
-        onError: (dynamic error, StackTrace stack) {
+    codec.then(_handleCodecReady, onError: (dynamic error, StackTrace stack) {
       FlutterError.reportError(new FlutterErrorDetails(
         exception: error,
         stack: stack,
@@ -346,10 +347,13 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
   final double _scale;
   final InformationCollector _informationCollector;
   ui.FrameInfo _nextFrame;
+
   // When the current was first shown.
   Duration _shownTimestamp;
+
   // The requested duration for the current frame;
   Duration _frameDuration;
+
   // How many frames have been emitted so far.
   int _framesEmitted;
   Timer _timer;

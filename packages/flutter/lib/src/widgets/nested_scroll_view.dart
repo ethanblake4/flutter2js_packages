@@ -462,6 +462,7 @@ class _NestedScrollCoordinator
   }
 
   bool _lastHasScrolledBody;
+
   void updateShadow() {
     final bool newHasScrolledBody = hasScrolledBody;
     if (_lastHasScrolledBody != newHasScrolledBody) {
@@ -1184,7 +1185,8 @@ class _NestedOuterBallisticScrollActivity extends BallisticScrollActivity {
 
   @override
   String toString() {
-    return '$runtimeType(${metrics.minRange} .. ${metrics.maxRange}; correcting by ${metrics.correctionOffset})';
+    return '$runtimeType(${metrics.minRange} .. ${metrics
+        .maxRange}; correcting by ${metrics.correctionOffset})';
   }
 }
 
@@ -1352,6 +1354,7 @@ class RenderSliverOverlapAbsorber extends RenderSliver
 
   SliverOverlapAbsorberHandle get handle => _handle;
   SliverOverlapAbsorberHandle _handle;
+
   set handle(SliverOverlapAbsorberHandle value) {
     assert(value != null);
     if (handle == value) return;
@@ -1508,6 +1511,7 @@ class RenderSliverOverlapInjector extends RenderSliver {
   /// [RenderNestedScrollViewViewport].
   SliverOverlapAbsorberHandle get handle => _handle;
   SliverOverlapAbsorberHandle _handle;
+
   set handle(SliverOverlapAbsorberHandle value) {
     assert(value != null);
     if (handle == value) return;
