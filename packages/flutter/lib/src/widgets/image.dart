@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io' show File;
 import 'dart:typed_data';
 
+import 'package:flutter2js/flutter_internals.dart' show File;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';

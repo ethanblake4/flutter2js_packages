@@ -516,9 +516,10 @@ class _TheatreElement extends RenderObjectElement {
 // This class uses [StackParentData] objects for its parent data so that the
 // children of its primary subtree's stack can be moved to this object's list
 // of zombie children without changing their parent data objects.
-class _RenderTheatre
-    extends RenderBoxContainerRenderObjectMixin<RenderBox, StackParentData>
-    with RenderObjectWithChildMixin<RenderStack>, RenderProxyBoxMixin {
+class _RenderTheatre extends RenderBoxWithChildMixin<RenderBox>
+    with RenderProxyBoxMixin, ContainerRenderObjectMixin<RenderBox, StackParentData> {
+
+  /// IMPORTANT: Flutter2js-only
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
@@ -530,6 +531,7 @@ class _RenderTheatre
     }
   }
 
+  /// IMPORTANT: Flutter2js-only
   @override
   void detach() {
     super.detach();

@@ -1156,12 +1156,6 @@ abstract class SchedulerBindingMixin implements SchedulerBinding {
     return entry.completer.future;
   }
 
-  @override
-  void unlocked() {
-    super.unlocked();
-    if (_taskQueue.isNotEmpty) _ensureEventLoopCallback();
-  }
-
   // Whether this scheduler already requested to be called from the event loop.
   bool _hasRequestedAnEventLoopCallback = false;
 

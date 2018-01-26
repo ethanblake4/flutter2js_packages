@@ -675,15 +675,15 @@ class SliverLogicalParentData extends ParentData {
 /// children using layout offsets.
 class SliverLogicalContainerParentData extends SliverLogicalParentData
     implements ContainerParentDataMixin<RenderSliver> {
-  //
-  // Dart2js: Copy-pasted from ContainerParentDataMixin
-  //
+  /// IMPORTANT: Flutter2js-only
   /// The previous sibling in the parent's child list.
   RenderSliver previousSibling;
 
+  /// IMPORTANT: Flutter2js-only
   /// The next sibling in the parent's child list.
   RenderSliver nextSibling;
 
+  /// IMPORTANT: Flutter2js-only
   /// Clear the sibling pointers.
   @override
   void detach() {
@@ -1488,6 +1488,20 @@ abstract class RenderSliverSingleBoxAdapter extends RenderSliver
     RenderBox child,
   }) {
     this.child = child;
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (child != null) child.attach(owner);
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void detach() {
+    super.detach();
+    if (child != null) child.detach();
   }
 
   @override

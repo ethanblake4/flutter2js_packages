@@ -19,8 +19,7 @@ const double _kQuarterTurnsInRadians = math.PI / 2.0;
 /// Unlike [RenderTransform], which applies a transform just prior to painting,
 /// this object applies its rotation prior to layout, which means the entire
 /// rotated box consumes only as much space as required by the rotated child.
-class RenderRotatedBox extends RenderBox
-    with RenderObjectWithChildMixin<RenderBox> {
+class RenderRotatedBox extends RenderBoxWithChildMixin<RenderBox> {
   /// Creates a rotated render box.
   ///
   /// The [quarterTurns] argument must not be null.

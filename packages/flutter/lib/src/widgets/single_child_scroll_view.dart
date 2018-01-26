@@ -174,8 +174,7 @@ class _SingleChildViewport extends SingleChildRenderObjectWidget {
   }
 }
 
-class _RenderSingleChildViewport extends RenderBox
-    with RenderObjectWithChildMixin<RenderBox>
+class _RenderSingleChildViewport extends RenderBoxWithChildMixin<RenderBox>
     implements RenderAbstractViewport {
   _RenderSingleChildViewport({
     AxisDirection axisDirection: AxisDirection.down,

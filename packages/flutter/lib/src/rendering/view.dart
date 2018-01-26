@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:developer';
-import 'dart:io' show Platform;
+import 'package:flutter2js/io.dart' show Platform;
 import 'package:flutter/ui.dart' as ui show Scene, SceneBuilder, window;
 
 import 'package:flutter/foundation.dart';
@@ -61,6 +61,20 @@ class RenderView extends RenderObject
   })
       : _configuration = configuration {
     this.child = child;
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (child != null) child.attach(owner);
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void detach() {
+    super.detach();
+    if (child != null) child.detach();
   }
 
   /// The amount of time the screen rotation animation should last (aspirational).

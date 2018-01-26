@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 import 'dart:developer' as developer;
-import 'dart:io' show exit;
+import 'package:flutter2js/io.dart' show exit;
 
 import 'package:meta/meta.dart';
 

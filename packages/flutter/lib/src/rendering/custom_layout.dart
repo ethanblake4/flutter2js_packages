@@ -257,6 +257,7 @@ class RenderCustomMultiChildLayoutBox
         MultiChildLayoutParentData>
     with
         RenderBoxContainerDefaultsMixin<RenderBox, MultiChildLayoutParentData> {
+
   /// Creates a render object that customizes the layout of multiple children.
   ///
   /// The [delegate] argument must not be null.

@@ -184,6 +184,33 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
     with
         ContainerRenderObjectMixin<RenderBox, SliverMultiBoxAdaptorParentData>,
         RenderSliverHelpers {
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    RenderBox child = firstChild;
+    while (child != null) {
+      child.attach(owner);
+      final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+    for (RenderBox child in _keepAliveBucket.values) child.attach(owner);
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void detach() {
+    super.detach();
+    RenderBox child = firstChild;
+    while (child != null) {
+      child.detach();
+      final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+    for (RenderBox child in _keepAliveBucket.values) child.detach();
+  }
+
   /// Creates a sliver with multiple box children.
   ///
   /// The [childManager] argument must not be null.
@@ -287,18 +314,6 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
       _childManager.removeChild(child);
       assert(child.parent == null);
     }
-  }
-
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    for (RenderBox child in _keepAliveBucket.values) child.attach(owner);
-  }
-
-  @override
-  void detach() {
-    super.detach();
-    for (RenderBox child in _keepAliveBucket.values) child.detach();
   }
 
   @override

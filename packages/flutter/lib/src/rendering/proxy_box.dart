@@ -35,8 +35,7 @@ export 'package:flutter/gestures.dart'
 /// the proxy box with its child. However, RenderProxyBox is a useful base class
 /// for render objects that wish to mimic most, but not all, of the properties
 /// of their child.
-class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox>
-    implements RenderProxyBoxMixin {
+class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox> implements RenderProxyBoxMixin {
   /// Creates a proxy render box.
   ///
   /// Proxy render boxes are rarely created directly because they simply proxy
@@ -48,64 +47,11 @@ class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox>
     this.child = child;
   }
 
-  @override
-  void setupParentData(RenderObject child) {
-    // We don't actually use the offset argument in BoxParentData, so let's
-    // avoid allocating it at all.
-    if (child.parentData is! ParentData) child.parentData = new ParentData();
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) {
-    if (child != null) return child.getMinIntrinsicWidth(height);
-    return 0.0;
-  }
-
-  @override
-  double computeMaxIntrinsicWidth(double height) {
-    if (child != null) return child.getMaxIntrinsicWidth(height);
-    return 0.0;
-  }
-
-  @override
-  double computeMinIntrinsicHeight(double width) {
-    if (child != null) return child.getMinIntrinsicHeight(width);
-    return 0.0;
-  }
-
-  @override
-  double computeMaxIntrinsicHeight(double width) {
-    if (child != null) return child.getMaxIntrinsicHeight(width);
-    return 0.0;
-  }
-
+  /// IMPORTANT: Flutter2js-only
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     if (child != null) return child.getDistanceToActualBaseline(baseline);
     return super.computeDistanceToActualBaseline(baseline);
-  }
-
-  @override
-  void performLayout() {
-    if (child != null) {
-      child.layout(constraints, parentUsesSize: true);
-      size = child.size;
-    } else {
-      performResize();
-    }
-  }
-
-  @override
-  bool hitTestChildren(HitTestResult result, {Offset position}) {
-    return child?.hitTest(result, position: position) ?? false;
-  }
-
-  @override
-  void applyPaintTransform(RenderObject child, Matrix4 transform) {}
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    if (child != null) context.paintChild(child, offset);
   }
 }
 
@@ -115,8 +61,8 @@ class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox>
 /// of [RenderProxyBox] is desired but inheriting from [RenderProxyBox] is
 /// impractical (e.g. because you want to mix in other classes as well).
 // TODO(ianh): Remove this class once https://github.com/dart-lang/sdk/issues/15101 is fixed
-abstract class RenderProxyBoxMixin
-    implements RenderBox, RenderObjectWithChildMixin<RenderBox> {
+@optionalTypeArgs
+abstract class RenderProxyBoxMixin implements RenderBox, RenderObjectWithChildMixin<RenderBox> {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory RenderProxyBoxMixin._() => null;
@@ -152,11 +98,12 @@ abstract class RenderProxyBoxMixin
     return 0.0;
   }
 
-  @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) {
-    if (child != null) return child.getDistanceToActualBaseline(baseline);
-    return super.computeDistanceToActualBaseline(baseline);
-  }
+  // IMPORTANT: Flutter2js-only
+//  @override
+//  double computeDistanceToActualBaseline(TextBaseline baseline) {
+//    if (child != null) return child.getDistanceToActualBaseline(baseline);
+//    return super.computeDistanceToActualBaseline(baseline);
+//  }
 
   @override
   void performLayout() {

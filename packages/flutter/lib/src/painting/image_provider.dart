@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io' show File;
+import 'package:flutter2js/io.dart' show File;
 import 'dart:typed_data';
 import 'package:flutter/ui.dart' as ui show instantiateImageCodec, Codec;
 import 'package:flutter/ui.dart' show Size, Locale, TextDirection, hashValues;

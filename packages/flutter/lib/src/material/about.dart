@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io' show Platform;
 
+import 'package:flutter2js/io.dart' show Platform;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 

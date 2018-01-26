@@ -39,6 +39,20 @@ class RenderSliverPadding extends RenderSliver
     this.child = child;
   }
 
+  /// IMPORTANT: Flutter2js-only.
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (child != null) child.attach(owner);
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void detach() {
+    super.detach();
+    if (child != null) child.detach();
+  }
+
   EdgeInsets _resolvedPadding;
 
   void _resolve() {

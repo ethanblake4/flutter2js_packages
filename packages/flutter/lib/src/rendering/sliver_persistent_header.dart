@@ -44,6 +44,20 @@ abstract class RenderSliverPersistentHeader extends RenderSliver
     this.child = child;
   }
 
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (child != null) child.attach(owner);
+  }
+
+  /// IMPORTANT: Flutter2js-only
+  @override
+  void detach() {
+    super.detach();
+    if (child != null) child.detach();
+  }
+
   /// The biggest that this render object can become, in the main axis direction.
   ///
   /// This value should not be based on the child. If it changes, call
