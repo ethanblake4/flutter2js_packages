@@ -35,7 +35,7 @@ export 'package:flutter/gestures.dart'
 /// the proxy box with its child. However, RenderProxyBox is a useful base class
 /// for render objects that wish to mimic most, but not all, of the properties
 /// of their child.
-class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox> implements RenderProxyBoxMixin {
+class RenderProxyBox extends RenderBoxWithChildMixin<RenderBox> with RenderProxyBoxMixin {
   /// Creates a proxy render box.
   ///
   /// Proxy render boxes are rarely created directly because they simply proxy

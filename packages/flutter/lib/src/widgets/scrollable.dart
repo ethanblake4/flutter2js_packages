@@ -5,16 +5,20 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'basic.dart';
 import 'framework.dart';
+import 'gesture_detector.dart';
 import 'notification_listener.dart';
+import 'scroll_configuration.dart';
 import 'scroll_context.dart';
 import 'scroll_controller.dart';
 import 'scroll_physics.dart';
 import 'scroll_position.dart';
+import 'scroll_position_with_single_context.dart';
 import 'ticker_provider.dart';
 import 'viewport.dart';
 
@@ -75,6 +79,7 @@ class Scrollable extends StatefulWidget {
     this.controller,
     this.physics,
     @required this.viewportBuilder,
+    this.excludeFromSemantics: false,
   })
       : super(key: key);
 
@@ -141,6 +146,19 @@ class Scrollable extends StatefulWidget {
   ///  * [ShrinkWrappingViewport], which is a viewport that displays a list of
   ///    slivers and sizes itself based on the size of the slivers.
   final ViewportBuilder viewportBuilder;
+
+  /// Whether the scroll actions introduced by this [Scrollable] are exposed
+  /// in the semantics tree.
+  ///
+  /// Text fields with an overflow are usually scrollable to make sure that the
+  /// user can get to the beginning/end of the entered text. However, these
+  /// scrolling actions are generally not exposed to the semantics layer.
+  ///
+  /// See also:
+  ///
+  ///  * [GestureDetector.excludeFromSemantics], which is used to accomplish the
+  ///    exclusion.
+  final bool excludeFromSemantics;
 
   /// The axis along which the scroll view scrolls.
   ///
@@ -242,46 +260,280 @@ class ScrollableState extends TickerProviderStateMixin<Scrollable>
   @override
   AxisDirection get axisDirection => widget.axisDirection;
 
-  @override
-  get notificationContext =>
-      throw new UnsupportedError("Not implemented in Flutter2js");
+  ScrollBehavior _configuration;
+  ScrollPhysics _physics;
+
+  // Only call this from places that will definitely trigger a rebuild.
+  void _updatePosition() {
+    _configuration = ScrollConfiguration.of(context);
+    _physics = _configuration.getScrollPhysics(context);
+    if (widget.physics != null) _physics = widget.physics.applyTo(_physics);
+    final ScrollController controller = widget.controller;
+    final ScrollPosition oldPosition = position;
+    if (oldPosition != null) {
+      controller?.detach(oldPosition);
+      oldPosition.removeListener(_sendSemanticsScrollEvent);
+      // It's important that we not dispose the old position until after the
+      // viewport has had a chance to unregister its listeners from the old
+      // position. So, schedule a microtask to do it.
+      scheduleMicrotask(oldPosition.dispose);
+    }
+
+    _position = controller?.createScrollPosition(_physics, this, oldPosition) ??
+        new ScrollPositionWithSingleContext(
+            physics: _physics, context: this, oldPosition: oldPosition);
+    _position.addListener(_sendSemanticsScrollEvent);
+
+    assert(position != null);
+    controller?.attach(position);
+  }
+
+  bool _semanticsScrollEventScheduled = false;
+
+  void _sendSemanticsScrollEvent() {
+    if (_semanticsScrollEventScheduled) return;
+    SchedulerBinding.instance.addPostFrameCallback((Duration timestamp) {
+      final _RenderExcludableScrollSemantics render =
+          _excludableScrollSemanticsKey.currentContext?.findRenderObject();
+      render?.sendSemanticsEvent(new ScrollCompletedSemanticsEvent(
+        axis: position.axis,
+        pixels: position.pixels,
+        minScrollExtent: position.minScrollExtent,
+        maxScrollExtent: position.maxScrollExtent,
+      ));
+      _semanticsScrollEventScheduled = false;
+    });
+    _semanticsScrollEventScheduled = true;
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _updatePosition();
+  }
+
+  bool _shouldUpdatePosition(Scrollable oldWidget) {
+    ScrollPhysics newPhysics = widget.physics;
+    ScrollPhysics oldPhysics = oldWidget.physics;
+    do {
+      if (newPhysics?.runtimeType != oldPhysics?.runtimeType) return true;
+      newPhysics = newPhysics?.parent;
+      oldPhysics = oldPhysics?.parent;
+    } while (newPhysics != null || oldPhysics != null);
+
+    return widget.controller?.runtimeType != oldWidget.controller?.runtimeType;
   }
 
   @override
   void didUpdateWidget(Scrollable oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller?.detach(position);
+      widget.controller?.attach(position);
+    }
+
+    if (_shouldUpdatePosition(oldWidget)) _updatePosition();
   }
 
   @override
   void dispose() {
+    widget.controller?.detach(position);
+    position.dispose();
     super.dispose();
   }
 
-  // SEMANTICS ACTIONS
+  // SEMANTICS
+
+  final GlobalKey _excludableScrollSemanticsKey = new GlobalKey();
 
   @override
   @protected
-  void setCanDrag(bool canDrag) {}
+  void setSemanticsActions(Set<SemanticsAction> actions) {
+    if (_gestureDetectorKey.currentState != null)
+      _gestureDetectorKey.currentState.replaceSemanticsActions(actions);
+  }
+
+  // GESTURE RECOGNITION AND POINTER IGNORING
+
+  final GlobalKey<RawGestureDetectorState> _gestureDetectorKey =
+      new GlobalKey<RawGestureDetectorState>();
+  final GlobalKey _ignorePointerKey = new GlobalKey();
+
+  // This field is set during layout, and then reused until the next time it is set.
+  Map<Type, GestureRecognizerFactory> _gestureRecognizers =
+      const <Type, GestureRecognizerFactory>{};
+  bool _shouldIgnorePointer = false;
+
+  bool _lastCanDrag;
+  Axis _lastAxisDirection;
+
+  @override
+  @protected
+  void setCanDrag(bool canDrag) {
+    if (canDrag == _lastCanDrag &&
+        (!canDrag || widget.axis == _lastAxisDirection)) return;
+    if (!canDrag) {
+      _gestureRecognizers = const <Type, GestureRecognizerFactory>{};
+    } else {
+      switch (widget.axis) {
+        case Axis.vertical:
+          _gestureRecognizers = <Type, GestureRecognizerFactory>{
+            VerticalDragGestureRecognizer:
+                new GestureRecognizerFactoryWithHandlers<
+                    VerticalDragGestureRecognizer>(
+              () => new VerticalDragGestureRecognizer(),
+              (VerticalDragGestureRecognizer instance) {
+                instance
+                  ..onDown = _handleDragDown
+                  ..onStart = _handleDragStart
+                  ..onUpdate = _handleDragUpdate
+                  ..onEnd = _handleDragEnd
+                  ..onCancel = _handleDragCancel
+                  ..minFlingDistance = _physics?.minFlingDistance
+                  ..minFlingVelocity = _physics?.minFlingVelocity
+                  ..maxFlingVelocity = _physics?.maxFlingVelocity;
+              },
+            ),
+          };
+          break;
+        case Axis.horizontal:
+          _gestureRecognizers = <Type, GestureRecognizerFactory>{
+            HorizontalDragGestureRecognizer:
+                new GestureRecognizerFactoryWithHandlers<
+                    HorizontalDragGestureRecognizer>(
+              () => new HorizontalDragGestureRecognizer(),
+              (HorizontalDragGestureRecognizer instance) {
+                instance
+                  ..onDown = _handleDragDown
+                  ..onStart = _handleDragStart
+                  ..onUpdate = _handleDragUpdate
+                  ..onEnd = _handleDragEnd
+                  ..onCancel = _handleDragCancel
+                  ..minFlingDistance = _physics?.minFlingDistance
+                  ..minFlingVelocity = _physics?.minFlingVelocity
+                  ..maxFlingVelocity = _physics?.maxFlingVelocity;
+              },
+            ),
+          };
+          break;
+      }
+    }
+    _lastCanDrag = canDrag;
+    _lastAxisDirection = widget.axis;
+    if (_gestureDetectorKey.currentState != null)
+      _gestureDetectorKey.currentState
+          .replaceGestureRecognizers(_gestureRecognizers);
+  }
 
   @override
   TickerProvider get vsync => this;
 
   @override
   @protected
-  void setIgnorePointer(bool value) {}
+  void setIgnorePointer(bool value) {
+    if (_shouldIgnorePointer == value) return;
+    _shouldIgnorePointer = value;
+    if (_ignorePointerKey.currentContext != null) {
+      final RenderIgnorePointer renderBox =
+          _ignorePointerKey.currentContext.findRenderObject();
+      renderBox.ignoring = _shouldIgnorePointer;
+    }
+  }
+
+  @override
+  BuildContext get notificationContext => _gestureDetectorKey.currentContext;
 
   @override
   BuildContext get storageContext => context;
+
+  // TOUCH HANDLERS
+
+  Drag _drag;
+  ScrollHoldController _hold;
+
+  void _handleDragDown(DragDownDetails details) {
+    assert(_drag == null);
+    assert(_hold == null);
+    _hold = position.hold(_disposeHold);
+  }
+
+  void _handleDragStart(DragStartDetails details) {
+    // It's possible for _hold to become null between _handleDragDown and
+    // _handleDragStart, for example if some user code calls jumpTo or otherwise
+    // triggers a new activity to begin.
+    assert(_drag == null);
+    _drag = position.drag(details, _disposeDrag);
+    assert(_drag != null);
+    assert(_hold == null);
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details) {
+    // _drag might be null if the drag activity ended and called _disposeDrag.
+    assert(_hold == null || _drag == null);
+    _drag?.update(details);
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    // _drag might be null if the drag activity ended and called _disposeDrag.
+    assert(_hold == null || _drag == null);
+    _drag?.end(details);
+    assert(_drag == null);
+  }
+
+  void _handleDragCancel() {
+    // _hold might be null if the drag started.
+    // _drag might be null if the drag activity ended and called _disposeDrag.
+    assert(_hold == null || _drag == null);
+    _hold?.cancel();
+    _drag?.cancel();
+    assert(_hold == null);
+    assert(_drag == null);
+  }
+
+  void _disposeHold() {
+    _hold = null;
+  }
+
+  void _disposeDrag() {
+    _drag = null;
+  }
 
   // DESCRIPTION
 
   @override
   Widget build(BuildContext context) {
-    throw new UnsupportedError("Scrollable is not supported in Flutter2js");
+    assert(position != null);
+    // TODO(ianh): Having all these global keys is sad.
+    Widget result = new RawGestureDetector(
+      key: _gestureDetectorKey,
+      gestures: _gestureRecognizers,
+      behavior: HitTestBehavior.opaque,
+      excludeFromSemantics: widget.excludeFromSemantics,
+      child: new Semantics(
+        explicitChildNodes: !widget.excludeFromSemantics,
+        child: new IgnorePointer(
+          key: _ignorePointerKey,
+          ignoring: _shouldIgnorePointer,
+          ignoringSemantics: false,
+          child: new _ScrollableScope(
+            scrollable: this,
+            position: position,
+            child: widget.viewportBuilder(context, position),
+          ),
+        ),
+      ),
+    );
+
+    if (!widget.excludeFromSemantics) {
+      result = new _ExcludableScrollSemantics(
+        key: _excludableScrollSemanticsKey,
+        child: result,
+      );
+    }
+
+    return _configuration.buildViewportChrome(
+        context, result, widget.axisDirection);
   }
 
   @override
@@ -289,5 +541,84 @@ class ScrollableState extends TickerProviderStateMixin<Scrollable>
     super.debugFillProperties(description);
     description
         .add(new DiagnosticsProperty<ScrollPosition>('position', position));
+  }
+}
+
+/// With [_ExcludableScrollSemantics] certain child [SemanticsNode]s can be
+/// excluded from the scrollable area for semantics purposes.
+///
+/// Nodes, that are to be excluded, have to be tagged with
+/// [RenderViewport.excludeFromScrolling] and the [RenderAbstractViewport] in
+/// use has to add the [RenderViewport.useTwoPaneSemantics] tag to its
+/// [SemanticsConfiguration] by overriding
+/// [RenderObject.describeSemanticsConfiguration].
+///
+/// If the tag [RenderViewport.useTwoPaneSemantics] is present on the viewport,
+/// two semantics nodes will be used to represent the [Scrollable]: The outer
+/// node will contain all children, that are excluded from scrolling. The inner
+/// node, which is annotated with the scrolling actions, will house the
+/// scrollable children.
+class _ExcludableScrollSemantics extends SingleChildRenderObjectWidget {
+  const _ExcludableScrollSemantics({Key key, Widget child})
+      : super(key: key, child: child);
+
+  @override
+  _RenderExcludableScrollSemantics createRenderObject(BuildContext context) =>
+      new _RenderExcludableScrollSemantics();
+}
+
+class _RenderExcludableScrollSemantics extends RenderProxyBox {
+  _RenderExcludableScrollSemantics({RenderBox child}) : super(child);
+
+  @override
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    super.describeSemanticsConfiguration(config);
+    config.isSemanticBoundary = true;
+  }
+
+  SemanticsNode _innerNode;
+  SemanticsNode _annotatedNode;
+
+  @override
+  void assembleSemanticsNode(SemanticsNode node, SemanticsConfiguration config,
+      Iterable<SemanticsNode> children) {
+    if (children.isEmpty ||
+        !children.first.isTagged(RenderViewport.useTwoPaneSemantics)) {
+      _annotatedNode = node;
+      super.assembleSemanticsNode(node, config, children);
+      return;
+    }
+
+    _innerNode ??= new SemanticsNode(showOnScreen: showOnScreen);
+    _innerNode
+      ..isMergedIntoParent = node.isPartOfNodeMerging
+      ..rect = Offset.zero & node.rect.size;
+    _annotatedNode = _innerNode;
+
+    final List<SemanticsNode> excluded = <SemanticsNode>[_innerNode];
+    final List<SemanticsNode> included = <SemanticsNode>[];
+    for (SemanticsNode child in children) {
+      assert(child.isTagged(RenderViewport.useTwoPaneSemantics));
+      if (child.isTagged(RenderViewport.excludeFromScrolling))
+        excluded.add(child);
+      else
+        included.add(child);
+    }
+    node.updateWith(config: null, childrenInInversePaintOrder: excluded);
+    _innerNode.updateWith(
+        config: config, childrenInInversePaintOrder: included);
+  }
+
+  @override
+  void clearSemantics() {
+    super.clearSemantics();
+    _innerNode = null;
+    _annotatedNode = null;
+  }
+
+  /// Sends a [SemanticsEvent] in the context of the [SemanticsNode] that is
+  /// annotated with this object's semantics information.
+  void sendSemanticsEvent(SemanticsEvent event) {
+    _annotatedNode?.sendEvent(event);
   }
 }
