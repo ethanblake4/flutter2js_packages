@@ -1,9 +1,7 @@
 name: flutter
 description: A modified Flutter package that is needed by Flutter2js framework.
 version: 0.0.4
-authors:
-- jban332 <jban332@gmail.com>
-homepage: https://github.com/jban332/flutter2js_modified_flutter
+homepage: https://github.com/flutter2js/flutter2js_modified_flutter
 
 environment:
   sdk: '>=1.24.0 <2.0.0'
@@ -21,7 +19,7 @@ dependencies:
 dependency_overrides:
   flutter2js:
     git:
-      url: git://github.com/jban332/flutter2js
+      url: git://github.com/flutter2js/flutter2js
 
 dev_dependencies:
   mockito: '^2.2.0'

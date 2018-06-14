@@ -2,7 +2,7 @@
 
 This repository contains Flutter packages that have been patched for _flutter2js_, which makes Flutter apps run in the browser.
 
-Learn more at [github.com/jban332/flutter2js](https://github.com/jban332/flutter2js).
+Learn more at [github.com/flutter2js/flutter2js](https://github.com/flutter2js/flutter2js).
 
 # List of packages
 ## Flutter SDK
