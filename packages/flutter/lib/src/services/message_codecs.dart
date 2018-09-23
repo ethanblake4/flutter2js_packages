@@ -299,8 +299,8 @@ class StandardMessageCodec implements MessageCodec<dynamic> {
       if (-0x7fffffff - 1 <= value && value <= 0x7fffffff) {
         buffer.putUint8(_kInt32);
         buffer.putInt32(value);
-      } else if (-0x7fffffffffffffff - 1 <= value &&
-          value <= 0x7fffffffffffffff) {
+      } else if (-0x8000000000000000 - 2 <= value &&
+          value <= 0x8000000000000000 - 1) {
         buffer.putUint8(_kInt64);
         buffer.putInt64(value);
       } else {

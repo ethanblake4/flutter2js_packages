@@ -65,7 +65,7 @@ typedef Future<T> AsyncValueGetter<T>();
 /// The largest SMI value.
 ///
 /// See <https://www.dartlang.org/articles/numeric-computation/#smis-and-mints>
-const int kMaxUnsignedSMI = 0x3FFFFFFFFFFFFFFF;
+const int kMaxUnsignedSMI = 0x4000000000000000 - 1;
 
 /// A BitField over an enum (or other class whose values implement "index").
 /// Only the first 62 values of the enum can be used as indices.
