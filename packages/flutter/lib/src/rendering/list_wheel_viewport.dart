@@ -351,7 +351,7 @@ class RenderListWheelViewport
   /// coordinates** can be painted.
   double get _firstVisibleLayoutOffset {
     assert(hasSize);
-    if (_renderChildrenOutsideViewport) return double.NEGATIVE_INFINITY;
+    if (_renderChildrenOutsideViewport) return double.negativeInfinity;
     return _minScrollExtent -
         size.height / 2.0 -
         _itemExtent / 2.0 +
@@ -362,7 +362,7 @@ class RenderListWheelViewport
   /// coordinates** can be painted.
   double get _lastVisibleLayoutOffset {
     assert(hasSize);
-    if (_renderChildrenOutsideViewport) return double.INFINITY;
+    if (_renderChildrenOutsideViewport) return double.infinity;
     return _minScrollExtent +
         size.height / 2.0 +
         _itemExtent / 2.0 +
@@ -378,7 +378,7 @@ class RenderListWheelViewport
   /// When the center of children passes this angle, they are no longer painted
   /// if [renderChildrenOutsideViewport] is false.
   double get _maxVisibleRadian {
-    if (_diameterRatio < 1.0) return math.PI / 2.0;
+    if (_diameterRatio < 1.0) return math.pi / 2.0;
     return math.asin(1.0 / _diameterRatio);
   }
 
@@ -525,7 +525,7 @@ class RenderListWheelViewport
     // renderChildrenOutsideViewport is true. Otherwise, only children within
     // suitable angles (via _first/lastVisibleLayoutOffset) reach the paint
     // phase.
-    if (angle > math.PI / 2.0 || angle < -math.PI / 2.0) return;
+    if (angle > math.pi / 2.0 || angle < -math.pi / 2.0) return;
 
     final Matrix4 transform = MatrixUtils.createCylindricalProjectionTransform(
       radius: size.height * _diameterRatio / 2.0,

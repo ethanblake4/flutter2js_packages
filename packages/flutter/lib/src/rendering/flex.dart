@@ -550,11 +550,11 @@ class RenderFlex
         if (flex == 0) {
           switch (_direction) {
             case Axis.horizontal:
-              mainSize = child.getMaxIntrinsicWidth(double.INFINITY);
+              mainSize = child.getMaxIntrinsicWidth(double.infinity);
               crossSize = childSize(child, mainSize);
               break;
             case Axis.vertical:
-              mainSize = child.getMaxIntrinsicHeight(double.INFINITY);
+              mainSize = child.getMaxIntrinsicHeight(double.infinity);
               crossSize = childSize(child, mainSize);
               break;
           }
@@ -668,7 +668,7 @@ class RenderFlex
     final double maxMainSize = _direction == Axis.horizontal
         ? constraints.maxWidth
         : constraints.maxHeight;
-    final bool canFlex = maxMainSize < double.INFINITY;
+    final bool canFlex = maxMainSize < double.infinity;
 
     double crossSize = 0.0;
     double allocatedSize =
@@ -788,7 +788,7 @@ class RenderFlex
     double maxBaselineDistance = 0.0;
     if (totalFlex > 0 || crossAxisAlignment == CrossAxisAlignment.baseline) {
       final double spacePerFlex =
-          canFlex && totalFlex > 0 ? (freeSpace / totalFlex) : double.NAN;
+          canFlex && totalFlex > 0 ? (freeSpace / totalFlex) : double.nan;
       child = firstChild;
       while (child != null) {
         final int flex = _getFlex(child);
@@ -797,11 +797,11 @@ class RenderFlex
               ? (child == lastFlexChild
                   ? (freeSpace - allocatedFlexSpace)
                   : spacePerFlex * flex)
-              : double.INFINITY;
+              : double.infinity;
           double minChildExtent;
           switch (_getFit(child)) {
             case FlexFit.tight:
-              assert(maxChildExtent < double.INFINITY);
+              assert(maxChildExtent < double.infinity);
               minChildExtent = maxChildExtent;
               break;
             case FlexFit.loose:

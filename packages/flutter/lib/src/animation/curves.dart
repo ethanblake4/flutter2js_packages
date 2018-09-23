@@ -362,7 +362,7 @@ class ElasticInCurve extends Curve {
     final double s = period / 4.0;
     t = t - 1.0;
     return -math.pow(2.0, 10.0 * t) *
-        math.sin((t - s) * (math.PI * 2.0) / period);
+        math.sin((t - s) * (math.pi * 2.0) / period);
   }
 
   @override
@@ -391,7 +391,7 @@ class ElasticOutCurve extends Curve {
     assert(t >= 0.0 && t <= 1.0);
     final double s = period / 4.0;
     return math.pow(2.0, -10 * t) *
-            math.sin((t - s) * (math.PI * 2.0) / period) +
+            math.sin((t - s) * (math.pi * 2.0) / period) +
         1.0;
   }
 
@@ -425,10 +425,10 @@ class ElasticInOutCurve extends Curve {
     if (t < 0.0)
       return -0.5 *
           math.pow(2.0, 10.0 * t) *
-          math.sin((t - s) * (math.PI * 2.0) / period);
+          math.sin((t - s) * (math.pi * 2.0) / period);
     else
       return math.pow(2.0, -10.0 * t) *
-              math.sin((t - s) * (math.PI * 2.0) / period) *
+              math.sin((t - s) * (math.pi * 2.0) / period) *
               0.5 +
           1.0;
   }

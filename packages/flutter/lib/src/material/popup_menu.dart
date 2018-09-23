@@ -400,7 +400,7 @@ class _CheckedPopupMenuItemState<T>
           'State is used for multiple AnimationController objects, or if it is passed to other '
           'objects and those objects might use it more than one time in total, then instead of '
           'mixing in a SingleTickerProviderStateMixin, use a regular TickerProviderStateMixin.');
-    });
+    }());
     _ticker = new Ticker(onTick, debugLabel: 'created by $this');
     // We assume that this is called from initState, build, or some sort of
     // event handler, and that thus TickerMode.of(context) would return true. We
@@ -421,7 +421,7 @@ class _CheckedPopupMenuItemState<T>
           'Otherwise, the ticker will leak.\n'
           'The offending ticker was: ${_ticker.toString(
           debugIncludeStack: true)}');
-    });
+    }());
     super.dispose();
   }
 

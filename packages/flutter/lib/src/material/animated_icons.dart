@@ -5,7 +5,7 @@
 /// Flutter widgets implementing Material Design animated icons.
 library material_animated_icons;
 
-import 'dart:math' as math show PI;
+import 'dart:math' as math show pi;
 import 'package:flutter/ui.dart' as ui show Paint, Path, Canvas;
 import 'package:flutter/ui.dart' show lerpDouble;
 

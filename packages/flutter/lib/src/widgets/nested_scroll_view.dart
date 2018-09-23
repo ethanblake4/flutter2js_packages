@@ -939,8 +939,8 @@ class _NestedScrollPosition extends ScrollPosition
   // Returns the amount of delta that was not used.
   double applyClampedDragUpdate(double delta) {
     assert(delta != 0.0);
-    final double min = delta < 0.0 ? -double.INFINITY : minScrollExtent;
-    final double max = delta > 0.0 ? double.INFINITY : maxScrollExtent;
+    final double min = delta < 0.0 ? -double.infinity : minScrollExtent;
+    final double max = delta > 0.0 ? double.infinity : maxScrollExtent;
     final double oldPixels = pixels;
     final double newPixels = (pixels - delta).clamp(min, max);
     final double clampedDelta = newPixels - pixels;

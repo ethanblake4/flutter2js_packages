@@ -230,7 +230,7 @@ class TextPainter {
             text.style.getTextStyle(textScaleFactor: textScaleFactor));
       builder.addText(_kZeroWidthSpace);
       _layoutTemplate = builder.build()
-        ..layout(new ui.ParagraphConstraints(width: double.INFINITY));
+        ..layout(new ui.ParagraphConstraints(width: double.infinity));
     }
     return _layoutTemplate.height;
   }
@@ -299,7 +299,7 @@ class TextPainter {
           .pushStyle(text.style.getTextStyle(textScaleFactor: textScaleFactor));
     builder.addText(_kZeroWidthSpace);
     final ui.Paragraph paragraph = builder.build()
-      ..layout(new ui.ParagraphConstraints(width: double.INFINITY));
+      ..layout(new ui.ParagraphConstraints(width: double.infinity));
 
     switch (baseline) {
       case TextBaseline.alphabetic:
@@ -353,7 +353,7 @@ class TextPainter {
   ///
   /// The [text] and [textDirection] properties must be non-null before this is
   /// called.
-  void layout({double minWidth: 0.0, double maxWidth: double.INFINITY}) {
+  void layout({double minWidth: 0.0, double maxWidth: double.infinity}) {
     assert(text != null,
         'TextPainter.text must be set to a non-null value before using the TextPainter.');
     assert(textDirection != null,

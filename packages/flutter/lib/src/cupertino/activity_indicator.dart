@@ -80,7 +80,7 @@ class _CupertinoActivityIndicatorState
   }
 }
 
-const double _kTwoPI = math.PI * 2.0;
+const double _kTwoPI = math.pi * 2.0;
 const int _kTickCount = 12;
 const int _kHalfTickCount = _kTickCount ~/ 2;
 const Color _kTickColor = CupertinoColors.lightBackgroundGray;

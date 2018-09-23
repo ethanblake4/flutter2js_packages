@@ -35,7 +35,7 @@ final SpringDescription _kFlingSpringDescription =
 );
 
 const Tolerance _kFlingTolerance = const Tolerance(
-  velocity: double.INFINITY,
+  velocity: double.infinity,
   distance: 0.01,
 );
 
@@ -152,8 +152,8 @@ class AnimationController extends Animation<double>
     this.debugLabel,
     @required TickerProvider vsync,
   })
-      : lowerBound = double.NEGATIVE_INFINITY,
-        upperBound = double.INFINITY,
+      : lowerBound = double.negativeInfinity,
+        upperBound = double.infinity,
         _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value);
@@ -253,7 +253,7 @@ class AnimationController extends Animation<double>
   double get velocity {
     if (!isAnimating) return 0.0;
     return _simulation.dx(lastElapsedDuration.inMicroseconds.toDouble() /
-        Duration.MICROSECONDS_PER_SECOND);
+        Duration.microsecondsPerSecond);
   }
 
   void _internalSetValue(double newValue) {
@@ -380,10 +380,10 @@ class AnimationController extends Animation<double>
       simulationDuration = this.duration * remainingFraction;
     } else if (target == value) {
       // Already at target, don't animate.
-      simulationDuration = Duration.ZERO;
+      simulationDuration = Duration.zero;
     }
     stop();
-    if (simulationDuration == Duration.ZERO) {
+    if (simulationDuration == Duration.zero) {
       if (value != target) {
         _value = target.clamp(lowerBound, upperBound);
         notifyListeners();
@@ -394,7 +394,7 @@ class AnimationController extends Animation<double>
       _checkStatusChanged();
       return new TickerFuture.complete();
     }
-    assert(simulationDuration > Duration.ZERO);
+    assert(simulationDuration > Duration.zero);
     assert(!isAnimating);
     return _startSimulation(new _InterpolationSimulation(
         _value, target, simulationDuration, curve));
@@ -468,7 +468,7 @@ class AnimationController extends Animation<double>
     assert(simulation != null);
     assert(!isAnimating);
     _simulation = simulation;
-    _lastElapsedDuration = Duration.ZERO;
+    _lastElapsedDuration = Duration.zero;
     _value = simulation.x(0.0).clamp(lowerBound, upperBound);
     final Future<Null> result = _ticker.start();
     _status = (_direction == _AnimationDirection.forward)
@@ -537,7 +537,7 @@ class AnimationController extends Animation<double>
   void _tick(Duration elapsed) {
     _lastElapsedDuration = elapsed;
     final double elapsedInSeconds =
-        elapsed.inMicroseconds.toDouble() / Duration.MICROSECONDS_PER_SECOND;
+        elapsed.inMicroseconds.toDouble() / Duration.microsecondsPerSecond;
     assert(elapsedInSeconds >= 0.0);
     _value = _simulation.x(elapsedInSeconds).clamp(lowerBound, upperBound);
     if (_simulation.isDone(elapsedInSeconds)) {
@@ -566,7 +566,7 @@ class _InterpolationSimulation extends Simulation {
   _InterpolationSimulation(
       this._begin, this._end, Duration duration, this._curve)
       : _durationInSeconds =
-            duration.inMicroseconds / Duration.MICROSECONDS_PER_SECOND;
+            duration.inMicroseconds / Duration.microsecondsPerSecond;
 
   final double _durationInSeconds;
   final double _begin;
@@ -598,7 +598,7 @@ class _InterpolationSimulation extends Simulation {
 class _RepeatingSimulation extends Simulation {
   _RepeatingSimulation(this.min, this.max, Duration period)
       : _periodInSeconds =
-            period.inMicroseconds / Duration.MICROSECONDS_PER_SECOND {
+            period.inMicroseconds / Duration.microsecondsPerSecond {
     assert(_periodInSeconds > 0.0);
   }
 

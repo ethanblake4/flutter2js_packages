@@ -776,7 +776,7 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement
     double trailingScrollOffset,
   ) {
     final int childCount = widget.delegate.estimatedChildCount;
-    if (childCount == null) return double.INFINITY;
+    if (childCount == null) return double.infinity;
     if (lastIndex == childCount - 1) return trailingScrollOffset;
     final int reifiedCount = lastIndex - firstIndex + 1;
     final double averageExtent =

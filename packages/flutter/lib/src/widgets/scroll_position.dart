@@ -416,7 +416,7 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
   Future<Null> ensureVisible(
     RenderObject object, {
     double alignment: 0.0,
-    Duration duration: Duration.ZERO,
+    Duration duration: Duration.zero,
     Curve curve: Curves.ease,
   }) {
     assert(object.attached);
@@ -429,7 +429,7 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
 
     if (target == pixels) return new Future<Null>.value();
 
-    if (duration == Duration.ZERO) {
+    if (duration == Duration.zero) {
       jumpTo(target);
       return new Future<Null>.value();
     }

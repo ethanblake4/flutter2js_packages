@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:developer' as developer;
 import 'package:flutter2js/io.dart' show exit;
 
@@ -373,7 +373,7 @@ abstract class BindingBase {
         result['type'] = '_extensionType';
         result['method'] = method;
         return new developer.ServiceExtensionResponse.result(
-            JSON.encode(result));
+            json.encode(result));
       } else {
         FlutterError.reportError(new FlutterErrorDetails(
             exception: caughtException,
@@ -381,7 +381,7 @@ abstract class BindingBase {
             context: 'during a service extension callback for "$method"'));
         return new developer.ServiceExtensionResponse.error(
             developer.ServiceExtensionResponse.extensionError,
-            JSON.encode(<String, String>{
+            json.encode(<String, String>{
               'exception': caughtException.toString(),
               'stack': caughtStack.toString(),
               'method': method,

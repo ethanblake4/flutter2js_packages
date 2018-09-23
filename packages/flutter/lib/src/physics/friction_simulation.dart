@@ -71,7 +71,7 @@ class FrictionSimulation extends Simulation {
   static double _dragFor(double startPosition, double endPosition,
       double startVelocity, double endVelocity) {
     return math.pow(
-        math.E, (startVelocity - endVelocity) / (startPosition - endPosition));
+        math.e, (startVelocity - endVelocity) / (startPosition - endPosition));
   }
 
   @override
@@ -90,7 +90,7 @@ class FrictionSimulation extends Simulation {
   double timeAtX(double x) {
     if (x == _x) return 0.0;
     if (_v == 0.0 || (_v > 0 ? (x < _x || x > finalX) : (x > _x || x < finalX)))
-      return double.INFINITY;
+      return double.infinity;
     return math.log(_dragLog * (x - _x) / _v + 1.0) / _dragLog;
   }
 

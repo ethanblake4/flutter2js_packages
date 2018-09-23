@@ -31,7 +31,7 @@ regional translations have names that include the locale's regional
 suffix. For example `material_en_GB.arb` contains additional English
 translations that are specific to Great Britain.
 
-There is one language-specifc .arb file for each supported locale. If
+There is one language-specific .arb file for each supported locale. If
 an additional file with a regional suffix is present, the regional
 localizations are automatically merged with the language-specific ones.
 
@@ -68,7 +68,8 @@ contain translations for the same set of resource IDs as
 For each resource ID defined for English in material_en.arb, there is
 an additional resource with an '@' prefix. These '@' resources are not
 used by the material library at run time, they just exist to inform
-translators about how the value will be used.
+translators about how the value will be used, and to inform the code
+generator about what code to write.
 
 ```dart
 "cancelButtonLabel": "CANCEL",
@@ -130,12 +131,14 @@ help define an app's text theme and time picker layout respectively.
 
 The value of `timeOfDayFormat` defines how a time picker displayed by
 [showTimePicker()](https://docs.flutter.io/flutter/material/showTimePicker.html)
-formats and lays out its time controls. The value of `timeOfDayFormat` must be
-a string that matches one of the formats defined by
-https://docs.flutter.io/flutter/material/TimeOfDayFormat-class.html.
+formats and lays out its time controls. The value of `timeOfDayFormat`
+must be a string that matches one of the formats defined by
+<https://docs.flutter.io/flutter/material/TimeOfDayFormat-class.html>.
+It is converted to an enum value because the `material_en.arb` file
+has this value labeled as `"x-flutter-type": "icuShortTimePattern"`.
 
 The value of `scriptCategory` is based on the
-[Language categories reference](https://material.io/guidelines/style/typography.html#typography-language-categories-reference)
+[Language categories reference](https://material.io/go/design-typography#typography-language-categories-reference)
 section in the Material spec. The `scriptCategory` value is used when looking up
 the `TextTheme`, see the
 [MaterialTextGeometry](https://docs.flutter.io/flutter/material/MaterialTextGeometry/forScriptCategory.html)
@@ -187,7 +190,7 @@ If you have feedback about the translations please
 ### See Also
 
 The [Internationalizing Flutter Apps](https://flutter.io/tutorials/internationalization/)
-tutorial describes how to use the internationlization APIs in an
+tutorial describes how to use the internationalization APIs in an
 ordinary Flutter app.
 
 [Application Resource Bundle](https://code.google.com/p/arb/wiki/ApplicationResourceBundleSpecification)

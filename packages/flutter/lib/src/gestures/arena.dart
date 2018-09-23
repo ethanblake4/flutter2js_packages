@@ -273,7 +273,7 @@ class GestureArenaManager {
             : ""}');
       }
       return true;
-    });
+    }());
     return true;
   }
 }

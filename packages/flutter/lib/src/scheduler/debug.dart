@@ -63,6 +63,6 @@ bool debugAssertAllSchedulerVarsUnset(String reason) {
       throw new FlutterError(reason);
     }
     return true;
-  });
+  }());
   return true;
 }

@@ -26,7 +26,7 @@ abstract class OffsetBase {
   /// See also:
   ///
   ///  * [isFinite], which is true if both components are finite (and not NaN).
-  bool get isInfinite => _dx >= double.INFINITY || _dy >= double.INFINITY;
+  bool get isInfinite => _dx >= double.infinity || _dy >= double.infinity;
 
   /// Whether both components are finite (neither infinite nor NaN).
   ///
@@ -182,7 +182,7 @@ class Offset extends OffsetBase {
   ///  * [isInfinite], which checks whether either component is infinite.
   ///  * [isFinite], which checks whether both components are finite.
   // This is included for completeness, because [Size.infinite] exists.
-  static const Offset infinite = const Offset(double.INFINITY, double.INFINITY);
+  static const Offset infinite = const Offset(double.infinity, double.infinity);
 
   /// Returns a new offset with the x component scaled by `scaleX` and the y
   /// component scaled by `scaleY`.
@@ -351,10 +351,10 @@ class Size extends OffsetBase {
   const Size.square(double dimension) : super(dimension, dimension);
 
   /// Creates a [Size] with the given [width] and an infinite [height].
-  const Size.fromWidth(double width) : super(width, double.INFINITY);
+  const Size.fromWidth(double width) : super(width, double.infinity);
 
   /// Creates a [Size] with the given [height] and an infinite [width].
-  const Size.fromHeight(double height) : super(double.INFINITY, height);
+  const Size.fromHeight(double height) : super(double.infinity, height);
 
   /// Creates a square [Size] whose [width] and [height] are twice the given
   /// dimension.
@@ -381,7 +381,7 @@ class Size extends OffsetBase {
   ///
   ///  * [isInfinite], which checks whether either dimension is infinite.
   ///  * [isFinite], which checks whether both dimensions are finite.
-  static const Size infinite = const Size(double.INFINITY, double.INFINITY);
+  static const Size infinite = const Size(double.infinity, double.infinity);
 
   /// Whether this size encloses a non-zero area.
   ///
@@ -680,10 +680,10 @@ class Rect {
   /// Whether any of the coordinates of this rectangle are equal to positive infinity.
   // included for consistency with Offset and Size
   bool get isInfinite {
-    return left >= double.INFINITY ||
-        top >= double.INFINITY ||
-        right >= double.INFINITY ||
-        bottom >= double.INFINITY;
+    return left >= double.infinity ||
+        top >= double.infinity ||
+        right >= double.infinity ||
+        bottom >= double.infinity;
   }
 
   /// Whether all coordinates of this rectangle are finite.

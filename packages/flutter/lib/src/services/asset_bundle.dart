@@ -158,7 +158,7 @@ abstract class CachingAssetBundle extends AssetBundle {
   Future<String> _fetchString(String key) async {
     final ByteData data = await load(key);
     if (data == null) throw new FlutterError('Unable to load asset: $key');
-    return UTF8.decode(data.buffer.asUint8List());
+    return utf8.decode(data.buffer.asUint8List());
   }
 
   /// Retrieve a string from the asset bundle, parse it with the given function,
@@ -211,7 +211,7 @@ abstract class CachingAssetBundle extends AssetBundle {
 class PlatformAssetBundle extends CachingAssetBundle {
   @override
   Future<ByteData> load(String key) async {
-    final Uint8List encoded = UTF8.encoder.convert(key);
+    final Uint8List encoded = utf8.encoder.convert(key);
     final ByteData asset = await BinaryMessages.send(
         'flutter/assets', encoded.buffer.asByteData());
     if (asset == null) throw new FlutterError('Unable to load asset: $key');

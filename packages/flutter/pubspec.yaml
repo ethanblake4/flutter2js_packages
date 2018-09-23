@@ -1,10 +1,10 @@
 name: flutter
-description: A modified Flutter package that is needed by Flutter2js framework.
+description: A modified Flutter package that is needed by Flutter2jsX framework.
 version: 0.0.4
-homepage: https://github.com/flutter2js/flutter2js_modified_flutter
+homepage: https://github.com/ethanblake4
 
 environment:
-  sdk: '>=1.24.0 <2.0.0'
+  sdk: '>2.0.0 <=3.0.0'
 
 dependencies:
   flutter2js: any
@@ -19,8 +19,8 @@ dependencies:
 dependency_overrides:
   flutter2js:
     git:
-      url: git://github.com/flutter2js/flutter2js
+      url: git://github.com/ethanblake4/flutter2js
 
 dev_dependencies:
-  mockito: '^2.2.0'
-  test: '^0.12.26'
+  mockito: any
+  test: any

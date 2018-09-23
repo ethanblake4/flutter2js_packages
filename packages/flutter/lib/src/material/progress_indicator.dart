@@ -219,7 +219,7 @@ class _LinearProgressIndicatorState
       TextDirection textDirection) {
     return new Container(
       constraints: const BoxConstraints.tightFor(
-        width: double.INFINITY,
+        width: double.infinity,
         height: _kLinearProgressIndicatorHeight,
       ),
       child: new CustomPaint(
@@ -253,12 +253,12 @@ class _LinearProgressIndicatorState
 }
 
 class _CircularProgressIndicatorPainter extends CustomPainter {
-  static const double _kTwoPI = math.PI * 2.0;
+  static const double _kTwoPI = math.pi * 2.0;
   static const double _kEpsilon = .001;
 
   // Canavs.drawArc(r, 0, 2*PI) doesn't draw anything, so just get close.
   static const double _kSweep = _kTwoPI - _kEpsilon;
-  static const double _kStartAngle = -math.PI / 2.0;
+  static const double _kStartAngle = -math.pi / 2.0;
 
   _CircularProgressIndicatorPainter({
     this.valueColor,
@@ -272,13 +272,13 @@ class _CircularProgressIndicatorPainter extends CustomPainter {
       : arcStart = value != null
             ? _kStartAngle
             : _kStartAngle +
-                tailValue * 3 / 2 * math.PI +
-                rotationValue * math.PI * 1.7 -
-                stepValue * 0.8 * math.PI,
+                tailValue * 3 / 2 * math.pi +
+                rotationValue * math.pi * 1.7 -
+                stepValue * 0.8 * math.pi,
         arcSweep = value != null
             ? value.clamp(0.0, 1.0) * _kSweep
             : math.max(
-                headValue * 3 / 2 * math.PI - tailValue * 3 / 2 * math.PI,
+                headValue * 3 / 2 * math.pi - tailValue * 3 / 2 * math.pi,
                 _kEpsilon);
 
   final Color valueColor;

@@ -235,7 +235,7 @@ class RotationTransition extends AnimatedWidget {
   @override
   Widget build(BuildContext context) {
     final double turnsValue = turns.value;
-    final Matrix4 transform = new Matrix4.rotationZ(turnsValue * math.PI * 2.0);
+    final Matrix4 transform = new Matrix4.rotationZ(turnsValue * math.pi * 2.0);
     return new Transform(
       transform: transform,
       alignment: Alignment.center,

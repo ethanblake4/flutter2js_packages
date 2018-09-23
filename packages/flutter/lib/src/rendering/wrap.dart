@@ -399,7 +399,7 @@ class RenderWrap extends RenderBox
     int childCount = 0;
     RenderBox child = firstChild;
     while (child != null) {
-      final double childWidth = child.getMaxIntrinsicWidth(double.INFINITY);
+      final double childWidth = child.getMaxIntrinsicWidth(double.infinity);
       final double childHeight = child.getMaxIntrinsicHeight(childWidth);
       if (runWidth + childWidth > width) {
         height += runHeight;
@@ -428,7 +428,7 @@ class RenderWrap extends RenderBox
     int childCount = 0;
     RenderBox child = firstChild;
     while (child != null) {
-      final double childHeight = child.getMaxIntrinsicHeight(double.INFINITY);
+      final double childHeight = child.getMaxIntrinsicHeight(double.infinity);
       final double childWidth = child.getMaxIntrinsicWidth(childHeight);
       if (runHeight + childHeight > height) {
         width += runWidth;
@@ -455,7 +455,7 @@ class RenderWrap extends RenderBox
         double width = 0.0;
         RenderBox child = firstChild;
         while (child != null) {
-          width = math.max(width, child.getMinIntrinsicWidth(double.INFINITY));
+          width = math.max(width, child.getMinIntrinsicWidth(double.infinity));
           child = childAfter(child);
         }
         return width;
@@ -472,7 +472,7 @@ class RenderWrap extends RenderBox
         double width = 0.0;
         RenderBox child = firstChild;
         while (child != null) {
-          width += child.getMaxIntrinsicWidth(double.INFINITY);
+          width += child.getMaxIntrinsicWidth(double.infinity);
           child = childAfter(child);
         }
         return width;
@@ -492,7 +492,7 @@ class RenderWrap extends RenderBox
         RenderBox child = firstChild;
         while (child != null) {
           height =
-              math.max(height, child.getMinIntrinsicHeight(double.INFINITY));
+              math.max(height, child.getMinIntrinsicHeight(double.infinity));
           child = childAfter(child);
         }
         return height;
@@ -509,7 +509,7 @@ class RenderWrap extends RenderBox
         double height = 0.0;
         RenderBox child = firstChild;
         while (child != null) {
-          height += child.getMaxIntrinsicHeight(double.INFINITY);
+          height += child.getMaxIntrinsicHeight(double.infinity);
           child = childAfter(child);
         }
         return height;

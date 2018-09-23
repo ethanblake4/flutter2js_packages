@@ -155,7 +155,7 @@ class _AnimatedIconPainter extends CustomPainter {
     // this and canvas.restore after, so we don't need to do it here.
     canvas.scale(scale, scale);
     if (shouldMirror) {
-      canvas.rotate(math.PI);
+      canvas.rotate(math.pi);
       canvas.translate(-size.width, -size.height);
     }
 

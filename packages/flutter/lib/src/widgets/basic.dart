@@ -1590,8 +1590,8 @@ class SizedBox extends SingleChildRenderObjectWidget {
 
   /// Creates a box that will become as large as its parent allows.
   const SizedBox.expand({Key key, Widget child})
-      : width = double.INFINITY,
-        height = double.INFINITY,
+      : width = double.infinity,
+        height = double.infinity,
         super(key: key, child: child);
 
   /// Creates a box with the specified size.
@@ -1625,7 +1625,7 @@ class SizedBox extends SingleChildRenderObjectWidget {
 
   @override
   String toStringShort() {
-    final String type = (width == double.INFINITY && height == double.INFINITY)
+    final String type = (width == double.infinity && height == double.infinity)
         ? '$runtimeType.expand'
         : '$runtimeType';
     return key == null ? '$type' : '$type-$key';
@@ -1635,7 +1635,7 @@ class SizedBox extends SingleChildRenderObjectWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
     final DiagnosticLevel level =
-        (width == double.INFINITY && height == double.INFINITY)
+        (width == double.infinity && height == double.infinity)
             ? DiagnosticLevel.hidden
             : DiagnosticLevel.info;
     description.add(
@@ -1919,8 +1919,8 @@ class LimitedBox extends SingleChildRenderObjectWidget {
   /// negative.
   const LimitedBox({
     Key key,
-    this.maxWidth: double.INFINITY,
-    this.maxHeight: double.INFINITY,
+    this.maxWidth: double.infinity,
+    this.maxHeight: double.infinity,
     Widget child,
   })
       : super(key: key, child: child);
@@ -1949,9 +1949,9 @@ class LimitedBox extends SingleChildRenderObjectWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
     description.add(new DoubleProperty('maxWidth', maxWidth,
-        defaultValue: double.INFINITY));
+        defaultValue: double.infinity));
     description.add(new DoubleProperty('maxHeight', maxHeight,
-        defaultValue: double.INFINITY));
+        defaultValue: double.infinity));
   }
 }
 

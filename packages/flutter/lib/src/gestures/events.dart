@@ -95,7 +95,7 @@ abstract class PointerEvent {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
   const PointerEvent({
-    this.timeStamp: Duration.ZERO,
+    this.timeStamp: Duration.zero,
     this.pointer: 0,
     this.kind: PointerDeviceKind.touch,
     this.device: 0,
@@ -290,7 +290,7 @@ class PointerAddedEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerAddedEvent(
-      {Duration timeStamp: Duration.ZERO,
+      {Duration timeStamp: Duration.zero,
       PointerDeviceKind kind: PointerDeviceKind.touch,
       int device: 0,
       Offset position: Offset.zero,
@@ -328,7 +328,7 @@ class PointerRemovedEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerRemovedEvent(
-      {Duration timeStamp: Duration.ZERO,
+      {Duration timeStamp: Duration.zero,
       PointerDeviceKind kind: PointerDeviceKind.touch,
       int device: 0,
       bool obscured: false,
@@ -362,7 +362,7 @@ class PointerHoverEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerHoverEvent({
-    Duration timeStamp: Duration.ZERO,
+    Duration timeStamp: Duration.zero,
     PointerDeviceKind kind: PointerDeviceKind.touch,
     int device: 0,
     Offset position: Offset.zero,
@@ -410,7 +410,7 @@ class PointerDownEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerDownEvent(
-      {Duration timeStamp: Duration.ZERO,
+      {Duration timeStamp: Duration.zero,
       int pointer: 0,
       PointerDeviceKind kind: PointerDeviceKind.touch,
       int device: 0,
@@ -461,7 +461,7 @@ class PointerMoveEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerMoveEvent({
-    Duration timeStamp: Duration.ZERO,
+    Duration timeStamp: Duration.zero,
     int pointer: 0,
     PointerDeviceKind kind: PointerDeviceKind.touch,
     int device: 0,
@@ -512,7 +512,7 @@ class PointerUpEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerUpEvent(
-      {Duration timeStamp: Duration.ZERO,
+      {Duration timeStamp: Duration.zero,
       int pointer: 0,
       PointerDeviceKind kind: PointerDeviceKind.touch,
       int device: 0,
@@ -552,7 +552,7 @@ class PointerCancelEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerCancelEvent(
-      {Duration timeStamp: Duration.ZERO,
+      {Duration timeStamp: Duration.zero,
       int pointer: 0,
       PointerDeviceKind kind: PointerDeviceKind.touch,
       int device: 0,

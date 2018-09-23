@@ -53,6 +53,6 @@ bool debugAssertAllGesturesVarsUnset(String reason) {
         debugPrintGestureArenaDiagnostics ||
         debugPrintRecognizerCallbacksTrace) throw new FlutterError(reason);
     return true;
-  });
+  }());
   return true;
 }

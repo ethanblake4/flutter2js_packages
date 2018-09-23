@@ -406,7 +406,7 @@ class CurvedAnimation extends Animation<double>
               'is near $roundedTransformedValue.');
         }
         return true;
-      });
+      }());
       return t;
     }
     return activeCurve.transform(t);

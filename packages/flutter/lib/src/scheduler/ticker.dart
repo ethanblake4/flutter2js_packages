@@ -63,7 +63,7 @@ class Ticker {
     assert(() {
       _debugCreationStack = StackTrace.current;
       return true;
-    });
+    }());
   }
 
   TickerFuture _future;
@@ -139,7 +139,7 @@ class Ticker {
             debugIncludeStack: true) }');
       }
       return true;
-    });
+    }());
     assert(_startTime == null);
     _future = new TickerFuture._();
     if (shouldScheduleTick) scheduleTick();
@@ -290,7 +290,7 @@ class Ticker {
       // catch cases of use-after-dispose.
       _startTime = const Duration();
       return true;
-    });
+    }());
   }
 
   /// An optional label can be provided for debugging purposes.
@@ -306,7 +306,7 @@ class Ticker {
     assert(() {
       buffer.write(debugLabel ?? '');
       return true;
-    });
+    }());
     buffer.write(')');
     assert(() {
       if (debugIncludeStack) {
@@ -319,7 +319,7 @@ class Ticker {
             .forEach(buffer.writeln);
       }
       return true;
-    });
+    }());
     return buffer.toString();
   }
 }
