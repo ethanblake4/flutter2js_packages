@@ -1048,10 +1048,10 @@ class WidgetInspectorService {
           if (image == null) {
             return <String, Object>{'result': null};
           }
-          final ByteData byteData = await image.toByteData(format:ui.ImageByteFormat.png);
+          // flutter2js final ByteData byteData = await image.toByteData(format:ui.ImageByteFormat.png);
 
           return <String, Object>{
-            'result': base64.encoder.convert(Uint8List.view(byteData.buffer)),
+            'result': null //flutter2js base64.encoder.convert(Uint8List.view(byteData.buffer)),
           };
         },
       );

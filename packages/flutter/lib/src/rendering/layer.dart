@@ -601,10 +601,11 @@ class OffsetLayer extends ContainerLayer {
     try {
       // Size is rounded up to the next pixel to make sure we don't clip off
       // anything.
-      return await scene.toImage(
+      /*flutter2js return await scene.toImage(
         (pixelRatio * bounds.width).ceil(),
         (pixelRatio * bounds.height).ceil(),
-      );
+      );*/
+      return null;
     } finally {
       scene.dispose();
     }

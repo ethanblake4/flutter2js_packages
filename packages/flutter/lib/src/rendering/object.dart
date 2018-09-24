@@ -2667,25 +2667,6 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
   }
 }
 
-/// IMPORTANT: Flutter2js-only
-abstract class RenderBoxWithChildMixin<ChildType extends RenderObject>
-    extends RenderBox with RenderObjectWithChildMixin<ChildType> {
-
-  /// IMPORTANT: Flutter2js-only.
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    if (_child != null) _child.attach(owner);
-  }
-
-  /// IMPORTANT: Flutter2js-only
-  @override
-  void detach() {
-    super.detach();
-    if (_child != null) _child.detach();
-  }
-}
-
 /// Generic mixin for render objects with one child.
 ///
 /// Provides a child model for a render object subclass that has a unique child.
@@ -2799,36 +2780,6 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject> extends 
   }
 }
 
-
-/// IMPORTANT: Flutter2js-only
-abstract class RenderBoxContainerRenderObjectMixin<
-ChildType extends RenderObject,
-ParentDataType extends ContainerParentDataMixin<ChildType>>
-    extends RenderBox
-    with ContainerRenderObjectMixin<ChildType, ParentDataType> {
-
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    ChildType child = _firstChild;
-    while (child != null) {
-      child.attach(owner);
-      final ParentDataType childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
-
-  @override
-  void detach() {
-    super.detach();
-    ChildType child = _firstChild;
-    while (child != null) {
-      child.detach();
-      final ParentDataType childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
-}
 
 /// Generic mixin for render objects with a list of children.
 ///
