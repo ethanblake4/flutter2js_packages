@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter2js/flutter_internals.dart' as flutter2js;
 import 'package:flutter/foundation.dart';
+import 'package:flutter2js/flutter_internals.dart' as flutter2js;
 
 import 'message_codec.dart';
 import 'message_codecs.dart';
@@ -46,8 +46,7 @@ class BasicMessageChannel<T> {
   /// Returns a [Future] which completes to the received response, which may
   /// be null.
   Future<T> send(T message) async {
-    return codec.decodeMessage(
-        await BinaryMessages.send(name, codec.encodeMessage(message)));
+    return codec.decodeMessage(await BinaryMessages.send(name, codec.encodeMessage(message)));
   }
 
   /// Sets a callback for receiving messages from the platform plugins on this
@@ -137,6 +136,131 @@ class MethodChannel {
   /// * a [MissingPluginException], if the method has not been implemented by a
   ///   platform plugin.
   ///
+  /// ## Sample code
+  ///
+  /// The following code snippets demonstrate how to invoke platform methods
+  /// in Dart using a MethodChannel and how to implement those methods in Java
+  /// (for Android) and Objective-C (for iOS). The code might be packaged up as
+  /// a musical plugin, see <https://flutter.io/developing-packages/>:
+  ///
+  /// ```dart
+  /// class Music {
+  ///   static const MethodChannel _channel = MethodChannel('music');
+  ///
+  ///   static Future<bool> isLicensed() async {
+  ///     // invokeMethod returns a Future<dynamic>, and we cannot pass that for
+  ///     // a Future<bool>, hence the indirection.
+  ///     final bool result = await _channel.invokeMethod('isLicensed');
+  ///     return result;
+  ///   }
+  ///
+  ///   static Future<List<Song>> songs() async {
+  ///     // invokeMethod here returns a Future<dynamic> that completes to a
+  ///     // List<dynamic> with Map<dynamic, dynamic> entries. Post-processing
+  ///     // code thus cannot assume e.g. List<Map<String, String>> even though
+  ///     // the actual values involved would support such a typed container.
+  ///     final List<dynamic> songs = await _channel.invokeMethod('getSongs');
+  ///     return songs.map(Song.fromJson).toList();
+  ///   }
+  ///
+  ///   static Future<void> play(Song song, double volume) async {
+  ///     // Errors occurring on the platform side cause invokeMethod to throw
+  ///     // PlatformExceptions.
+  ///     try {
+  ///       await _channel.invokeMethod('play', <String, dynamic>{
+  ///         'song': song.id,
+  ///         'volume': volume,
+  ///       });
+  ///     } on PlatformException catch (e) {
+  ///       throw 'Unable to play ${song.title}: ${e.message}';
+  ///     }
+  ///   }
+  /// }
+  ///
+  /// class Song {
+  ///   Song(this.id, this.title, this.artist);
+  ///
+  ///   final String id;
+  ///   final String title;
+  ///   final String artist;
+  ///
+  ///   static Song fromJson(dynamic json) {
+  ///     return Song(json['id'], json['title'], json['artist']);
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// ```java
+  /// // Assumes existence of an Android MusicApi.
+  /// public class MusicPlugin implements MethodCallHandler {
+  ///   @Override
+  ///   public void onMethodCall(MethodCall call, Result result) {
+  ///     switch (call.method) {
+  ///       case "isLicensed":
+  ///         result.success(MusicApi.checkLicense());
+  ///         break;
+  ///       case "getSongs":
+  ///         final List<MusicApi.Track> tracks = MusicApi.getTracks();
+  ///         final List<Object> json = ArrayList<>(tracks.size());
+  ///         for (MusicApi.Track track : tracks) {
+  ///           json.add(track.toJson()); // Map<String, Object> entries
+  ///         }
+  ///         result.success(json);
+  ///         break;
+  ///       case "play":
+  ///         final String song = call.argument("song");
+  ///         final double volume = call.argument("volume");
+  ///         try {
+  ///           MusicApi.playSongAtVolume(song, volume);
+  ///           result.success(null);
+  ///         } catch (MusicalException e) {
+  ///           result.error("playError", e.getMessage(), null);
+  ///         }
+  ///         break;
+  ///       default:
+  ///         result.notImplemented();
+  ///     }
+  ///   }
+  ///   // Other methods elided.
+  /// }
+  /// ```
+  ///
+  /// ```objective-c
+  /// @interface MusicPlugin : NSObject<FlutterPlugin>
+  /// @end
+  ///
+  /// // Assumes existence of an iOS Broadway Play Api.
+  /// @implementation MusicPlugin
+  /// - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
+  ///   if ([@"isLicensed" isEqualToString:call.method]) {
+  ///     result([NSNumber numberWithBool:[BWPlayApi isLicensed]]);
+  ///   } else if ([@"getSongs" isEqualToString:call.method]) {
+  ///     NSArray* items = [BWPlayApi items];
+  ///     NSMutableArray* json = [NSMutableArray arrayWithCapacity:items.count];
+  ///     for (BWPlayItem* item in items) {
+  ///       [json addObject:@{@"id":item.itemId, @"title":item.name, @"artist":item.artist}];
+  ///     }
+  ///     result(json);
+  ///   } else if ([@"play" isEqualToString:call.method]) {
+  ///     NSString* itemId = call.arguments[@"song"];
+  ///     NSNumber* volume = call.arguments[@"volume"];
+  ///     NSError* error = nil;
+  ///     BOOL success = [BWPlayApi playItem:itemId volume:volume.doubleValue error:&error];
+  ///     if (success) {
+  ///       result(nil);
+  ///     } else {
+  ///       result([FlutterError errorWithCode:[NSString stringWithFormat:@"Error %ld", error.code]
+  ///                                  message:error.domain
+  ///                                  details:error.localizedDescription]);
+  ///     }
+  ///   } else {
+  ///     result(FlutterMethodNotImplemented);
+  ///   }
+  /// }
+  /// // Other methods elided.
+  /// @end
+  /// ```
+  ///
   /// See also:
   ///
   /// * [StandardMessageCodec] which defines the payload values supported by
@@ -147,8 +271,13 @@ class MethodChannel {
   ///   for how to access method call arguments on Android.
   Future<dynamic> invokeMethod(String method, [dynamic arguments]) async {
     assert(method != null);
-    return flutter2js.PlatformPlugin.current
-        .sendMethodChannelMessage(method, arguments);
+    final dynamic result = await BinaryMessages.send(
+      name,
+      codec.encodeMethodCall(MethodCall(method, arguments)),
+    );
+    if (result == null)
+      throw MissingPluginException('No implementation found for method $method on channel $name');
+    return codec.decodeEnvelope(result);
   }
 
   /// Sets a callback for receiving method calls on this channel.
@@ -168,9 +297,7 @@ class MethodChannel {
   void setMethodCallHandler(Future<dynamic> handler(MethodCall call)) {
     BinaryMessages.setMessageHandler(
       name,
-      handler == null
-          ? null
-          : (ByteData message) => _handleAsMethodCall(message, handler),
+      handler == null ? null : (ByteData message) => _handleAsMethodCall(message, handler),
     );
   }
 
@@ -187,17 +314,19 @@ class MethodChannel {
   ///
   /// This is intended for testing. Method calls intercepted in this manner are
   /// not sent to platform plugins.
+  ///
+  /// The provided `handler` must return a `Future` that completes with the
+  /// return value of the call. The value will be encoded using
+  /// [MethodCodec.encodeSuccessEnvelope], to act as if platform plugin had
+  /// returned that value.
   void setMockMethodCallHandler(Future<dynamic> handler(MethodCall call)) {
     BinaryMessages.setMockMessageHandler(
       name,
-      handler == null
-          ? null
-          : (ByteData message) => _handleAsMethodCall(message, handler),
+      handler == null ? null : (ByteData message) => _handleAsMethodCall(message, handler),
     );
   }
 
-  Future<ByteData> _handleAsMethodCall(ByteData message,
-      Future<dynamic> handler(MethodCall call)) async {
+  Future<ByteData> _handleAsMethodCall(ByteData message, Future<dynamic> handler(MethodCall call)) async {
     final MethodCall call = codec.decodeMethodCall(message);
     try {
       return codec.encodeSuccessEnvelope(await handler(call));
@@ -210,8 +339,7 @@ class MethodChannel {
     } on MissingPluginException {
       return null;
     } catch (e) {
-      return codec.encodeErrorEnvelope(
-          code: 'error', message: e.toString(), details: null);
+      return codec.encodeErrorEnvelope(code: 'error', message: e.toString(), details: null);
     }
   }
 }
@@ -222,9 +350,8 @@ class MethodChannel {
 /// instead of throwing an exception.
 class OptionalMethodChannel extends MethodChannel {
   /// Creates a [MethodChannel] that ignores missing platform plugins.
-  const OptionalMethodChannel(String name,
-      [MethodCodec codec = const StandardMethodCodec()])
-      : super(name, codec);
+  const OptionalMethodChannel(String name, [MethodCodec codec = const StandardMethodCodec()])
+    : super(name, codec);
 
   @override
   Future<dynamic> invokeMethod(String method, [dynamic arguments]) async {
@@ -272,7 +399,7 @@ class EventChannel {
   /// * a decoded data event (possibly null) for each successful event
   /// received from the platform plugin;
   /// * an error event containing a [PlatformException] for each error event
-  /// received from the platform plugin;
+  /// received from the platform plugin.
   ///
   /// Errors occurring during stream activation or deactivation are reported
   /// through the [FlutterError] facility. Stream activation happens only when

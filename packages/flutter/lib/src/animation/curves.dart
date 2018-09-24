@@ -28,13 +28,13 @@ abstract class Curve {
   /// Returns a new curve that is the reversed inversion of this one.
   /// This is often useful as the reverseCurve of an [Animation].
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_in.png)
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_flipped.png)
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_in.mp4}
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_flipped.mp4}
   ///
   /// See also:
   ///
   ///  * [FlippedCurve], the class that is used to implement this getter.
-  Curve get flipped => new FlippedCurve(this);
+  Curve get flipped => FlippedCurve(this);
 
   @override
   String toString() {
@@ -57,12 +57,12 @@ class _Linear extends Curve {
 /// The curve rises linearly from 0.0 to 1.0 and then falls discontinuously back
 /// to 0.0 each iteration.
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_sawtooth.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_sawtooth.mp4}
 class SawTooth extends Curve {
   /// Creates a sawtooth curve.
   ///
   /// The [count] argument must not be null.
-  const SawTooth(this.count);
+  const SawTooth(this.count) : assert(count != null);
 
   /// The number of repetitions of the sawtooth pattern in the unit interval.
   final int count;
@@ -70,7 +70,8 @@ class SawTooth extends Curve {
   @override
   double transform(double t) {
     assert(t >= 0.0 && t <= 1.0);
-    if (t == 1.0) return 1.0;
+    if (t == 1.0)
+      return 1.0;
     t *= count;
     return t - t.truncateToDouble();
   }
@@ -89,12 +90,15 @@ class SawTooth extends Curve {
 /// set to 1.0 will essentially become a three-second animation that starts
 /// three seconds later.
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_interval.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_interval.mp4}
 class Interval extends Curve {
   /// Creates an interval curve.
   ///
   /// The arguments must not be null.
-  const Interval(this.begin, this.end, {this.curve: Curves.linear});
+  const Interval(this.begin, this.end, { this.curve = Curves.linear })
+      : assert(begin != null),
+        assert(end != null),
+        assert(curve != null);
 
   /// The largest value for which this interval is 0.0.
   ///
@@ -117,27 +121,30 @@ class Interval extends Curve {
     assert(end >= 0.0);
     assert(end <= 1.0);
     assert(end >= begin);
-    if (t == 0.0 || t == 1.0) return t;
+    if (t == 0.0 || t == 1.0)
+      return t;
     t = ((t - begin) / (end - begin)).clamp(0.0, 1.0);
-    if (t == 0.0 || t == 1.0) return t;
+    if (t == 0.0 || t == 1.0)
+      return t;
     return curve.transform(t);
   }
 
   @override
   String toString() {
-    if (curve is! _Linear) return '$runtimeType($begin\u22EF$end)\u27A9$curve';
+    if (curve is! _Linear)
+      return '$runtimeType($begin\u22EF$end)\u27A9$curve';
     return '$runtimeType($begin\u22EF$end)';
   }
 }
 
 /// A curve that is 0.0 until it hits the threshold, then it jumps to 1.0.
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_threshold.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_threshold.mp4}
 class Threshold extends Curve {
   /// Creates a threshold curve.
   ///
   /// The [threshold] argument must not be null.
-  const Threshold(this.threshold);
+  const Threshold(this.threshold) : assert(threshold != null);
 
   /// The value before which the curve is 0.0 and after which the curve is 1.0.
   ///
@@ -149,7 +156,8 @@ class Threshold extends Curve {
     assert(t >= 0.0 && t <= 1.0);
     assert(threshold >= 0.0);
     assert(threshold <= 1.0);
-    if (t == 0.0 || t == 1.0) return t;
+    if (t == 0.0 || t == 1.0)
+      return t;
     return t < threshold ? 0.0 : 1.0;
   }
 }
@@ -163,10 +171,10 @@ class Threshold extends Curve {
 ///  * [Curves.easeOut]
 ///  * [Curves.easeInOut]
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_in.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_in_out.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_in.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_in_out.mp4}
 ///
 /// The [Cubic] class implements third-order Bézier curves.
 class Cubic extends Curve {
@@ -176,7 +184,11 @@ class Cubic extends Curve {
   /// cubic curves in [Curves].
   ///
   /// The [a], [b], [c], and [d] arguments must not be null.
-  const Cubic(this.a, this.b, this.c, this.d);
+  const Cubic(this.a, this.b, this.c, this.d)
+      : assert(a != null),
+        assert(b != null),
+        assert(c != null),
+        assert(d != null);
 
   /// The x coordinate of the first control point.
   ///
@@ -202,10 +214,12 @@ class Cubic extends Curve {
   /// to the curve at the point (1, 1).
   final double d;
 
-  static const double _kCubicErrorBound = 0.001;
+  static const double _cubicErrorBound = 0.001;
 
   double _evaluateCubic(double a, double b, double m) {
-    return 3 * a * (1 - m) * (1 - m) * m + 3 * b * (1 - m) * m * m + m * m * m;
+    return 3 * a * (1 - m) * (1 - m) * m +
+           3 * b * (1 - m) *           m * m +
+                                       m * m * m;
   }
 
   @override
@@ -216,7 +230,7 @@ class Cubic extends Curve {
     while (true) {
       final double midpoint = (start + end) / 2;
       final double estimate = _evaluateCubic(a, c, midpoint);
-      if ((t - estimate).abs() < _kCubicErrorBound)
+      if ((t - estimate).abs() < _cubicErrorBound)
         return _evaluateCubic(b, d, midpoint);
       if (estimate < t)
         start = midpoint;
@@ -227,26 +241,25 @@ class Cubic extends Curve {
 
   @override
   String toString() {
-    return '$runtimeType(${a.toStringAsFixed(2)}, ${b.toStringAsFixed(2)}, ${c
-        .toStringAsFixed(2)}, ${d.toStringAsFixed(2)})';
+    return '$runtimeType(${a.toStringAsFixed(2)}, ${b.toStringAsFixed(2)}, ${c.toStringAsFixed(2)}, ${d.toStringAsFixed(2)})';
   }
 }
 
 /// A curve that is the reversed inversion of its given curve.
 ///
-/// This curve evalutes the given curve in reverse (i.e., from 1.0 to 0.0 as t
+/// This curve evaluates the given curve in reverse (i.e., from 1.0 to 0.0 as t
 /// increases from 0.0 to 1.0) and returns the inverse of the given curve's value
 /// (i.e., 1.0 minus the given curve's value).
 ///
 /// This is the class used to implement the [flipped] getter on curves.
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_in.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_flipped_curve.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_in.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_flipped_curve.mp4}
 class FlippedCurve extends Curve {
   /// Creates a flipped curve.
   ///
   /// The [curve] argument must not be null.
-  const FlippedCurve(this.curve);
+  const FlippedCurve(this.curve) : assert(curve != null);
 
   /// The curve that is being flipped.
   final Curve curve;
@@ -280,6 +293,7 @@ class _DecelerateCurve extends Curve {
     return 1.0 - t * t;
   }
 }
+
 
 // BOUNCE CURVES
 
@@ -339,6 +353,7 @@ class _BounceInOutCurve extends Curve {
   }
 }
 
+
 // ELASTIC CURVES
 
 /// An oscillating curve that grows in magnitude while overshooting its bounds.
@@ -346,7 +361,7 @@ class _BounceInOutCurve extends Curve {
 /// An instance of this class using the default period of 0.4 is available as
 /// [Curves.elasticIn].
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_in.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_in.mp4}
 class ElasticInCurve extends Curve {
   /// Creates an elastic-in curve.
   ///
@@ -361,8 +376,7 @@ class ElasticInCurve extends Curve {
     assert(t >= 0.0 && t <= 1.0);
     final double s = period / 4.0;
     t = t - 1.0;
-    return -math.pow(2.0, 10.0 * t) *
-        math.sin((t - s) * (math.pi * 2.0) / period);
+    return -math.pow(2.0, 10.0 * t) * math.sin((t - s) * (math.pi * 2.0) / period);
   }
 
   @override
@@ -376,7 +390,7 @@ class ElasticInCurve extends Curve {
 /// An instance of this class using the default period of 0.4 is available as
 /// [Curves.elasticOut].
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_out.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_out.mp4}
 class ElasticOutCurve extends Curve {
   /// Creates an elastic-out curve.
   ///
@@ -390,9 +404,7 @@ class ElasticOutCurve extends Curve {
   double transform(double t) {
     assert(t >= 0.0 && t <= 1.0);
     final double s = period / 4.0;
-    return math.pow(2.0, -10 * t) *
-            math.sin((t - s) * (math.pi * 2.0) / period) +
-        1.0;
+    return math.pow(2.0, -10 * t) * math.sin((t - s) * (math.pi * 2.0) / period) + 1.0;
   }
 
   @override
@@ -407,7 +419,7 @@ class ElasticOutCurve extends Curve {
 /// An instance of this class using the default period of 0.4 is available as
 /// [Curves.elasticInOut].
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_in_out.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_in_out.mp4}
 class ElasticInOutCurve extends Curve {
   /// Creates an elastic-in-out curve.
   ///
@@ -423,14 +435,9 @@ class ElasticInOutCurve extends Curve {
     final double s = period / 4.0;
     t = 2.0 * t - 1.0;
     if (t < 0.0)
-      return -0.5 *
-          math.pow(2.0, 10.0 * t) *
-          math.sin((t - s) * (math.pi * 2.0) / period);
+      return -0.5 * math.pow(2.0, 10.0 * t) * math.sin((t - s) * (math.pi * 2.0) / period);
     else
-      return math.pow(2.0, -10.0 * t) *
-              math.sin((t - s) * (math.pi * 2.0) / period) *
-              0.5 +
-          1.0;
+      return math.pow(2.0, -10.0 * t) * math.sin((t - s) * (math.pi * 2.0) / period) * 0.5 + 1.0;
   }
 
   @override
@@ -439,23 +446,24 @@ class ElasticInOutCurve extends Curve {
   }
 }
 
+
 // PREDEFINED CURVES
 
 /// A collection of common animation curves.
 ///
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_in.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_in_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_decelerate.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_in.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_in_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_in.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_in_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_out.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_fast_out_slow_in.png)
-/// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_linear.png)
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_in.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_in_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_decelerate.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_in.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_in_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_in.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_in_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_out.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_fast_out_slow_in.mp4}
+/// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_linear.mp4}
 ///
 /// See also:
 ///
@@ -470,8 +478,8 @@ class Curves {
   /// method returns its input unmodified. This is useful as a default curve for
   /// cases where a [Curve] is required but no actual curve is desired.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_linear.png)
-  static const Curve linear = const _Linear._();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_linear.mp4}
+  static const Curve linear = _Linear._();
 
   /// A curve where the rate of change starts out quickly and then decelerates; an
   /// upside-down `f(t) = t²` parabola.
@@ -479,28 +487,28 @@ class Curves {
   /// This is equivalent to the Android `DecelerateInterpolator` class with a unit
   /// factor (the default factor).
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_decelerate.png)
-  static const Curve decelerate = const _DecelerateCurve._();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_decelerate.mp4}
+  static const Curve decelerate = _DecelerateCurve._();
 
   /// A cubic animation curve that speeds up quickly and ends slowly.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease.png)
-  static const Cubic ease = const Cubic(0.25, 0.1, 0.25, 1.0);
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease.mp4}
+  static const Cubic ease = Cubic(0.25, 0.1, 0.25, 1.0);
 
   /// A cubic animation curve that starts slowly and ends quickly.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_in.png)
-  static const Cubic easeIn = const Cubic(0.42, 0.0, 1.0, 1.0);
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_in.mp4}
+  static const Cubic easeIn = Cubic(0.42, 0.0, 1.0, 1.0);
 
   /// A cubic animation curve that starts quickly and ends slowly.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_out.png)
-  static const Cubic easeOut = const Cubic(0.0, 0.0, 0.58, 1.0);
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_out.mp4}
+  static const Cubic easeOut = Cubic(0.0, 0.0, 0.58, 1.0);
 
   /// A cubic animation curve that starts slowly, speeds up, and then and ends slowly.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_ease_in_out.png)
-  static const Cubic easeInOut = const Cubic(0.42, 0.0, 0.58, 1.0);
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_ease_in_out.mp4}
+  static const Cubic easeInOut = Cubic(0.42, 0.0, 0.58, 1.0);
 
   /// A curve that starts quickly and eases into its final position.
   ///
@@ -508,36 +516,36 @@ class Curves {
   /// final destination. As a result, the user isn’t left waiting for the
   /// animation to finish, and the negative effects of motion are minimized.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_fast_out_slow_in.png)
-  static const Cubic fastOutSlowIn = const Cubic(0.4, 0.0, 0.2, 1.0);
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_fast_out_slow_in.mp4}
+  static const Cubic fastOutSlowIn = Cubic(0.4, 0.0, 0.2, 1.0);
 
   /// An oscillating curve that grows in magnitude.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_in.png)
-  static const Curve bounceIn = const _BounceInCurve._();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_in.mp4}
+  static const Curve bounceIn = _BounceInCurve._();
 
   /// An oscillating curve that first grows and then shrink in magnitude.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_out.png)
-  static const Curve bounceOut = const _BounceOutCurve._();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_out.mp4}
+  static const Curve bounceOut = _BounceOutCurve._();
 
   /// An oscillating curve that first grows and then shrink in magnitude.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_bounce_in_out.png)
-  static const Curve bounceInOut = const _BounceInOutCurve._();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_bounce_in_out.mp4}
+  static const Curve bounceInOut = _BounceInOutCurve._();
 
-  /// An oscillating curve that grows in magnitude while overshootings its bounds.
+  /// An oscillating curve that grows in magnitude while overshooting its bounds.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_in.png)
-  static const ElasticInCurve elasticIn = const ElasticInCurve();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_in.mp4}
+  static const ElasticInCurve elasticIn = ElasticInCurve();
 
-  /// An oscillating curve that shrinks in magnitude while overshootings its bounds.
+  /// An oscillating curve that shrinks in magnitude while overshooting its bounds.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_out.png)
-  static const ElasticOutCurve elasticOut = const ElasticOutCurve();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_out.mp4}
+  static const ElasticOutCurve elasticOut = ElasticOutCurve();
 
-  /// An oscillating curve that grows and then shrinks in magnitude while overshootings its bounds.
+  /// An oscillating curve that grows and then shrinks in magnitude while overshooting its bounds.
   ///
-  /// ![](https://flutter.github.io/assets-for-api-docs/animation/curve_elastic_in_out.png)
-  static const ElasticInOutCurve elasticInOut = const ElasticInOutCurve();
+  /// {@animation 464 192 https://flutter.github.io/assets-for-api-docs/assets/animation/curve_elastic_in_out.mp4}
+  static const ElasticInOutCurve elasticInOut = ElasticInOutCurve();
 }

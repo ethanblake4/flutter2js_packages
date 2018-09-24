@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/ui.dart' show Offset, PointerDeviceKind;
+
+import 'package:flutter/foundation.dart';
 
 export 'package:flutter/ui.dart' show Offset, PointerDeviceKind;
 
@@ -34,7 +35,7 @@ const int kMiddleMouseButton = 0x04;
 
 /// The bit of [PointerEvent.buttons] that corresponds to the secondary stylus button.
 ///
-/// The secondary stylus button is typically on the end of the stylus fartherest
+/// The secondary stylus button is typically on the end of the stylus farthest
 /// from the tip but can be reconfigured to be a different physical button.
 const int kSecondaryStylusButton = 0x04;
 
@@ -57,8 +58,7 @@ const int kForwardMouseButton = 0x10;
 /// See [kPrimaryMouseButton], [kSecondaryMouseButton], [kMiddleMouseButton],
 /// [kBackMouseButton], and [kForwardMouseButton] for semantic names for some
 /// mouse buttons.
-int nthMouseButton(int number) =>
-    (kPrimaryMouseButton << (number - 1)) & kMaxUnsignedSMI;
+int nthMouseButton(int number) => (kPrimaryMouseButton << (number - 1)) & kMaxUnsignedSMI;
 
 /// The bit of [PointerEvent.buttons] that corresponds to the nth stylus button.
 ///
@@ -66,8 +66,7 @@ int nthMouseButton(int number) =>
 ///
 /// See [kPrimaryStylusButton] and [kSecondaryStylusButton] for semantic names
 /// for some stylus buttons.
-int nthStylusButton(int number) =>
-    (kPrimaryStylusButton << (number - 1)) & kMaxUnsignedSMI;
+int nthStylusButton(int number) => (kPrimaryStylusButton << (number - 1)) & kMaxUnsignedSMI;
 
 /// Base class for touch, stylus, or mouse events.
 ///
@@ -75,7 +74,7 @@ int nthStylusButton(int number) =>
 /// logical pixels. Logical pixels approximate a grid with about 38 pixels per
 /// centimeter, or 96 pixels per inch.
 ///
-/// This allows gestures to be recognised independent of the precise hardware
+/// This allows gestures to be recognized independent of the precise hardware
 /// characteristics of the device. In particular, features such as touch slop
 /// (see [kTouchSlop]) can be defined in terms of roughly physical lengths so
 /// that the user can shift their finger by the same distance on a high-density
@@ -95,27 +94,27 @@ abstract class PointerEvent {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
   const PointerEvent({
-    this.timeStamp: Duration.zero,
-    this.pointer: 0,
-    this.kind: PointerDeviceKind.touch,
-    this.device: 0,
-    this.position: Offset.zero,
-    this.delta: Offset.zero,
-    this.buttons: 0,
-    this.down: false,
-    this.obscured: false,
-    this.pressure: 1.0,
-    this.pressureMin: 1.0,
-    this.pressureMax: 1.0,
-    this.distance: 0.0,
-    this.distanceMax: 0.0,
-    this.radiusMajor: 0.0,
-    this.radiusMinor: 0.0,
-    this.radiusMin: 0.0,
-    this.radiusMax: 0.0,
-    this.orientation: 0.0,
-    this.tilt: 0.0,
-    this.synthesized: false,
+    this.timeStamp = Duration.zero,
+    this.pointer = 0,
+    this.kind = PointerDeviceKind.touch,
+    this.device = 0,
+    this.position = Offset.zero,
+    this.delta = Offset.zero,
+    this.buttons = 0,
+    this.down = false,
+    this.obscured = false,
+    this.pressure = 1.0,
+    this.pressureMin = 1.0,
+    this.pressureMax = 1.0,
+    this.distance = 0.0,
+    this.distanceMax = 0.0,
+    this.radiusMajor = 0.0,
+    this.radiusMinor = 0.0,
+    this.radiusMin = 0.0,
+    this.radiusMax = 0.0,
+    this.orientation = 0.0,
+    this.tilt = 0.0,
+    this.synthesized = false,
   });
 
   /// Time of event dispatch, relative to an arbitrary timeline.
@@ -177,7 +176,7 @@ abstract class PointerEvent {
   final double distance;
 
   /// The minimum value that a distance can return for this pointer (always 0.0).
-  final double distanceMin = 0.0;
+  double get distanceMin => 0.0;
 
   /// The maximum value that a distance can return for this pointer. If this
   /// input device cannot detect "hover touch" input events, then this will be
@@ -242,7 +241,7 @@ abstract class PointerEvent {
   /// in pointer behaviors.
   ///
   /// For instance, on end events, Android always drops any location changes
-  /// that happened between its reporting intervals when emiting the end events.
+  /// that happened between its reporting intervals when emitting the end events.
   ///
   /// On iOS, minor incorrect location changes from the previous move events
   /// can be reported on end events. We synthesize a [PointerEvent] to cover
@@ -255,29 +254,29 @@ abstract class PointerEvent {
   /// Returns a complete textual description of this event.
   String toStringFull() {
     return '$runtimeType('
-        'timeStamp: $timeStamp, '
-        'pointer: $pointer, '
-        'kind: $kind, '
-        'device: $device, '
-        'position: $position, '
-        'delta: $delta, '
-        'buttons: $buttons, '
-        'down: $down, '
-        'obscured: $obscured, '
-        'pressure: $pressure, '
-        'pressureMin: $pressureMin, '
-        'pressureMax: $pressureMax, '
-        'distance: $distance, '
-        'distanceMin: $distanceMin, '
-        'distanceMax: $distanceMax, '
-        'radiusMajor: $radiusMajor, '
-        'radiusMinor: $radiusMinor, '
-        'radiusMin: $radiusMin, '
-        'radiusMax: $radiusMax, '
-        'orientation: $orientation, '
-        'tilt: $tilt, '
-        'synthesized: $synthesized'
-        ')';
+             'timeStamp: $timeStamp, '
+             'pointer: $pointer, '
+             'kind: $kind, '
+             'device: $device, '
+             'position: $position, '
+             'delta: $delta, '
+             'buttons: $buttons, '
+             'down: $down, '
+             'obscured: $obscured, '
+             'pressure: $pressure, '
+             'pressureMin: $pressureMin, '
+             'pressureMax: $pressureMax, '
+             'distance: $distance, '
+             'distanceMin: $distanceMin, '
+             'distanceMax: $distanceMax, '
+             'radiusMajor: $radiusMajor, '
+             'radiusMinor: $radiusMinor, '
+             'radiusMin: $radiusMin, '
+             'radiusMax: $radiusMax, '
+             'orientation: $orientation, '
+             'tilt: $tilt, '
+             'synthesized: $synthesized'
+           ')';
   }
 }
 
@@ -289,34 +288,35 @@ class PointerAddedEvent extends PointerEvent {
   /// Creates a pointer added event.
   ///
   /// All of the argument must be non-null.
-  const PointerAddedEvent(
-      {Duration timeStamp: Duration.zero,
-      PointerDeviceKind kind: PointerDeviceKind.touch,
-      int device: 0,
-      Offset position: Offset.zero,
-      bool obscured: false,
-      double pressureMin: 1.0,
-      double pressureMax: 1.0,
-      double distance: 0.0,
-      double distanceMax: 0.0,
-      double radiusMin: 0.0,
-      double radiusMax: 0.0,
-      double orientation: 0.0,
-      double tilt: 0.0})
-      : super(
-            timeStamp: timeStamp,
-            kind: kind,
-            device: device,
-            position: position,
-            obscured: obscured,
-            pressureMin: pressureMin,
-            pressureMax: pressureMax,
-            distance: distance,
-            distanceMax: distanceMax,
-            radiusMin: radiusMin,
-            radiusMax: radiusMax,
-            orientation: orientation,
-            tilt: tilt);
+  const PointerAddedEvent({
+    Duration timeStamp = Duration.zero,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    Offset position = Offset.zero,
+    bool obscured = false,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distance = 0.0,
+    double distanceMax = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0,
+    double orientation = 0.0,
+    double tilt = 0.0
+  }) : super(
+    timeStamp: timeStamp,
+    kind: kind,
+    device: device,
+    position: position,
+    obscured: obscured,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distance: distance,
+    distanceMax: distanceMax,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax,
+    orientation: orientation,
+    tilt: tilt
+  );
 }
 
 /// The device is no longer tracking the pointer.
@@ -327,27 +327,28 @@ class PointerRemovedEvent extends PointerEvent {
   /// Creates a pointer removed event.
   ///
   /// All of the argument must be non-null.
-  const PointerRemovedEvent(
-      {Duration timeStamp: Duration.zero,
-      PointerDeviceKind kind: PointerDeviceKind.touch,
-      int device: 0,
-      bool obscured: false,
-      double pressureMin: 1.0,
-      double pressureMax: 1.0,
-      double distanceMax: 0.0,
-      double radiusMin: 0.0,
-      double radiusMax: 0.0})
-      : super(
-            timeStamp: timeStamp,
-            kind: kind,
-            device: device,
-            position: null,
-            obscured: obscured,
-            pressureMin: pressureMin,
-            pressureMax: pressureMax,
-            distanceMax: distanceMax,
-            radiusMin: radiusMin,
-            radiusMax: radiusMax);
+  const PointerRemovedEvent({
+    Duration timeStamp = Duration.zero,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    bool obscured = false,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distanceMax = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0
+  }) : super(
+    timeStamp: timeStamp,
+    kind: kind,
+    device: device,
+    position: null,
+    obscured: obscured,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distanceMax: distanceMax,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax
+  );
 }
 
 /// The pointer has moved with respect to the device while the pointer is not
@@ -362,46 +363,45 @@ class PointerHoverEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerHoverEvent({
-    Duration timeStamp: Duration.zero,
-    PointerDeviceKind kind: PointerDeviceKind.touch,
-    int device: 0,
-    Offset position: Offset.zero,
-    Offset delta: Offset.zero,
-    int buttons: 0,
-    bool obscured: false,
-    double pressureMin: 1.0,
-    double pressureMax: 1.0,
-    double distance: 0.0,
-    double distanceMax: 0.0,
-    double radiusMajor: 0.0,
-    double radiusMinor: 0.0,
-    double radiusMin: 0.0,
-    double radiusMax: 0.0,
-    double orientation: 0.0,
-    double tilt: 0.0,
-    bool synthesized: false,
-  })
-      : super(
-          timeStamp: timeStamp,
-          kind: kind,
-          device: device,
-          position: position,
-          delta: delta,
-          buttons: buttons,
-          down: false,
-          obscured: obscured,
-          pressureMin: pressureMin,
-          pressureMax: pressureMax,
-          distance: distance,
-          distanceMax: distanceMax,
-          radiusMajor: radiusMajor,
-          radiusMinor: radiusMinor,
-          radiusMin: radiusMin,
-          radiusMax: radiusMax,
-          orientation: orientation,
-          tilt: tilt,
-          synthesized: synthesized,
-        );
+    Duration timeStamp = Duration.zero,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    Offset position = Offset.zero,
+    Offset delta = Offset.zero,
+    int buttons = 0,
+    bool obscured = false,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distance = 0.0,
+    double distanceMax = 0.0,
+    double radiusMajor = 0.0,
+    double radiusMinor = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0,
+    double orientation = 0.0,
+    double tilt = 0.0,
+    bool synthesized = false,
+  }) : super(
+    timeStamp: timeStamp,
+    kind: kind,
+    device: device,
+    position: position,
+    delta: delta,
+    buttons: buttons,
+    down: false,
+    obscured: obscured,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distance: distance,
+    distanceMax: distanceMax,
+    radiusMajor: radiusMajor,
+    radiusMinor: radiusMinor,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax,
+    orientation: orientation,
+    tilt: tilt,
+    synthesized: synthesized,
+  );
 }
 
 /// The pointer has made contact with the device.
@@ -409,44 +409,45 @@ class PointerDownEvent extends PointerEvent {
   /// Creates a pointer down event.
   ///
   /// All of the argument must be non-null.
-  const PointerDownEvent(
-      {Duration timeStamp: Duration.zero,
-      int pointer: 0,
-      PointerDeviceKind kind: PointerDeviceKind.touch,
-      int device: 0,
-      Offset position: Offset.zero,
-      int buttons: 0,
-      bool obscured: false,
-      double pressure: 1.0,
-      double pressureMin: 1.0,
-      double pressureMax: 1.0,
-      double distanceMax: 0.0,
-      double radiusMajor: 0.0,
-      double radiusMinor: 0.0,
-      double radiusMin: 0.0,
-      double radiusMax: 0.0,
-      double orientation: 0.0,
-      double tilt: 0.0})
-      : super(
-            timeStamp: timeStamp,
-            pointer: pointer,
-            kind: kind,
-            device: device,
-            position: position,
-            buttons: buttons,
-            down: true,
-            obscured: obscured,
-            pressure: pressure,
-            pressureMin: pressureMin,
-            pressureMax: pressureMax,
-            distance: 0.0,
-            distanceMax: distanceMax,
-            radiusMajor: radiusMajor,
-            radiusMinor: radiusMinor,
-            radiusMin: radiusMin,
-            radiusMax: radiusMax,
-            orientation: orientation,
-            tilt: tilt);
+  const PointerDownEvent({
+    Duration timeStamp = Duration.zero,
+    int pointer = 0,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    Offset position = Offset.zero,
+    int buttons = 0,
+    bool obscured = false,
+    double pressure = 1.0,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distanceMax = 0.0,
+    double radiusMajor = 0.0,
+    double radiusMinor = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0,
+    double orientation = 0.0,
+    double tilt = 0.0
+  }) : super(
+    timeStamp: timeStamp,
+    pointer: pointer,
+    kind: kind,
+    device: device,
+    position: position,
+    buttons: buttons,
+    down: true,
+    obscured: obscured,
+    pressure: pressure,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distance: 0.0,
+    distanceMax: distanceMax,
+    radiusMajor: radiusMajor,
+    radiusMinor: radiusMinor,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax,
+    orientation: orientation,
+    tilt: tilt
+  );
 }
 
 /// The pointer has moved with respect to the device while the pointer is in
@@ -461,49 +462,48 @@ class PointerMoveEvent extends PointerEvent {
   ///
   /// All of the argument must be non-null.
   const PointerMoveEvent({
-    Duration timeStamp: Duration.zero,
-    int pointer: 0,
-    PointerDeviceKind kind: PointerDeviceKind.touch,
-    int device: 0,
-    Offset position: Offset.zero,
-    Offset delta: Offset.zero,
-    int buttons: 0,
-    bool obscured: false,
-    double pressure: 1.0,
-    double pressureMin: 1.0,
-    double pressureMax: 1.0,
-    double distanceMax: 0.0,
-    double radiusMajor: 0.0,
-    double radiusMinor: 0.0,
-    double radiusMin: 0.0,
-    double radiusMax: 0.0,
-    double orientation: 0.0,
-    double tilt: 0.0,
-    bool synthesized: false,
-  })
-      : super(
-          timeStamp: timeStamp,
-          pointer: pointer,
-          kind: kind,
-          device: device,
-          position: position,
-          delta: delta,
-          buttons: buttons,
-          down: true,
-          obscured: obscured,
-          pressure: pressure,
-          pressureMin: pressureMin,
-          pressureMax: pressureMax,
-          distance: 0.0,
-          distanceMax: distanceMax,
-          radiusMajor: radiusMajor,
-          radiusMinor: radiusMinor,
-          radiusMin: radiusMin,
-          radiusMax: radiusMax,
-          orientation: orientation,
-          tilt: tilt,
-          synthesized: synthesized,
-        );
+    Duration timeStamp = Duration.zero,
+    int pointer = 0,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    Offset position = Offset.zero,
+    Offset delta = Offset.zero,
+    int buttons = 0,
+    bool obscured = false,
+    double pressure = 1.0,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distanceMax = 0.0,
+    double radiusMajor = 0.0,
+    double radiusMinor = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0,
+    double orientation = 0.0,
+    double tilt = 0.0,
+    bool synthesized = false,
+  }) : super(
+    timeStamp: timeStamp,
+    pointer: pointer,
+    kind: kind,
+    device: device,
+    position: position,
+    delta: delta,
+    buttons: buttons,
+    down: true,
+    obscured: obscured,
+    pressure: pressure,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distance: 0.0,
+    distanceMax: distanceMax,
+    radiusMajor: radiusMajor,
+    radiusMinor: radiusMinor,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax,
+    orientation: orientation,
+    tilt: tilt,
+    synthesized: synthesized,
+  );
 }
 
 /// The pointer has stopped making contact with the device.
@@ -511,39 +511,46 @@ class PointerUpEvent extends PointerEvent {
   /// Creates a pointer up event.
   ///
   /// All of the argument must be non-null.
-  const PointerUpEvent(
-      {Duration timeStamp: Duration.zero,
-      int pointer: 0,
-      PointerDeviceKind kind: PointerDeviceKind.touch,
-      int device: 0,
-      Offset position: Offset.zero,
-      int buttons: 0,
-      bool obscured: false,
-      double pressureMin: 1.0,
-      double pressureMax: 1.0,
-      double distance: 0.0,
-      double distanceMax: 0.0,
-      double radiusMin: 0.0,
-      double radiusMax: 0.0,
-      double orientation: 0.0,
-      double tilt: 0.0})
-      : super(
-            timeStamp: timeStamp,
-            pointer: pointer,
-            kind: kind,
-            device: device,
-            position: position,
-            buttons: buttons,
-            down: false,
-            obscured: obscured,
-            pressureMin: pressureMin,
-            pressureMax: pressureMax,
-            distance: distance,
-            distanceMax: distanceMax,
-            radiusMin: radiusMin,
-            radiusMax: radiusMax,
-            orientation: orientation,
-            tilt: tilt);
+  const PointerUpEvent({
+    Duration timeStamp = Duration.zero,
+    int pointer = 0,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    Offset position = Offset.zero,
+    int buttons = 0,
+    bool obscured = false,
+    double pressure = 1.0,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distance = 0.0,
+    double distanceMax = 0.0,
+    double radiusMajor = 0.0,
+    double radiusMinor = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0,
+    double orientation = 0.0,
+    double tilt = 0.0
+  }) : super(
+    timeStamp: timeStamp,
+    pointer: pointer,
+    kind: kind,
+    device: device,
+    position: position,
+    buttons: buttons,
+    down: false,
+    obscured: obscured,
+    pressure: pressure,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distance: distance,
+    distanceMax: distanceMax,
+    radiusMajor: radiusMajor,
+    radiusMinor: radiusMinor,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax,
+    orientation: orientation,
+    tilt: tilt
+  );
 }
 
 /// The input from the pointer is no longer directed towards this receiver.
@@ -551,37 +558,42 @@ class PointerCancelEvent extends PointerEvent {
   /// Creates a pointer cancel event.
   ///
   /// All of the argument must be non-null.
-  const PointerCancelEvent(
-      {Duration timeStamp: Duration.zero,
-      int pointer: 0,
-      PointerDeviceKind kind: PointerDeviceKind.touch,
-      int device: 0,
-      Offset position: Offset.zero,
-      int buttons: 0,
-      bool obscured: false,
-      double pressureMin: 1.0,
-      double pressureMax: 1.0,
-      double distance: 0.0,
-      double distanceMax: 0.0,
-      double radiusMin: 0.0,
-      double radiusMax: 0.0,
-      double orientation: 0.0,
-      double tilt: 0.0})
-      : super(
-            timeStamp: timeStamp,
-            pointer: pointer,
-            kind: kind,
-            device: device,
-            position: position,
-            buttons: buttons,
-            down: false,
-            obscured: obscured,
-            pressureMin: pressureMin,
-            pressureMax: pressureMax,
-            distance: distance,
-            distanceMax: distanceMax,
-            radiusMin: radiusMin,
-            radiusMax: radiusMax,
-            orientation: orientation,
-            tilt: tilt);
+  const PointerCancelEvent({
+    Duration timeStamp = Duration.zero,
+    int pointer = 0,
+    PointerDeviceKind kind = PointerDeviceKind.touch,
+    int device = 0,
+    Offset position = Offset.zero,
+    int buttons = 0,
+    bool obscured = false,
+    double pressureMin = 1.0,
+    double pressureMax = 1.0,
+    double distance = 0.0,
+    double distanceMax = 0.0,
+    double radiusMajor = 0.0,
+    double radiusMinor = 0.0,
+    double radiusMin = 0.0,
+    double radiusMax = 0.0,
+    double orientation = 0.0,
+    double tilt = 0.0
+  }) : super(
+    timeStamp: timeStamp,
+    pointer: pointer,
+    kind: kind,
+    device: device,
+    position: position,
+    buttons: buttons,
+    down: false,
+    obscured: obscured,
+    pressureMin: pressureMin,
+    pressureMax: pressureMax,
+    distance: distance,
+    distanceMax: distanceMax,
+    radiusMajor: radiusMajor,
+    radiusMinor: radiusMinor,
+    radiusMin: radiusMin,
+    radiusMax: radiusMax,
+    orientation: orientation,
+    tilt: tilt
+  );
 }

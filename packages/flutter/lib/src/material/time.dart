@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/ui.dart' show hashValues;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'material_localizations.dart';
@@ -44,30 +43,25 @@ class TimeOfDay {
   ///
   /// The [hour] argument must be between 0 and 23, inclusive. The [minute]
   /// argument must be between 0 and 59, inclusive.
-  const TimeOfDay({@required this.hour, @required this.minute});
+  const TimeOfDay({ @required this.hour, @required this.minute });
 
   /// Creates a time of day based on the given time.
   ///
   /// The [hour] is set to the time's hour and the [minute] is set to the time's
   /// minute in the timezone of the given [DateTime].
-  TimeOfDay.fromDateTime(DateTime time)
-      : hour = time.hour,
-        minute = time.minute;
+  TimeOfDay.fromDateTime(DateTime time) : hour = time.hour, minute = time.minute;
 
   /// Creates a time of day based on the current time.
   ///
   /// The [hour] is set to the current hour and the [minute] is set to the
   /// current minute in the local time zone.
-  factory TimeOfDay.now() {
-    return new TimeOfDay.fromDateTime(new DateTime.now());
-  }
+  factory TimeOfDay.now() { return TimeOfDay.fromDateTime(DateTime.now()); }
 
   /// Returns a new TimeOfDay with the hour and/or minute replaced.
-  TimeOfDay replacing({int hour, int minute}) {
+  TimeOfDay replacing({ int hour, int minute }) {
     assert(hour == null || (hour >= 0 && hour < hoursPerDay));
     assert(minute == null || (minute >= 0 && minute < minutesPerHour));
-    return new TimeOfDay(
-        hour: hour ?? this.hour, minute: minute ?? this.minute);
+    return TimeOfDay(hour: hour ?? this.hour, minute: minute ?? this.minute);
   }
 
   /// The selected hour, in 24 hour time from 0..23.
@@ -90,8 +84,7 @@ class TimeOfDay {
   /// This is a shortcut for [MaterialLocalizations.formatTimeOfDay].
   String format(BuildContext context) {
     debugCheckHasMediaQuery(context);
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     return localizations.formatTimeOfDay(
       this,
       alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
@@ -100,9 +93,11 @@ class TimeOfDay {
 
   @override
   bool operator ==(dynamic other) {
-    if (other is! TimeOfDay) return false;
+    if (other is! TimeOfDay)
+      return false;
     final TimeOfDay typedOther = other;
-    return typedOther.hour == hour && typedOther.minute == minute;
+    return typedOther.hour == hour
+        && typedOther.minute == minute;
   }
 
   @override
@@ -111,7 +106,8 @@ class TimeOfDay {
   @override
   String toString() {
     String _addLeadingZeroIfNeeded(int value) {
-      if (value < 10) return '0$value';
+      if (value < 10)
+        return '0$value';
       return value.toString();
     }
 
@@ -188,7 +184,7 @@ enum HourFormat {
 }
 
 /// The [HourFormat] used for the given [TimeOfDayFormat].
-HourFormat hourFormat({@required TimeOfDayFormat of}) {
+HourFormat hourFormat({ @required TimeOfDayFormat of }) {
   switch (of) {
     case TimeOfDayFormat.h_colon_mm_space_a:
     case TimeOfDayFormat.a_space_h_colon_mm:

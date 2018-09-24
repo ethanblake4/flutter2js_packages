@@ -137,16 +137,19 @@ abstract class Decoration extends Diagnosticable {
   /// an [AnimationController].
   static Decoration lerp(Decoration a, Decoration b, double t) {
     assert(t != null);
-    if (a == null && b == null) return null;
-    if (a == null) return b.lerpFrom(null, t) ?? b;
-    if (b == null) return a.lerpTo(null, t) ?? a;
-    if (t == 0.0) return a;
-    if (t == 1.0) return b;
-    return b.lerpFrom(a, t) ??
-        a.lerpTo(b, t) ??
-        (t < 0.5
-            ? (a.lerpTo(null, t * 2.0) ?? a)
-            : (b.lerpFrom(null, (t - 0.5) * 2.0) ?? b));
+    if (a == null && b == null)
+      return null;
+    if (a == null)
+      return b.lerpFrom(null, t) ?? b;
+    if (b == null)
+      return a.lerpTo(null, t) ?? a;
+    if (t == 0.0)
+      return a;
+    if (t == 1.0)
+      return b;
+    return b.lerpFrom(a, t)
+        ?? a.lerpTo(b, t)
+        ?? (t < 0.5 ? (a.lerpTo(null, t * 2.0) ?? a) : (b.lerpFrom(null, (t - 0.5) * 2.0) ?? b));
   }
 
   /// Tests whether the given point, on a rectangle of a given size,
@@ -164,8 +167,7 @@ abstract class Decoration extends Diagnosticable {
   /// is what [Container] uses), the `textDirection` parameter will be populated
   /// based on the ambient [Directionality] (by way of the [RenderDecoratedBox]
   /// renderer).
-  bool hitTest(Size size, Offset position, {TextDirection textDirection}) =>
-      true;
+  bool hitTest(Size size, Offset position, { TextDirection textDirection }) => true;
 
   /// Returns a [BoxPainter] that will paint this decoration.
   ///
@@ -186,7 +188,7 @@ abstract class Decoration extends Diagnosticable {
 abstract class BoxPainter {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  BoxPainter([this.onChanged]);
+  const BoxPainter([this.onChanged]);
 
   /// Paints the [Decoration] for which this object was created on the
   /// given canvas using the given configuration.
@@ -229,5 +231,5 @@ abstract class BoxPainter {
   /// The [onChanged] callback will not be invoked after this method has been
   /// called.
   @mustCallSuper
-  void dispose() {}
+  void dispose() { }
 }

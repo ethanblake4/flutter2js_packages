@@ -8,24 +8,30 @@ import 'package:flutter/ui.dart' as ui show lerpDouble;
 import 'package:flutter/foundation.dart';
 
 import 'basic_types.dart';
+import 'debug.dart';
 
 /// A shadow cast by a box.
 ///
-/// BoxShadow can cast non-rectangular shadows if the box is non-rectangular
+/// [BoxShadow] can cast non-rectangular shadows if the box is non-rectangular
 /// (e.g., has a border radius or a circular shape).
 ///
 /// This class is similar to CSS box-shadow.
+///
+/// See also:
+///
+///  * [Canvas.drawShadow], which is a more efficient way to draw shadows.
 @immutable
 class BoxShadow {
   /// Creates a box shadow.
   ///
   /// By default, the shadow is solid black with zero [offset], [blurRadius],
   /// and [spreadRadius].
-  const BoxShadow(
-      {this.color: const Color(0xFF000000),
-      this.offset: Offset.zero,
-      this.blurRadius: 0.0,
-      this.spreadRadius: 0.0});
+  const BoxShadow({
+    this.color = const Color(0xFF000000),
+    this.offset = Offset.zero,
+    this.blurRadius = 0.0,
+    this.spreadRadius = 0.0
+  });
 
   /// The color of the shadow.
   final Color color;
@@ -54,13 +60,32 @@ class BoxShadow {
   /// See the sigma argument to [MaskFilter.blur].
   double get blurSigma => convertRadiusToSigma(blurRadius);
 
+  /// Create the [Paint] object that corresponds to this shadow description.
+  ///
+  /// The [offset] and [spreadRadius] are not represented in the [Paint] object.
+  /// To honor those as well, the shape should be inflated by [spreadRadius] pixels
+  /// in every direction and then translated by [offset] before being filled using
+  /// this [Paint].
+  Paint toPaint() {
+    final Paint result = Paint()
+      ..color = color
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
+    assert(() {
+      if (debugDisableShadows)
+        result.maskFilter = null;
+      return true;
+    }());
+    return result;
+  }
+
   /// Returns a new box shadow with its offset, blurRadius, and spreadRadius scaled by the given factor.
   BoxShadow scale(double factor) {
-    return new BoxShadow(
-        color: color,
-        offset: offset * factor,
-        blurRadius: blurRadius * factor,
-        spreadRadius: spreadRadius * factor);
+    return BoxShadow(
+      color: color,
+      offset: offset * factor,
+      blurRadius: blurRadius * factor,
+      spreadRadius: spreadRadius * factor
+    );
   }
 
   /// Linearly interpolate between two box shadows.
@@ -82,10 +107,13 @@ class BoxShadow {
   /// an [AnimationController].
   static BoxShadow lerp(BoxShadow a, BoxShadow b, double t) {
     assert(t != null);
-    if (a == null && b == null) return null;
-    if (a == null) return b.scale(t);
-    if (b == null) return a.scale(1.0 - t);
-    return new BoxShadow(
+    if (a == null && b == null)
+      return null;
+    if (a == null)
+      return b.scale(t);
+    if (b == null)
+      return a.scale(1.0 - t);
+    return BoxShadow(
       color: Color.lerp(a.color, b.color, t),
       offset: Offset.lerp(a.offset, b.offset, t),
       blurRadius: ui.lerpDouble(a.blurRadius, b.blurRadius, t),
@@ -108,10 +136,10 @@ class BoxShadow {
   ///
   /// Values for `t` are usually obtained from an [Animation<double>], such as
   /// an [AnimationController].
-  static List<BoxShadow> lerpList(
-      List<BoxShadow> a, List<BoxShadow> b, double t) {
+  static List<BoxShadow> lerpList(List<BoxShadow> a, List<BoxShadow> b, double t) {
     assert(t != null);
-    if (a == null && b == null) return null;
+    if (a == null && b == null)
+      return null;
     a ??= <BoxShadow>[];
     b ??= <BoxShadow>[];
     final List<BoxShadow> result = <BoxShadow>[];
@@ -120,19 +148,22 @@ class BoxShadow {
       result.add(BoxShadow.lerp(a[i], b[i], t));
     for (int i = commonLength; i < a.length; i += 1)
       result.add(a[i].scale(1.0 - t));
-    for (int i = commonLength; i < b.length; i += 1) result.add(b[i].scale(t));
+    for (int i = commonLength; i < b.length; i += 1)
+      result.add(b[i].scale(t));
     return result;
   }
 
   @override
   bool operator ==(dynamic other) {
-    if (identical(this, other)) return true;
-    if (runtimeType != other.runtimeType) return false;
+    if (identical(this, other))
+      return true;
+    if (runtimeType != other.runtimeType)
+      return false;
     final BoxShadow typedOther = other;
     return color == typedOther.color &&
-        offset == typedOther.offset &&
-        blurRadius == typedOther.blurRadius &&
-        spreadRadius == typedOther.spreadRadius;
+           offset == typedOther.offset &&
+           blurRadius == typedOther.blurRadius &&
+           spreadRadius == typedOther.spreadRadius;
   }
 
   @override

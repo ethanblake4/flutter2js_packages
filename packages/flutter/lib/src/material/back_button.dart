@@ -4,6 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import 'debug.dart';
 import 'icon_button.dart';
 import 'icons.dart';
 import 'material_localizations.dart';
@@ -24,7 +25,7 @@ import 'theme.dart';
 class BackButtonIcon extends StatelessWidget {
   /// Creates an icon that shows the appropriate "back" image for
   /// the current platform (as obtained from the [Theme]).
-  const BackButtonIcon({Key key}) : super(key: key);
+  const BackButtonIcon({ Key key }) : super(key: key);
 
   /// Returns the appropriate "back" icon for the given `platform`.
   static IconData _getIconData(TargetPlatform platform) {
@@ -40,8 +41,7 @@ class BackButtonIcon extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      new Icon(_getIconData(Theme.of(context).platform));
+  Widget build(BuildContext context) => Icon(_getIconData(Theme.of(context).platform));
 }
 
 /// A material design back button.
@@ -72,7 +72,7 @@ class BackButtonIcon extends StatelessWidget {
 class BackButton extends StatelessWidget {
   /// Creates an [IconButton] with the appropriate "back" icon for the current
   /// target platform.
-  const BackButton({Key key, this.color}) : super(key: key);
+  const BackButton({ Key key, this.color }) : super(key: key);
 
   /// The color to use for the icon.
   ///
@@ -82,13 +82,15 @@ class BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new IconButton(
-        icon: const BackButtonIcon(),
-        color: color,
-        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        onPressed: () {
-          Navigator.of(context).maybePop();
-        });
+    assert(debugCheckHasMaterialLocalizations(context));
+    return IconButton(
+      icon: const BackButtonIcon(),
+      color: color,
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      onPressed: () {
+        Navigator.maybePop(context);
+      }
+    );
   }
 }
 
@@ -110,15 +112,15 @@ class BackButton extends StatelessWidget {
 ///  * [IconButton], to create other material design icon buttons.
 class CloseButton extends StatelessWidget {
   /// Creates a Material Design close button.
-  const CloseButton({Key key}) : super(key: key);
+  const CloseButton({ Key key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return new IconButton(
+    return IconButton(
       icon: const Icon(Icons.close),
       tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
       onPressed: () {
-        Navigator.of(context).maybePop();
+        Navigator.maybePop(context);
       },
     );
   }

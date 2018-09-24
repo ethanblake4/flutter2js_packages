@@ -59,8 +59,9 @@ bool debugPrintScheduleFrameStacks = false;
 /// a complete list.
 bool debugAssertAllSchedulerVarsUnset(String reason) {
   assert(() {
-    if (debugPrintBeginFrameBanner || debugPrintEndFrameBanner) {
-      throw new FlutterError(reason);
+    if (debugPrintBeginFrameBanner ||
+        debugPrintEndFrameBanner) {
+      throw FlutterError(reason);
     }
     return true;
   }());

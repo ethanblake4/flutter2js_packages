@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 
@@ -17,7 +16,7 @@ import 'scroll_metrics.dart';
 abstract class ViewportNotificationMixin extends Notification {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  ViewportNotificationMixin();
+  factory ViewportNotificationMixin._() => null;
 
   /// The number of viewports that this notification has bubbled through.
   ///
@@ -31,8 +30,8 @@ abstract class ViewportNotificationMixin extends Notification {
 
   @override
   bool visitAncestor(Element element) {
-    if (element is RenderObjectElement &&
-        element.renderObject is RenderAbstractViewport) _depth += 1;
+    if (element is RenderObjectElement && element.renderObject is RenderAbstractViewport)
+      _depth += 1;
     return super.visitAncestor(element);
   }
 
@@ -81,7 +80,7 @@ abstract class ViewportNotificationMixin extends Notification {
 ///
 /// To drive layout based on the scroll position, consider listening to the
 /// [ScrollPosition] directly (or indirectly via a [ScrollController]).
-abstract class ScrollNotification extends LayoutChangedNotification {
+abstract class ScrollNotification extends LayoutChangedNotification with ViewportNotificationMixin {
   /// Initializes fields for subclasses.
   ScrollNotification({
     @required this.metrics,
@@ -101,25 +100,7 @@ abstract class ScrollNotification extends LayoutChangedNotification {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    description.add('depth: $depth (${ depth == 0 ? "local" : "remote"})');
     description.add('$metrics');
-  }
-
-  /// The number of viewports that this notification has bubbled through.
-  ///
-  /// Typically listeners only respond to notifications with a [depth] of zero.
-  ///
-  /// Specifically, this is the number of [Widget]s representing
-  /// [RenderAbstractViewport] render objects through which this notification
-  /// has bubbled.
-  int get depth => _depth;
-  int _depth = 0;
-
-  @override
-  bool visitAncestor(Element element) {
-    if (element is RenderObjectElement &&
-        element.renderObject is RenderAbstractViewport) _depth += 1;
-    return super.visitAncestor(element);
   }
 }
 
@@ -135,8 +116,7 @@ class ScrollStartNotification extends ScrollNotification {
     @required ScrollMetrics metrics,
     @required BuildContext context,
     this.dragDetails,
-  })
-      : super(metrics: metrics, context: context);
+  }) : super(metrics: metrics, context: context);
 
   /// If the [Scrollable] started scrolling because of a drag, the details about
   /// that drag start.
@@ -147,7 +127,8 @@ class ScrollStartNotification extends ScrollNotification {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    if (dragDetails != null) description.add('$dragDetails');
+    if (dragDetails != null)
+      description.add('$dragDetails');
   }
 }
 
@@ -167,8 +148,7 @@ class ScrollUpdateNotification extends ScrollNotification {
     @required BuildContext context,
     this.dragDetails,
     this.scrollDelta,
-  })
-      : super(metrics: metrics, context: context);
+  }) : super(metrics: metrics, context: context);
 
   /// If the [Scrollable] changed its scroll position because of a drag, the
   /// details about that drag update.
@@ -183,7 +163,8 @@ class ScrollUpdateNotification extends ScrollNotification {
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
     description.add('scrollDelta: $scrollDelta');
-    if (dragDetails != null) description.add('$dragDetails');
+    if (dragDetails != null)
+      description.add('$dragDetails');
   }
 }
 
@@ -204,9 +185,12 @@ class OverscrollNotification extends ScrollNotification {
     @required BuildContext context,
     this.dragDetails,
     @required this.overscroll,
-    this.velocity: 0.0,
-  })
-      : super(metrics: metrics, context: context);
+    this.velocity = 0.0,
+  }) : assert(overscroll != null),
+       assert(overscroll.isFinite),
+       assert(overscroll != 0.0),
+       assert(velocity != null),
+       super(metrics: metrics, context: context);
 
   /// If the [Scrollable] overscrolled because of a drag, the details about that
   /// drag update.
@@ -233,7 +217,8 @@ class OverscrollNotification extends ScrollNotification {
     super.debugFillDescription(description);
     description.add('overscroll: ${overscroll.toStringAsFixed(1)}');
     description.add('velocity: ${velocity.toStringAsFixed(1)}');
-    if (dragDetails != null) description.add('$dragDetails');
+    if (dragDetails != null)
+      description.add('$dragDetails');
   }
 }
 
@@ -249,8 +234,7 @@ class ScrollEndNotification extends ScrollNotification {
     @required ScrollMetrics metrics,
     @required BuildContext context,
     this.dragDetails,
-  })
-      : super(metrics: metrics, context: context);
+  }) : super(metrics: metrics, context: context);
 
   /// If the [Scrollable] stopped scrolling because of a drag, the details about
   /// that drag end.
@@ -268,7 +252,8 @@ class ScrollEndNotification extends ScrollNotification {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    if (dragDetails != null) description.add('$dragDetails');
+    if (dragDetails != null)
+      description.add('$dragDetails');
   }
 }
 
@@ -285,8 +270,7 @@ class UserScrollNotification extends ScrollNotification {
     @required ScrollMetrics metrics,
     @required BuildContext context,
     this.direction,
-  })
-      : super(metrics: metrics, context: context);
+  }) : super(metrics: metrics, context: context);
 
   /// The direction in which the user is scrolling.
   final ScrollDirection direction;
@@ -300,7 +284,7 @@ class UserScrollNotification extends ScrollNotification {
 
 /// A predicate for [ScrollNotification], used to customize widgets that
 /// listen to notifications from their children.
-typedef bool ScrollNotificationPredicate(ScrollNotification notification);
+typedef ScrollNotificationPredicate = bool Function(ScrollNotification notification);
 
 /// A [ScrollNotificationPredicate] that checks whether
 /// `notification.depth == 0`, which means that the notification did not bubble

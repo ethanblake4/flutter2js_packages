@@ -11,12 +11,12 @@ import 'package:typed_data/typed_buffers.dart' show Uint8Buffer;
 /// A WriteBuffer instance can be used only once. Attempts to reuse will result
 /// in [NoSuchMethodError]s being thrown.
 ///
-/// The byte order used is [Endianness.HOST_ENDIAN] throughout.
+/// The byte order used is [Endian.host] throughout.
 class WriteBuffer {
   /// Creates an interface for incrementally building a [ByteData] instance.
   WriteBuffer() {
-    _buffer = new Uint8Buffer();
-    _eightBytes = new ByteData(8);
+    _buffer = Uint8Buffer();
+    _eightBytes = ByteData(8);
     _eightBytesAsList = _eightBytes.buffer.asUint8List();
   }
 
@@ -65,31 +65,29 @@ class WriteBuffer {
     _buffer.addAll(list);
   }
 
-  /// Write all the values from a [Int32List] into the buffer.
+  /// Write all the values from an [Int32List] into the buffer.
   void putInt32List(Int32List list) {
     _alignTo(4);
-    _buffer
-        .addAll(list.buffer.asUint8List(list.offsetInBytes, 4 * list.length));
+    _buffer.addAll(list.buffer.asUint8List(list.offsetInBytes, 4 * list.length));
   }
 
   /// Write all the values from an [Int64List] into the buffer.
   void putInt64List(Int64List list) {
     _alignTo(8);
-    _buffer
-        .addAll(list.buffer.asUint8List(list.offsetInBytes, 8 * list.length));
+    _buffer.addAll(list.buffer.asUint8List(list.offsetInBytes, 8 * list.length));
   }
 
   /// Write all the values from a [Float64List] into the buffer.
   void putFloat64List(Float64List list) {
     _alignTo(8);
-    _buffer
-        .addAll(list.buffer.asUint8List(list.offsetInBytes, 8 * list.length));
+    _buffer.addAll(list.buffer.asUint8List(list.offsetInBytes, 8 * list.length));
   }
 
   void _alignTo(int alignment) {
     final int mod = _buffer.length % alignment;
     if (mod != 0) {
-      for (int i = 0; i < alignment - mod; i++) _buffer.add(0);
+      for (int i = 0; i < alignment - mod; i++)
+        _buffer.add(0);
     }
   }
 
@@ -103,10 +101,11 @@ class WriteBuffer {
 
 /// Read-only buffer for reading sequentially from a [ByteData] instance.
 ///
-/// The byte order used is [Endianness.HOST_ENDIAN] throughout.
+/// The byte order used is [Endian.host] throughout.
 class ReadBuffer {
   /// Creates a [ReadBuffer] for reading from the specified [data].
-  ReadBuffer(this.data);
+  ReadBuffer(this.data)
+    : assert(data != null);
 
   /// The underlying data being read.
   final ByteData data;
@@ -160,8 +159,7 @@ class ReadBuffer {
 
   /// Reads the given number of Uint8s from the buffer.
   Uint8List getUint8List(int length) {
-    final Uint8List list =
-        data.buffer.asUint8List(data.offsetInBytes + _position, length);
+    final Uint8List list = data.buffer.asUint8List(data.offsetInBytes + _position, length);
     _position += length;
     return list;
   }
@@ -169,8 +167,7 @@ class ReadBuffer {
   /// Reads the given number of Int32s from the buffer.
   Int32List getInt32List(int length) {
     _alignTo(4);
-    final Int32List list =
-        data.buffer.asInt32List(data.offsetInBytes + _position, length);
+    final Int32List list = data.buffer.asInt32List(data.offsetInBytes + _position, length);
     _position += 4 * length;
     return list;
   }
@@ -178,8 +175,7 @@ class ReadBuffer {
   /// Reads the given number of Int64s from the buffer.
   Int64List getInt64List(int length) {
     _alignTo(8);
-    final Int64List list =
-        data.buffer.asInt64List(data.offsetInBytes + _position, length);
+    final Int64List list = data.buffer.asInt64List(data.offsetInBytes + _position, length);
     _position += 8 * length;
     return list;
   }
@@ -187,14 +183,14 @@ class ReadBuffer {
   /// Reads the given number of Float64s from the buffer.
   Float64List getFloat64List(int length) {
     _alignTo(8);
-    final Float64List list =
-        data.buffer.asFloat64List(data.offsetInBytes + _position, length);
+    final Float64List list = data.buffer.asFloat64List(data.offsetInBytes + _position, length);
     _position += 8 * length;
     return list;
   }
 
   void _alignTo(int alignment) {
     final int mod = _position % alignment;
-    if (mod != 0) _position += alignment - mod;
+    if (mod != 0)
+      _position += alignment - mod;
   }
 }

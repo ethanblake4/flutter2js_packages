@@ -12,7 +12,7 @@ import 'typography.dart';
 export 'theme_data.dart' show Brightness, ThemeData;
 
 /// The duration over which theme changes animate by default.
-const Duration kThemeAnimationDuration = const Duration(milliseconds: 200);
+const Duration kThemeAnimationDuration = Duration(milliseconds: 200);
 
 /// Applies a theme to descendant widgets.
 ///
@@ -39,10 +39,11 @@ class Theme extends StatelessWidget {
   const Theme({
     Key key,
     @required this.data,
-    this.isMaterialAppTheme: false,
+    this.isMaterialAppTheme = false,
     @required this.child,
-  })
-      : super(key: key);
+  }) : assert(child != null),
+       assert(data != null),
+       super(key: key);
 
   /// Specifies the color and typography values for descendant widgets.
   final ThemeData data;
@@ -63,7 +64,7 @@ class Theme extends StatelessWidget {
   /// {@macro flutter.widgets.child}
   final Widget child;
 
-  static final ThemeData _kFallbackTheme = new ThemeData.fallback();
+  static final ThemeData _kFallbackTheme = ThemeData.fallback();
 
   /// The data from the closest [Theme] instance that encloses the given
   /// context.
@@ -88,7 +89,7 @@ class Theme extends StatelessWidget {
   /// ```dart
   /// @override
   /// Widget build(BuildContext context) {
-  ///   return new Text(
+  ///   return Text(
   ///     'Example',
   ///     style: Theme.of(context).textTheme.title,
   ///   );
@@ -105,14 +106,14 @@ class Theme extends StatelessWidget {
   /// ```dart
   /// @override
   /// Widget build(BuildContext context) {
-  ///   return new MaterialApp(
-  ///     theme: new ThemeData.light(),
-  ///     body: new Builder(
+  ///   return MaterialApp(
+  ///     theme: ThemeData.light(),
+  ///     body: Builder(
   ///       // Create an inner BuildContext so that we can refer to
   ///       // the Theme with Theme.of().
   ///       builder: (BuildContext context) {
-  ///         return new Center(
-  ///           child: new Text(
+  ///         return Center(
+  ///           child: Text(
   ///             'Example',
   ///             style: Theme.of(context).textTheme.title,
   ///           ),
@@ -122,7 +123,7 @@ class Theme extends StatelessWidget {
   ///   );
   /// }
   /// ```
-  static ThemeData of(BuildContext context, {bool shadowThemeOnly: false}) {
+  static ThemeData of(BuildContext context, { bool shadowThemeOnly = false }) {
     final _InheritedTheme inheritedTheme =
         context.inheritFromWidgetOfExactType(_InheritedTheme);
     if (shadowThemeOnly) {
@@ -131,20 +132,17 @@ class Theme extends StatelessWidget {
       return inheritedTheme.theme.data;
     }
 
-    final ThemeData colorTheme =
-        (inheritedTheme != null) ? inheritedTheme.theme.data : _kFallbackTheme;
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-    final TextTheme geometryTheme =
-        localizations?.localTextGeometry ?? MaterialTextGeometry.englishLike;
+    final ThemeData colorTheme = (inheritedTheme != null) ? inheritedTheme.theme.data : _kFallbackTheme;
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    final TextTheme geometryTheme = localizations?.localTextGeometry ?? MaterialTextGeometry.englishLike;
     return ThemeData.localize(colorTheme, geometryTheme);
   }
 
   @override
   Widget build(BuildContext context) {
-    return new _InheritedTheme(
+    return _InheritedTheme(
       theme: this,
-      child: new IconTheme(
+      child: IconTheme(
         data: data.iconTheme,
         child: child,
       ),
@@ -152,16 +150,19 @@ class Theme extends StatelessWidget {
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description
-        .add(new DiagnosticsProperty<ThemeData>('data', data, showName: false));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ThemeData>('data', data, showName: false));
   }
 }
 
 class _InheritedTheme extends InheritedWidget {
-  const _InheritedTheme({Key key, @required this.theme, @required Widget child})
-      : super(key: key, child: child);
+  const _InheritedTheme({
+    Key key,
+    @required this.theme,
+    @required Widget child
+  }) : assert(theme != null),
+       super(key: key, child: child);
 
   final Theme theme;
 
@@ -181,8 +182,7 @@ class ThemeDataTween extends Tween<ThemeData> {
   /// The [begin] and [end] properties must be non-null before the tween is
   /// first used, but the arguments can be null if the values are going to be
   /// filled in later.
-  ThemeDataTween({ThemeData begin, ThemeData end})
-      : super(begin: begin, end: end);
+  ThemeDataTween({ ThemeData begin, ThemeData end }) : super(begin: begin, end: end);
 
   @override
   ThemeData lerp(double t) => ThemeData.lerp(begin, end, t);
@@ -190,6 +190,10 @@ class ThemeDataTween extends Tween<ThemeData> {
 
 /// Animated version of [Theme] which automatically transitions the colors,
 /// etc, over a given duration whenever the given theme changes.
+///
+/// Here's an illustration of what using this widget looks like, using a [curve]
+/// of [Curves.elasticInOut].
+/// {@animation 250 266 https://flutter.github.io/assets-for-api-docs/assets/widgets/animated_theme.mp4}
 ///
 /// See also:
 ///
@@ -206,12 +210,13 @@ class AnimatedTheme extends ImplicitlyAnimatedWidget {
   const AnimatedTheme({
     Key key,
     @required this.data,
-    this.isMaterialAppTheme: false,
-    Curve curve: Curves.linear,
-    Duration duration: kThemeAnimationDuration,
+    this.isMaterialAppTheme = false,
+    Curve curve = Curves.linear,
+    Duration duration = kThemeAnimationDuration,
     @required this.child,
-  })
-      : super(key: key, curve: curve, duration: duration);
+  }) : assert(child != null),
+       assert(data != null),
+       super(key: key, curve: curve, duration: duration);
 
   /// Specifies the color and typography values for descendant widgets.
   final ThemeData data;
@@ -225,7 +230,7 @@ class AnimatedTheme extends ImplicitlyAnimatedWidget {
   final Widget child;
 
   @override
-  _AnimatedThemeState createState() => new _AnimatedThemeState();
+  _AnimatedThemeState createState() => _AnimatedThemeState();
 }
 
 class _AnimatedThemeState extends AnimatedWidgetBaseState<AnimatedTheme> {
@@ -234,23 +239,22 @@ class _AnimatedThemeState extends AnimatedWidgetBaseState<AnimatedTheme> {
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     // TODO(ianh): Use constructor tear-offs when it becomes possible
-    _data = visitor(_data, widget.data,
-        (dynamic value) => new ThemeDataTween(begin: value));
+    _data = visitor(_data, widget.data, (dynamic value) => ThemeDataTween(begin: value));
     assert(_data != null);
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Theme(
-        isMaterialAppTheme: widget.isMaterialAppTheme,
-        child: widget.child,
-        data: _data.evaluate(animation));
+    return Theme(
+      isMaterialAppTheme: widget.isMaterialAppTheme,
+      child: widget.child,
+      data: _data.evaluate(animation)
+    );
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(new DiagnosticsProperty<ThemeDataTween>('data', _data,
-        showName: false, defaultValue: null));
+    description.add(DiagnosticsProperty<ThemeDataTween>('data', _data, showName: false, defaultValue: null));
   }
 }

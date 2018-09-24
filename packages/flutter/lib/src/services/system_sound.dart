@@ -20,6 +20,6 @@ class SystemSound {
   /// Play the specified system sound. If that sound is not present on the
   /// system, the call is ignored.
   static Future<Null> play(SystemSoundType type) async {
-    return flutter2js.PlatformPlugin.current.playSystemSound(type);
+    await flutter2js.PlatformPlugin.current.playSystemSound(type);
   }
 }

@@ -2,10 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
-
 import 'framework.dart';
 import 'navigator.dart';
+import 'routes.dart';
 
 /// Registers a callback to veto attempts by the user to dismiss the enclosing
 /// [ModalRoute].
@@ -14,7 +13,7 @@ import 'navigator.dart';
 ///
 ///  * [ModalRoute.addScopedWillPopCallback] and [ModalRoute.removeScopedWillPopCallback],
 ///    which this widget uses to register and unregister [onWillPop].
-class WillPopScope extends StatelessWidget {
+class WillPopScope extends StatefulWidget {
   /// Creates a widget that registers a callback to veto attempts by the user to
   /// dismiss the enclosing [ModalRoute].
   ///
@@ -23,10 +22,12 @@ class WillPopScope extends StatelessWidget {
     Key key,
     @required this.child,
     @required this.onWillPop,
-  })
-      : super(key: key);
+  }) : assert(child != null),
+       super(key: key);
 
   /// The widget below this widget in the tree.
+  ///
+  /// {@macro flutter.widgets.child}
   final Widget child;
 
   /// Called to veto attempts by the user to dismiss the enclosing [ModalRoute].
@@ -36,7 +37,41 @@ class WillPopScope extends StatelessWidget {
   final WillPopCallback onWillPop;
 
   @override
-  Widget build(BuildContext context) {
-    return child;
+  _WillPopScopeState createState() => _WillPopScopeState();
+}
+
+class _WillPopScopeState extends State<WillPopScope> {
+  ModalRoute<dynamic> _route;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.onWillPop != null)
+      _route?.removeScopedWillPopCallback(widget.onWillPop);
+    _route = ModalRoute.of(context);
+    if (widget.onWillPop != null)
+      _route?.addScopedWillPopCallback(widget.onWillPop);
   }
+
+  @override
+  void didUpdateWidget(WillPopScope oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    assert(_route == ModalRoute.of(context));
+    if (widget.onWillPop != oldWidget.onWillPop && _route != null) {
+      if (oldWidget.onWillPop != null)
+        _route.removeScopedWillPopCallback(oldWidget.onWillPop);
+      if (widget.onWillPop != null)
+        _route.addScopedWillPopCallback(widget.onWillPop);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.onWillPop != null)
+      _route?.removeScopedWillPopCallback(widget.onWillPop);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

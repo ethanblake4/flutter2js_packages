@@ -23,8 +23,12 @@ class ImageIcon extends StatelessWidget {
   /// Creates an image icon.
   ///
   /// The [size] and [color] default to the value given by the current [IconTheme].
-  const ImageIcon(this.image, {Key key, this.size, this.color})
-      : super(key: key);
+  const ImageIcon(this.image, {
+    Key key,
+    this.size,
+    this.color,
+    this.semanticLabel,
+  }) : super(key: key);
 
   /// The image to display as the icon.
   ///
@@ -50,13 +54,27 @@ class ImageIcon extends StatelessWidget {
   /// [IconTheme], if any.
   final Color color;
 
+  /// Semantic label for the icon.
+  ///
+  /// Announced in accessibility modes (e.g TalkBack/VoiceOver).
+  /// This label does not show in the UI.
+  ///
+  /// See also:
+  ///
+  ///  * [Semantics.label], which is set to [semanticLabel] in the underlying
+  ///    [Semantics] widget.
+  final String semanticLabel;
+
   @override
   Widget build(BuildContext context) {
     final IconThemeData iconTheme = IconTheme.of(context);
-
     final double iconSize = size ?? iconTheme.size;
 
-    if (image == null) return new SizedBox(width: iconSize, height: iconSize);
+    if (image == null)
+      return Semantics(
+        label: semanticLabel,
+        child: SizedBox(width: iconSize, height: iconSize)
+      );
 
     final double iconOpacity = iconTheme.opacity;
     Color iconColor = color ?? iconTheme.color;
@@ -64,23 +82,25 @@ class ImageIcon extends StatelessWidget {
     if (iconOpacity != null && iconOpacity != 1.0)
       iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity);
 
-    return new Image(
-      image: image,
-      width: iconSize,
-      height: iconSize,
-      color: iconColor,
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.center,
+    return Semantics(
+      label: semanticLabel,
+      child: Image(
+        image: image,
+        width: iconSize,
+        height: iconSize,
+        color: iconColor,
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.center,
+        excludeFromSemantics: true,
+      ),
     );
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description.add(new DiagnosticsProperty<ImageProvider>('image', image,
-        ifNull: '<empty>', showName: false));
-    description.add(new DoubleProperty('size', size, defaultValue: null));
-    description.add(
-        new DiagnosticsProperty<Color>('color', color, defaultValue: null));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ImageProvider>('image', image, ifNull: '<empty>', showName: false));
+    properties.add(DoubleProperty('size', size, defaultValue: null));
+    properties.add(DiagnosticsProperty<Color>('color', color, defaultValue: null));
   }
 }

@@ -5,9 +5,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/ui.dart' show hashValues;
 
 import 'platform_channel.dart';
+
+export 'dart:typed_data' show ByteData;
 
 /// A message encoding/decoding mechanism.
 ///
@@ -35,7 +36,8 @@ abstract class MessageCodec<T> {
 class MethodCall {
   /// Creates a [MethodCall] representing the invocation of [method] with the
   /// specified [arguments].
-  const MethodCall(this.method, [this.arguments]);
+  const MethodCall(this.method, [this.arguments])
+    : assert(method != null);
 
   /// The name of the method to be called.
   final String method;
@@ -44,39 +46,6 @@ class MethodCall {
   ///
   /// Must be a valid value for the [MethodCodec] used.
   final dynamic arguments;
-
-  @override
-  bool operator ==(dynamic other) {
-    if (identical(this, other)) return true;
-    if (runtimeType != other.runtimeType) return false;
-    return method == other.method && _deepEquals(arguments, other.arguments);
-  }
-
-  @override
-  int get hashCode => hashValues(method, arguments);
-
-  bool _deepEquals(dynamic a, dynamic b) {
-    if (a == b) return true;
-    if (a is List) return b is List && _deepEqualsList(a, b);
-    if (a is Map) return b is Map && _deepEqualsMap(a, b);
-    return false;
-  }
-
-  bool _deepEqualsList(List<dynamic> a, List<dynamic> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (!_deepEquals(a[i], b[i])) return false;
-    }
-    return true;
-  }
-
-  bool _deepEqualsMap(Map<dynamic, dynamic> a, Map<dynamic, dynamic> b) {
-    if (a.length != b.length) return false;
-    for (dynamic key in a.keys) {
-      if (!b.containsKey(key) || !_deepEquals(a[key], b[key])) return false;
-    }
-    return true;
-  }
 
   @override
   String toString() => '$runtimeType($method, $arguments)';
@@ -112,9 +81,9 @@ abstract class MethodCodec {
   ///
   /// The specified error [code], human-readable error [message], and error
   /// [details] correspond to the fields of [PlatformException].
-  ByteData encodeErrorEnvelope(
-      {@required String code, String message, dynamic details});
+  ByteData encodeErrorEnvelope({@required String code, String message, dynamic details});
 }
+
 
 /// Thrown to indicate that a platform interaction failed in the platform
 /// plugin.
@@ -137,7 +106,7 @@ class PlatformException implements Exception {
     @required this.code,
     this.message,
     this.details,
-  });
+  }) : assert(code != null);
 
   /// An error code.
   final String code;

@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/rendering.dart';
-import 'package:flutter/foundation.dart';
 import 'framework.dart';
 
 /// A rectangle upon which a backend texture is mapped.
@@ -35,14 +34,13 @@ import 'framework.dart';
 ///   for how to create and manage backend textures on iOS.
 class Texture extends LeafRenderObjectWidget {
   /// Creates a widget backed by the texture identified by [textureId].
-  const Texture({Key key, @required this.textureId}) : super(key: key);
+  const Texture({ Key key, @required this.textureId }): assert(textureId != null), super(key: key);
 
   /// The identity of the backend texture.
   final int textureId;
 
   @override
-  TextureBox createRenderObject(BuildContext context) =>
-      new TextureBox(textureId: textureId);
+  TextureBox createRenderObject(BuildContext context) => TextureBox(textureId: textureId);
 
   @override
   void updateRenderObject(BuildContext context, TextureBox renderObject) {

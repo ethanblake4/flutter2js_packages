@@ -23,7 +23,7 @@ class IconData {
     this.codePoint, {
     this.fontFamily,
     this.fontPackage,
-    this.matchTextDirection: false,
+    this.matchTextDirection = false,
   });
 
   /// The Unicode code point at which this icon is stored in the icon font.
@@ -51,20 +51,18 @@ class IconData {
 
   @override
   bool operator ==(dynamic other) {
-    if (runtimeType != other.runtimeType) return false;
+    if (runtimeType != other.runtimeType)
+      return false;
     final IconData typedOther = other;
-    return codePoint == typedOther.codePoint &&
-        fontFamily == typedOther.fontFamily &&
-        fontPackage == typedOther.fontPackage &&
-        matchTextDirection == typedOther.matchTextDirection;
+    return codePoint == typedOther.codePoint
+        && fontFamily == typedOther.fontFamily
+        && fontPackage == typedOther.fontPackage
+        && matchTextDirection == typedOther.matchTextDirection;
   }
 
   @override
-  int get hashCode =>
-      hashValues(codePoint, fontFamily, fontPackage, matchTextDirection);
+  int get hashCode => hashValues(codePoint, fontFamily, fontPackage, matchTextDirection);
 
   @override
-  String toString() =>
-      'IconData(U+${codePoint.toRadixString(16).toUpperCase().padLeft(
-          5, '0')})';
+  String toString() => 'IconData(U+${codePoint.toRadixString(16).toUpperCase().padLeft(5, '0')})';
 }

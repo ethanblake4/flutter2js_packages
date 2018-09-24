@@ -6,11 +6,11 @@ import 'basic_types.dart';
 import 'print.dart';
 
 /// Signature for [FlutterError.onError] handler.
-typedef void FlutterExceptionHandler(FlutterErrorDetails details);
+typedef FlutterExceptionHandler = void Function(FlutterErrorDetails details);
 
 /// Signature for [FlutterErrorDetails.informationCollector] callback
 /// and other callbacks that collect information into a string buffer.
-typedef void InformationCollector(StringBuffer information);
+typedef InformationCollector = void Function(StringBuffer information);
 
 /// Class for information provided to [FlutterExceptionHandler] callbacks.
 ///
@@ -25,14 +25,15 @@ class FlutterErrorDetails {
   /// The [exception] must not be null; other arguments can be left to
   /// their default values. (`throw null` results in a
   /// [NullThrownError] exception.)
-  const FlutterErrorDetails(
-      {this.exception,
-      this.stack,
-      this.library: 'Flutter framework',
-      this.context,
-      this.stackFilter,
-      this.informationCollector,
-      this.silent: false});
+  const FlutterErrorDetails({
+    this.exception,
+    this.stack,
+    this.library = 'Flutter framework',
+    this.context,
+    this.stackFilter,
+    this.informationCollector,
+    this.silent = false
+  });
 
   /// The exception. Often this will be an [AssertionError], maybe specifically
   /// a [FlutterError]. However, this could be any value at all.
@@ -122,8 +123,7 @@ class FlutterErrorDetails {
           if (position == fullMessage.length - message.length &&
               position > 2 &&
               fullMessage.substring(position - 2, position) == ': ') {
-            longMessage =
-                '${message.trimRight()}\n${fullMessage.substring(0, position - 2)}';
+            longMessage = '${message.trimRight()}\n${fullMessage.substring(0, position - 2)}';
           }
         }
       }
@@ -136,28 +136,31 @@ class FlutterErrorDetails {
       longMessage = '  ${exception.toString()}';
     }
     longMessage = longMessage.trimRight();
-    if (longMessage.isEmpty) longMessage = '  <no message available>';
+    if (longMessage.isEmpty)
+      longMessage = '  <no message available>';
     return longMessage;
   }
 
   @override
   String toString() {
-    final StringBuffer buffer = new StringBuffer();
-    if ((library != null && library != '') ||
-        (context != null && context != '')) {
+    final StringBuffer buffer = StringBuffer();
+    if ((library != null && library != '') || (context != null && context != '')) {
       if (library != null && library != '') {
         buffer.write('Error caught by $library');
-        if (context != null && context != '') buffer.write(', ');
+        if (context != null && context != '')
+          buffer.write(', ');
       } else {
         buffer.writeln('Exception ');
       }
-      if (context != null && context != '') buffer.write('thrown $context');
+      if (context != null && context != '')
+        buffer.write('thrown $context');
       buffer.writeln('.');
     } else {
       buffer.write('An error was caught.');
     }
     buffer.writeln(exceptionAsString());
-    if (informationCollector != null) informationCollector(buffer);
+    if (informationCollector != null)
+      informationCollector(buffer);
     if (stack != null) {
       Iterable<String> stackLines = stack.toString().trimRight().split('\n');
       if (stackFilter != null) {
@@ -247,8 +250,7 @@ class FlutterError extends AssertionError {
   /// had not been called before (so the next message is verbose again).
   ///
   /// The default behavior for the [onError] handler is to call this function.
-  static void dumpErrorToConsole(FlutterErrorDetails details,
-      {bool forceReport: false}) {
+  static void dumpErrorToConsole(FlutterErrorDetails details, { bool forceReport = false }) {
     assert(details != null);
     assert(details.exception != null);
     bool reportError = details.silent != true; // could be null
@@ -257,28 +259,24 @@ class FlutterError extends AssertionError {
       reportError = true;
       return true;
     }());
-    if (!reportError && !forceReport) return;
+    if (!reportError && !forceReport)
+      return;
     if (_errorCount == 0 || forceReport) {
-      final String header =
-          '\u2550\u2550\u2561 EXCEPTION CAUGHT BY ${details.library} \u255E'
-              .toUpperCase();
+      final String header = '\u2550\u2550\u2561 EXCEPTION CAUGHT BY ${details.library} \u255E'.toUpperCase();
       final String footer = '\u2550' * wrapWidth;
       debugPrint('$header${"\u2550" * (footer.length - header.length)}');
-      final String verb =
-          'thrown${ details.context != null ? " ${details.context}" : ""}';
+      final String verb = 'thrown${ details.context != null ? " ${details.context}" : ""}';
       if (details.exception is NullThrownError) {
         debugPrint('The null value was $verb.', wrapWidth: wrapWidth);
       } else if (details.exception is num) {
-        debugPrint('The number ${details.exception} was $verb.',
-            wrapWidth: wrapWidth);
+        debugPrint('The number ${details.exception} was $verb.', wrapWidth: wrapWidth);
       } else {
         String errorName;
         if (details.exception is AssertionError) {
           errorName = 'assertion';
         } else if (details.exception is String) {
           errorName = 'message';
-        } else if (details.exception is Error ||
-            details.exception is Exception) {
+        } else if (details.exception is Error || details.exception is Exception) {
           errorName = '${details.exception.runtimeType}';
         } else {
           errorName = '${details.exception.runtimeType} object';
@@ -290,67 +288,53 @@ class FlutterError extends AssertionError {
         String message = details.exceptionAsString();
         if (message.startsWith(prefix))
           message = message.substring(prefix.length);
-        debugPrint('The following $errorName was $verb:\n$message',
-            wrapWidth: wrapWidth);
+        debugPrint('The following $errorName was $verb:\n$message', wrapWidth: wrapWidth);
       }
-      Iterable<String> stackLines = (details.stack != null)
-          ? details.stack.toString().trimRight().split('\n')
-          : null;
-      if ((details.exception is AssertionError) &&
-          (details.exception is! FlutterError)) {
+      Iterable<String> stackLines = (details.stack != null) ? details.stack.toString().trimRight().split('\n') : null;
+      if ((details.exception is AssertionError) && (details.exception is! FlutterError)) {
         bool ourFault = true;
         if (stackLines != null) {
           final List<String> stackList = stackLines.take(2).toList();
           if (stackList.length >= 2) {
             // TODO(ianh): This has bitrotted and is no longer matching. https://github.com/flutter/flutter/issues/4021
-            final RegExp throwPattern =
-                new RegExp(r'^#0 +_AssertionError._throwNew \(dart:.+\)$');
-            final RegExp assertPattern =
-                new RegExp(r'^#1 +[^(]+ \((.+?):([0-9]+)(?::[0-9]+)?\)$');
+            final RegExp throwPattern = RegExp(r'^#0 +_AssertionError._throwNew \(dart:.+\)$');
+            final RegExp assertPattern = RegExp(r'^#1 +[^(]+ \((.+?):([0-9]+)(?::[0-9]+)?\)$');
             if (throwPattern.hasMatch(stackList[0])) {
               final Match assertMatch = assertPattern.firstMatch(stackList[1]);
               if (assertMatch != null) {
                 assert(assertMatch.groupCount == 2);
-                final RegExp ourLibraryPattern =
-                    new RegExp(r'^package:flutter/');
+                final RegExp ourLibraryPattern = RegExp(r'^package:flutter/');
                 ourFault = ourLibraryPattern.hasMatch(assertMatch.group(1));
               }
             }
           }
         }
         if (ourFault) {
-          debugPrint(
-              '\nEither the assertion indicates an error in the framework itself, or we should '
-              'provide substantially more information in this error message to help you determine '
-              'and fix the underlying cause.',
-              wrapWidth: wrapWidth);
-          debugPrint(
-              'In either case, please report this assertion by filing a bug on GitHub:',
-              wrapWidth: wrapWidth);
+          debugPrint('\nEither the assertion indicates an error in the framework itself, or we should '
+                     'provide substantially more information in this error message to help you determine '
+                     'and fix the underlying cause.', wrapWidth: wrapWidth);
+          debugPrint('In either case, please report this assertion by filing a bug on GitHub:', wrapWidth: wrapWidth);
           debugPrint('  https://github.com/flutter/flutter/issues/new');
         }
       }
       if (details.stack != null) {
-        debugPrint('\nWhen the exception was thrown, this was the stack:',
-            wrapWidth: wrapWidth);
+        debugPrint('\nWhen the exception was thrown, this was the stack:', wrapWidth: wrapWidth);
         if (details.stackFilter != null) {
           stackLines = details.stackFilter(stackLines);
         } else {
           stackLines = defaultStackFilter(stackLines);
         }
-        for (String line in stackLines) debugPrint(line, wrapWidth: wrapWidth);
+        for (String line in stackLines)
+          debugPrint(line, wrapWidth: wrapWidth);
       }
       if (details.informationCollector != null) {
-        final StringBuffer information = new StringBuffer();
+        final StringBuffer information = StringBuffer();
         details.informationCollector(information);
-        debugPrint('\n${information.toString().trimRight()}',
-            wrapWidth: wrapWidth);
+        debugPrint('\n${information.toString().trimRight()}', wrapWidth: wrapWidth);
       }
       debugPrint(footer);
     } else {
-      debugPrint(
-          'Another exception was thrown: ${details.exceptionAsString().split(
-              "\n")[0].trimLeft()}');
+      debugPrint('Another exception was thrown: ${details.exceptionAsString().split("\n")[0].trimLeft()}');
     }
     _errorCount += 1;
   }
@@ -367,19 +351,18 @@ class FlutterError extends AssertionError {
   /// format but the frame numbers will not be consecutive (frames are elided)
   /// and the final line may be prose rather than a stack frame.
   static Iterable<String> defaultStackFilter(Iterable<String> frames) {
-    const List<String> filteredPackages = const <String>[
+    const List<String> filteredPackages = <String>[
       'dart:async-patch',
       'dart:async',
       'package:stack_trace',
     ];
-    const List<String> filteredClasses = const <String>[
+    const List<String> filteredClasses = <String>[
       '_AssertionError',
       '_FakeAsync',
       '_FrameCallbackEntry',
     ];
-    final RegExp stackParser = new RegExp(
-        r'^#[0-9]+ +([^.]+).* \(([^/\\]*)[/\\].+:[0-9]+(?::[0-9]+)?\)$');
-    final RegExp packageParser = new RegExp(r'^([^:]+):(.+)$');
+    final RegExp stackParser = RegExp(r'^#[0-9]+ +([^.]+).* \(([^/\\]*)[/\\].+:[0-9]+(?::[0-9]+)?\)$');
+    final RegExp packageParser = RegExp(r'^([^:]+):(.+)$');
     final List<String> result = <String>[];
     final List<String> skipped = <String>[];
     for (String line in frames) {
@@ -389,8 +372,7 @@ class FlutterError extends AssertionError {
         if (filteredPackages.contains(match.group(2))) {
           final Match packageMatch = packageParser.firstMatch(match.group(2));
           if (packageMatch != null && packageMatch.group(1) == 'package') {
-            skipped.add('package ${packageMatch.group(
-                    2)}'); // avoid "package package:foo"
+            skipped.add('package ${packageMatch.group(2)}'); // avoid "package package:foo"
           } else {
             skipped.add('package ${match.group(2)}');
           }
@@ -406,11 +388,11 @@ class FlutterError extends AssertionError {
     if (skipped.length == 1) {
       result.add('(elided one frame from ${skipped.single})');
     } else if (skipped.length > 1) {
-      final List<String> where = new Set<String>.from(skipped).toList()..sort();
-      if (where.length > 1) where[where.length - 1] = 'and ${where.last}';
+      final List<String> where = Set<String>.from(skipped).toList()..sort();
+      if (where.length > 1)
+        where[where.length - 1] = 'and ${where.last}';
       if (where.length > 2) {
-        result
-            .add('(elided ${skipped.length} frames from ${where.join(", ")})');
+        result.add('(elided ${skipped.length} frames from ${where.join(", ")})');
       } else {
         result.add('(elided ${skipped.length} frames from ${where.join(" ")})');
       }
@@ -422,7 +404,8 @@ class FlutterError extends AssertionError {
   static void reportError(FlutterErrorDetails details) {
     assert(details != null);
     assert(details.exception != null);
-    if (onError != null) onError(details);
+    if (onError != null)
+      onError(details);
   }
 }
 
@@ -435,10 +418,11 @@ class FlutterError extends AssertionError {
 /// of lines. By default, all non-filtered stack lines are shown.
 ///
 /// The `label` argument, if present, will be printed before the stack.
-void debugPrintStack({String label, int maxFrames}) {
-  if (label != null) debugPrint(label);
-  Iterable<String> lines =
-      StackTrace.current.toString().trimRight().split('\n');
-  if (maxFrames != null) lines = lines.take(maxFrames);
+void debugPrintStack({ String label, int maxFrames }) {
+  if (label != null)
+    debugPrint(label);
+  Iterable<String> lines = StackTrace.current.toString().trimRight().split('\n');
+  if (maxFrames != null)
+    lines = lines.take(maxFrames);
   debugPrint(FlutterError.defaultStackFilter(lines).join('\n'));
 }

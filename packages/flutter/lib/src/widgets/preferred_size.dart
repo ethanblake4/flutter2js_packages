@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 import 'basic.dart';
@@ -19,6 +18,7 @@ import 'framework.dart';
 ///
 /// Use [PreferredSize] to give a preferred size to an arbitrary widget.
 abstract class PreferredSizeWidget implements Widget {
+
   /// The size this widget would prefer if it were otherwise unconstrained.
   ///
   /// In many cases it's only necessary to define one preferred dimension.
@@ -46,10 +46,11 @@ class PreferredSize extends StatelessWidget implements PreferredSizeWidget {
     Key key,
     @required this.child,
     @required this.preferredSize,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   /// The widget below this widget in the tree.
+  ///
+  /// {@macro flutter.widgets.child}
   final Widget child;
 
   @override

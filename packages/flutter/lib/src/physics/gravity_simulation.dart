@@ -16,7 +16,7 @@ import 'simulation.dart';
 ///
 /// ```dart
 /// void _startFall() {
-///   _controller.animateWith(new GravitySimulation(
+///   _controller.animateWith(GravitySimulation(
 ///     10.0, // acceleration, pixels per second per second
 ///     0.0, // starting position, pixels
 ///     300.0, // ending position, pixels
@@ -48,11 +48,19 @@ class GravitySimulation extends Simulation {
   /// L/T² respectively. The same units of velocity are used for the velocity
   /// obtained from [dx].
   GravitySimulation(
-      double acceleration, double distance, double endDistance, double velocity)
-      : _a = acceleration,
-        _x = distance,
-        _v = velocity,
-        _end = endDistance;
+    double acceleration,
+    double distance,
+    double endDistance,
+    double velocity
+  ) : assert(acceleration != null),
+      assert(distance != null),
+      assert(velocity != null),
+      assert(endDistance != null),
+      assert(endDistance >= 0),
+      _a = acceleration,
+      _x = distance,
+      _v = velocity,
+      _end = endDistance;
 
   final double _x;
   final double _v;

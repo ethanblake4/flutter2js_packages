@@ -32,9 +32,9 @@ import 'text_style.dart';
 /// The text "Hello world!", in black:
 ///
 /// ```dart
-/// new TextSpan(
+/// TextSpan(
 ///   text: 'Hello world!',
-///   style: new TextStyle(color: Colors.black),
+///   style: TextStyle(color: Colors.black),
 /// )
 /// ```
 ///
@@ -104,7 +104,7 @@ class TextSpan extends DiagnosticableTree {
   /// ```dart
   /// class BuzzingText extends StatefulWidget {
   ///   @override
-  ///   _BuzzingTextState createState() => new _BuzzingTextState();
+  ///   _BuzzingTextState createState() => _BuzzingTextState();
   /// }
   ///
   /// class _BuzzingTextState extends State<BuzzingText> {
@@ -113,7 +113,7 @@ class TextSpan extends DiagnosticableTree {
   ///   @override
   ///   void initState() {
   ///     super.initState();
-  ///     _longPressRecognizer = new LongPressGestureRecognizer()
+  ///     _longPressRecognizer = LongPressGestureRecognizer()
   ///       ..onLongPress = _handlePress;
   ///   }
   ///
@@ -129,21 +129,21 @@ class TextSpan extends DiagnosticableTree {
   ///
   ///   @override
   ///   Widget build(BuildContext context) {
-  ///     return new RichText(
-  ///       text: new TextSpan(
+  ///     return RichText(
+  ///       text: TextSpan(
   ///         text: 'Can you ',
-  ///         style: new TextStyle(color: Colors.black),
+  ///         style: TextStyle(color: Colors.black),
   ///         children: <TextSpan>[
-  ///           new TextSpan(
+  ///           TextSpan(
   ///             text: 'find the',
-  ///             style: new TextStyle(
+  ///             style: TextStyle(
   ///               color: Colors.green,
   ///               decoration: TextDecoration.underline,
   ///               decorationStyle: TextDecorationStyle.wavy,
   ///             ),
   ///             recognizer: _longPressRecognizer,
   ///           ),
-  ///           new TextSpan(
+  ///           TextSpan(
   ///             text: ' secret?',
   ///           ),
   ///         ],
@@ -161,30 +161,34 @@ class TextSpan extends DiagnosticableTree {
   /// Rather than using this directly, it's simpler to use the
   /// [TextPainter] class to paint [TextSpan] objects onto [Canvas]
   /// objects.
-  void build(ui.ParagraphBuilder builder, {double textScaleFactor: 1.0}) {
+  void build(ui.ParagraphBuilder builder, { double textScaleFactor = 1.0 }) {
     assert(debugAssertIsValid());
     final bool hasStyle = style != null;
     if (hasStyle)
       builder.pushStyle(style.getTextStyle(textScaleFactor: textScaleFactor));
-    if (text != null) builder.addText(text);
+    if (text != null)
+      builder.addText(text);
     if (children != null) {
       for (TextSpan child in children) {
         assert(child != null);
         child.build(builder, textScaleFactor: textScaleFactor);
       }
     }
-    if (hasStyle) builder.pop();
+    if (hasStyle)
+      builder.pop();
   }
 
   /// Walks this text span and its descendants in pre-order and calls [visitor]
   /// for each span that has text.
   bool visitTextSpan(bool visitor(TextSpan span)) {
     if (text != null) {
-      if (!visitor(this)) return false;
+      if (!visitor(this))
+        return false;
     }
     if (children != null) {
       for (TextSpan child in children) {
-        if (!child.visitTextSpan(visitor)) return false;
+        if (!child.visitTextSpan(visitor))
+          return false;
       }
     }
     return true;
@@ -217,7 +221,7 @@ class TextSpan extends DiagnosticableTree {
   /// Styles are not honored in this process.
   String toPlainText() {
     assert(debugAssertIsValid());
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuffer buffer = StringBuffer();
     visitTextSpan((TextSpan span) {
       buffer.write(span.text);
       return true;
@@ -229,7 +233,8 @@ class TextSpan extends DiagnosticableTree {
   ///
   /// Returns null if the index is out of bounds.
   int codeUnitAt(int index) {
-    if (index < 0) return null;
+    if (index < 0)
+      return null;
     int offset = 0;
     int result;
     visitTextSpan((TextSpan span) {
@@ -256,15 +261,18 @@ class TextSpan extends DiagnosticableTree {
       if (!visitTextSpan((TextSpan span) {
         if (span.children != null) {
           for (TextSpan child in span.children) {
-            if (child == null) return false;
+            if (child == null)
+              return false;
           }
         }
         return true;
       })) {
-        throw new FlutterError('TextSpan contains a null child.\n'
-            'A TextSpan object with a non-null child list should not have any nulls in its child list.\n'
-            'The full text in question was:\n'
-            '${toStringDeep(prefixLineOne: '  ')}');
+        throw FlutterError(
+          'TextSpan contains a null child.\n'
+          'A TextSpan object with a non-null child list should not have any nulls in its child list.\n'
+          'The full text in question was:\n'
+          '${toStringDeep(prefixLineOne: '  ')}'
+        );
       }
       return true;
     }());
@@ -278,25 +286,27 @@ class TextSpan extends DiagnosticableTree {
   ///
   ///  * [TextStyle.compareTo], which does the same thing for [TextStyle]s.
   RenderComparison compareTo(TextSpan other) {
-    if (identical(this, other)) return RenderComparison.identical;
+    if (identical(this, other))
+      return RenderComparison.identical;
     if (other.text != text ||
         children?.length != other.children?.length ||
         (style == null) != (other.style == null))
       return RenderComparison.layout;
-    RenderComparison result = recognizer == other.recognizer
-        ? RenderComparison.identical
-        : RenderComparison.metadata;
+    RenderComparison result = recognizer == other.recognizer ? RenderComparison.identical : RenderComparison.metadata;
     if (style != null) {
       final RenderComparison candidate = style.compareTo(other.style);
-      if (candidate.index > result.index) result = candidate;
-      if (result == RenderComparison.layout) return result;
+      if (candidate.index > result.index)
+        result = candidate;
+      if (result == RenderComparison.layout)
+        return result;
     }
     if (children != null) {
       for (int index = 0; index < children.length; index += 1) {
-        final RenderComparison candidate =
-            children[index].compareTo(other.children[index]);
-        if (candidate.index > result.index) result = candidate;
-        if (result == RenderComparison.layout) return result;
+        final RenderComparison candidate = children[index].compareTo(other.children[index]);
+        if (candidate.index > result.index)
+          result = candidate;
+        if (result == RenderComparison.layout)
+          return result;
       }
     }
     return result;
@@ -304,13 +314,15 @@ class TextSpan extends DiagnosticableTree {
 
   @override
   bool operator ==(dynamic other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
+    if (identical(this, other))
+      return true;
+    if (other.runtimeType != runtimeType)
+      return false;
     final TextSpan typedOther = other;
-    return typedOther.text == text &&
-        typedOther.style == style &&
-        typedOther.recognizer == recognizer &&
-        listEquals<TextSpan>(typedOther.children, children);
+    return typedOther.text == text
+        && typedOther.style == style
+        && typedOther.recognizer == recognizer
+        && listEquals<TextSpan>(typedOther.children, children);
   }
 
   @override
@@ -325,29 +337,29 @@ class TextSpan extends DiagnosticableTree {
     properties.defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.whitespace;
     // Properties on style are added as if they were properties directly on
     // this TextSpan.
-    if (style != null) style.debugFillProperties(properties);
+    if (style != null)
+      style.debugFillProperties(properties);
 
-    properties.add(new DiagnosticsProperty<GestureRecognizer>(
-      'recognizer',
-      recognizer,
+    properties.add(DiagnosticsProperty<GestureRecognizer>(
+      'recognizer', recognizer,
       description: recognizer?.runtimeType?.toString(),
       defaultValue: null,
     ));
 
-    properties.add(
-        new StringProperty('text', text, showName: false, defaultValue: null));
+    properties.add(StringProperty('text', text, showName: false, defaultValue: null));
     if (style == null && text == null && children == null)
-      properties.add(new DiagnosticsNode.message('(empty)'));
+      properties.add(DiagnosticsNode.message('(empty)'));
   }
 
   @override
   List<DiagnosticsNode> debugDescribeChildren() {
-    if (children == null) return const <DiagnosticsNode>[];
+    if (children == null)
+      return const <DiagnosticsNode>[];
     return children.map((TextSpan child) {
       if (child != null) {
         return child.toDiagnosticsNode();
       } else {
-        return new DiagnosticsNode.message('<null child>');
+        return DiagnosticsNode.message('<null child>');
       }
     }).toList();
   }

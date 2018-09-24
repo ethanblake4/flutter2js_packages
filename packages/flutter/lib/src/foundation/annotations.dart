@@ -18,8 +18,8 @@
 /// ```dart
 /// /// A copper coffee pot, as desired by Ben Turpin.
 /// /// ...documentation...
-/// @Category(const <String>['Pots', 'Coffee'])
-/// @Category(const <String>['Copper', 'Cookware'])
+/// @Category(<String>['Pots', 'Coffee'])
+/// @Category(<String>['Copper', 'Cookware'])
 /// @DocumentationIcon('https://example.com/images/coffee.png')
 /// @Summary('A proper cup of coffee is made in a proper copper coffee pot.')
 /// class CopperCoffeePot {
@@ -35,7 +35,7 @@
 ///    class that overrides the inline documentations' own description.
 class Category {
   /// Create an annotation to provide a categorization of a class.
-  const Category(this.sections);
+  const Category(this.sections) : assert(sections != null);
 
   /// The strings the correspond to the section and subsection of the
   /// category represented by this object.
@@ -55,7 +55,7 @@ class Category {
 /// ```dart
 /// /// Utility class for beginning a dream-sharing sequence.
 /// /// ...documentation...
-/// @Category(const <String>['Military Technology', 'Experimental'])
+/// @Category(<String>['Military Technology', 'Experimental'])
 /// @DocumentationIcon('https://docs.example.org/icons/top.png')
 /// class DreamSharing {
 ///   // ...code...
@@ -69,7 +69,7 @@ class Category {
 ///    class that overrides the inline documentations' own description.
 class DocumentationIcon {
   /// Create an annotation to provide a URL to an image describing a class.
-  const DocumentationIcon(this.url);
+  const DocumentationIcon(this.url) : assert(url != null);
 
   /// The URL to an image that represents the annotated class.
   final String url;
@@ -89,8 +89,8 @@ class DocumentationIcon {
 /// ///
 /// /// Instances of this class can hunt small animals.
 /// /// This cat has three legs.
-/// @Category(const <String>['Animals', 'Cats'])
-/// @Category(const <String>['Cute', 'Pets'])
+/// @Category(<String>['Animals', 'Cats'])
+/// @Category(<String>['Cute', 'Pets'])
 /// @DocumentationIcon('https://www.examples.net/docs/images/icons/pillar.jpeg')
 /// @Summary('A famous three-legged cat.')
 /// class Pillar extends Cat {
@@ -105,7 +105,7 @@ class DocumentationIcon {
 ///    represents the class.
 class Summary {
   /// Create an annotation to provide a short description of a class.
-  const Summary(this.text);
+  const Summary(this.text) : assert(text != null);
 
   /// The text of the summary of the annotated class.
   final String text;

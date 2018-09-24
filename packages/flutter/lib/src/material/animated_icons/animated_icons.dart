@@ -19,7 +19,7 @@ part of material_animated_icons;
 /// ### Sample code
 ///
 /// ```dart
-/// new AnimatedIcon(
+/// AnimatedIcon(
 ///   icon: AnimatedIcons.menu_arrow,
 ///   progress: controller,
 ///   semanticLabel: 'Show menu',
@@ -27,6 +27,7 @@ part of material_animated_icons;
 /// ```
 ///
 class AnimatedIcon extends StatelessWidget {
+
   /// Creates an AnimatedIcon.
   ///
   /// The [progress] and [icon] arguments must not be null.
@@ -39,7 +40,9 @@ class AnimatedIcon extends StatelessWidget {
     this.size,
     this.semanticLabel,
     this.textDirection,
-  });
+  }) : assert(progress != null),
+       assert(icon != null),
+       super(key: key);
 
   /// The animation progress for the animated icon.
   ///
@@ -90,34 +93,32 @@ class AnimatedIcon extends StatelessWidget {
   ///
   /// If this is null, the ambient [Directionality] is used instead.
   ///
-  /// If the text diection is [TextDirection.rtl], the icon will be mirrored
+  /// If the text direction is [TextDirection.rtl], the icon will be mirrored
   /// horizontally (e.g back arrow will point right).
   final TextDirection textDirection;
 
-  static final _UiPathFactory _pathFactory = () => new ui.Path();
+  static final _UiPathFactory _pathFactory = () => ui.Path();
 
   @override
   Widget build(BuildContext context) {
     final _AnimatedIconData iconData = icon;
     final IconThemeData iconTheme = IconTheme.of(context);
     final double iconSize = size ?? iconTheme.size;
-    final TextDirection textDirection =
-        this.textDirection ?? Directionality.of(context);
+    final TextDirection textDirection = this.textDirection ?? Directionality.of(context);
     final double iconOpacity = iconTheme.opacity;
     Color iconColor = color ?? iconTheme.color;
     if (iconOpacity != 1.0)
       iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity);
-    return new Semantics(
+    return Semantics(
       label: semanticLabel,
-      child: new CustomPaint(
-        size: new Size(iconSize, iconSize),
-        painter: new _AnimatedIconPainter(
+      child: CustomPaint(
+        size: Size(iconSize, iconSize),
+        painter: _AnimatedIconPainter(
           paths: iconData.paths,
           progress: progress,
           color: iconColor,
           scale: iconSize / iconData.size.width,
-          shouldMirror:
-              textDirection == TextDirection.rtl && iconData.matchTextDirection,
+          shouldMirror: textDirection == TextDirection.rtl && iconData.matchTextDirection,
           uiPathFactory: _pathFactory,
         ),
       ),
@@ -125,7 +126,7 @@ class AnimatedIcon extends StatelessWidget {
   }
 }
 
-typedef ui.Path _UiPathFactory();
+typedef _UiPathFactory = ui.Path Function();
 
 class _AnimatedIconPainter extends CustomPainter {
   _AnimatedIconPainter({
@@ -135,8 +136,7 @@ class _AnimatedIconPainter extends CustomPainter {
     @required this.scale,
     @required this.shouldMirror,
     @required this.uiPathFactory,
-  })
-      : super(repaint: progress);
+  }) : super(repaint: progress);
 
   // This list is assumed to be immutable, changes to the contents of the list
   // will not trigger a redraw as shouldRepaint will keep returning false.
@@ -144,7 +144,6 @@ class _AnimatedIconPainter extends CustomPainter {
   final Animation<double> progress;
   final Color color;
   final double scale;
-
   /// If this is true the image will be mirrored horizontally.
   final bool shouldMirror;
   final _UiPathFactory uiPathFactory;
@@ -164,16 +163,16 @@ class _AnimatedIconPainter extends CustomPainter {
       path.paint(canvas, color, uiPathFactory, clampedProgress);
   }
 
+
   @override
   bool shouldRepaint(_AnimatedIconPainter oldDelegate) {
-    return oldDelegate.progress.value != progress.value ||
-        oldDelegate.color != color
+    return oldDelegate.progress.value != progress.value
+        || oldDelegate.color != color
         // We are comparing the paths list by reference, assuming the list is
         // treated as immutable to be more efficient.
-        ||
-        oldDelegate.paths != paths ||
-        oldDelegate.scale != scale ||
-        oldDelegate.uiPathFactory != uiPathFactory;
+        || oldDelegate.paths != paths
+        || oldDelegate.scale != scale
+        || oldDelegate.uiPathFactory != uiPathFactory;
   }
 
   @override
@@ -187,19 +186,22 @@ class _AnimatedIconPainter extends CustomPainter {
 }
 
 class _PathFrames {
-  const _PathFrames({@required this.commands, @required this.opacities});
+  const _PathFrames({
+    @required this.commands,
+    @required this.opacities
+  });
 
   final List<_PathCommand> commands;
   final List<double> opacities;
 
-  void paint(ui.Canvas canvas, Color color, _UiPathFactory uiPathFactory,
-      double progress) {
+  void paint(ui.Canvas canvas, Color color, _UiPathFactory uiPathFactory, double progress) {
     final double opacity = _interpolate(opacities, progress, lerpDouble);
-    final ui.Paint paint = new ui.Paint()
+    final ui.Paint paint = ui.Paint()
       ..style = PaintingStyle.fill
       ..color = color.withOpacity(color.opacity * opacity);
     final ui.Path path = uiPathFactory();
-    for (_PathCommand command in commands) command.apply(path, progress);
+    for (_PathCommand command in commands)
+      command.apply(path, progress);
     canvas.drawPath(path, paint);
   }
 }
@@ -231,8 +233,7 @@ class _PathMoveTo extends _PathCommand {
 }
 
 class _PathCubicTo extends _PathCommand {
-  const _PathCubicTo(
-      this.controlPoints1, this.controlPoints2, this.targetPoints);
+  const _PathCubicTo(this.controlPoints1, this.controlPoints2, this.targetPoints);
 
   final List<Offset> controlPoints2;
   final List<Offset> controlPoints1;
@@ -240,14 +241,14 @@ class _PathCubicTo extends _PathCommand {
 
   @override
   void apply(Path path, double progress) {
-    final Offset controlPoint1 =
-        _interpolate(controlPoints1, progress, Offset.lerp);
-    final Offset controlPoint2 =
-        _interpolate(controlPoints2, progress, Offset.lerp);
-    final Offset targetPoint =
-        _interpolate(targetPoints, progress, Offset.lerp);
-    path.cubicTo(controlPoint1.dx, controlPoint1.dy, controlPoint2.dx,
-        controlPoint2.dy, targetPoint.dx, targetPoint.dy);
+    final Offset controlPoint1 = _interpolate(controlPoints1, progress, Offset.lerp);
+    final Offset controlPoint2 = _interpolate(controlPoints2, progress, Offset.lerp);
+    final Offset targetPoint = _interpolate(targetPoints, progress, Offset.lerp);
+    path.cubicTo(
+      controlPoint1.dx, controlPoint1.dy,
+      controlPoint2.dx, controlPoint2.dy,
+      targetPoint.dx, targetPoint.dy
+    );
   }
 }
 
@@ -275,7 +276,7 @@ class _PathClose extends _PathCommand {
 
 // Interpolates a value given a set of values equally spaced in time.
 //
-// [interpolator] is the interpolation function used to  interpolate between 2
+// [interpolator] is the interpolation function used to interpolate between 2
 // points of type T.
 //
 // This is currently done with linear interpolation between every 2 consecutive
@@ -284,16 +285,16 @@ class _PathClose extends _PathCommand {
 // not be smooth enough we can try applying spline instead.
 //
 // [progress] is expected to be between 0.0 and 1.0.
-T _interpolate<T>(
-    List<T> values, double progress, _Interpolator<T> interpolator) {
+T _interpolate<T>(List<T> values, double progress, _Interpolator<T> interpolator) {
   assert(progress <= 1.0);
   assert(progress >= 0.0);
-  if (values.length == 1) return values[0];
-  final double targetIdx = lerpDouble(0, values.length - 1, progress);
+  if (values.length == 1)
+    return values[0];
+  final double targetIdx = lerpDouble(0, values.length -1, progress);
   final int lowIdx = targetIdx.floor();
   final int highIdx = targetIdx.ceil();
   final double t = targetIdx - lowIdx;
   return interpolator(values[lowIdx], values[highIdx], t);
 }
 
-typedef T _Interpolator<T>(T a, T b, double progress);
+typedef _Interpolator<T> = T Function(T a, T b, double progress);

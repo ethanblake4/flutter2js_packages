@@ -40,8 +40,8 @@ const double _kMinButtonSize = 48.0;
 /// ## Sample code
 ///
 /// ```dart
-/// new IconButton(
-///   icon: new Icon(Icons.volume_up),
+/// IconButton(
+///   icon: Icon(Icons.volume_up),
 ///   tooltip: 'Increase volume by 10%',
 ///   onPressed: () { setState(() { _volume *= 1.1; }); },
 /// )
@@ -69,19 +69,23 @@ class IconButton extends StatelessWidget {
   ///
   /// The [icon] argument must be specified, and is typically either an [Icon]
   /// or an [ImageIcon].
-  const IconButton(
-      {Key key,
-      this.iconSize: 24.0,
-      this.padding: const EdgeInsets.all(8.0),
-      this.alignment: Alignment.center,
-      @required this.icon,
-      this.color,
-      this.highlightColor,
-      this.splashColor,
-      this.disabledColor,
-      @required this.onPressed,
-      this.tooltip})
-      : super(key: key);
+  const IconButton({
+    Key key,
+    this.iconSize = 24.0,
+    this.padding = const EdgeInsets.all(8.0),
+    this.alignment = Alignment.center,
+    @required this.icon,
+    this.color,
+    this.highlightColor,
+    this.splashColor,
+    this.disabledColor,
+    @required this.onPressed,
+    this.tooltip
+  }) : assert(iconSize != null),
+       assert(padding != null),
+       assert(alignment != null),
+       assert(icon != null),
+       super(key: key);
 
   /// The size of the icon inside the button.
   ///
@@ -133,11 +137,11 @@ class IconButton extends StatelessWidget {
   /// See also [disabledColor].
   ///
   /// ```dart
-  ///  new IconButton(
-  ///    color: Colors.blue,
-  ///    onPressed: _handleTap,
-  ///    icon: Icons.widgets,
-  ///  ),
+  /// IconButton(
+  ///   color: Colors.blue,
+  ///   onPressed: _handleTap,
+  ///   icon: Icons.widgets,
+  /// ),
   /// ```
   final Color color;
 
@@ -187,21 +191,25 @@ class IconButton extends StatelessWidget {
     else
       currentColor = disabledColor ?? Theme.of(context).disabledColor;
 
-    Widget result = new Semantics(
+    Widget result = Semantics(
       button: true,
-      child: new ConstrainedBox(
-        constraints: const BoxConstraints(
-            minWidth: _kMinButtonSize, minHeight: _kMinButtonSize),
-        child: new Padding(
+      enabled: onPressed != null,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: _kMinButtonSize, minHeight: _kMinButtonSize),
+        child: Padding(
           padding: padding,
-          child: new SizedBox(
+          child: SizedBox(
             height: iconSize,
             width: iconSize,
-            child: new Align(
+            child: Align(
               alignment: alignment,
               child: IconTheme.merge(
-                  data: new IconThemeData(size: iconSize, color: currentColor),
-                  child: icon),
+                data: IconThemeData(
+                  size: iconSize,
+                  color: currentColor
+                ),
+                child: icon
+              ),
             ),
           ),
         ),
@@ -209,9 +217,12 @@ class IconButton extends StatelessWidget {
     );
 
     if (tooltip != null) {
-      result = new Tooltip(message: tooltip, child: result);
+      result = Tooltip(
+        message: tooltip,
+        child: result
+      );
     }
-    return new InkResponse(
+    return InkResponse(
       onTap: onPressed,
       child: result,
       highlightColor: highlightColor ?? Theme.of(context).highlightColor,
@@ -225,13 +236,10 @@ class IconButton extends StatelessWidget {
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description
-        .add(new DiagnosticsProperty<Widget>('icon', icon, showName: false));
-    description.add(new ObjectFlagProperty<VoidCallback>('onPressed', onPressed,
-        ifNull: 'disabled'));
-    description.add(new StringProperty('tooltip', tooltip,
-        defaultValue: null, quoted: false));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<Widget>('icon', icon, showName: false));
+    properties.add(ObjectFlagProperty<VoidCallback>('onPressed', onPressed, ifNull: 'disabled'));
+    properties.add(StringProperty('tooltip', tooltip, defaultValue: null, quoted: false));
   }
 }

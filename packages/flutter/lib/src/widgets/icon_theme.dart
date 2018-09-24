@@ -20,8 +20,9 @@ class IconTheme extends InheritedWidget {
     Key key,
     @required this.data,
     @required Widget child,
-  })
-      : super(key: key, child: child);
+  }) : assert(data != null),
+       assert(child != null),
+       super(key: key, child: child);
 
   /// Creates an icon theme that controls the color, opacity, and size of
   /// descendant widgets, and merges in the current icon theme, if any.
@@ -32,9 +33,9 @@ class IconTheme extends InheritedWidget {
     @required IconThemeData data,
     @required Widget child,
   }) {
-    return new Builder(
+    return Builder(
       builder: (BuildContext context) {
-        return new IconTheme(
+        return IconTheme(
           key: key,
           data: _getInheritedIconThemeData(context).merge(data),
           child: child,
@@ -58,9 +59,7 @@ class IconTheme extends InheritedWidget {
   /// ```
   static IconThemeData of(BuildContext context) {
     final IconThemeData iconThemeData = _getInheritedIconThemeData(context);
-    return iconThemeData.isConcrete
-        ? iconThemeData
-        : const IconThemeData.fallback().merge(iconThemeData);
+    return iconThemeData.isConcrete ? iconThemeData : const IconThemeData.fallback().merge(iconThemeData);
   }
 
   static IconThemeData _getInheritedIconThemeData(BuildContext context) {
@@ -69,12 +68,11 @@ class IconTheme extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(IconTheme old) => data != old.data;
+  bool updateShouldNotify(IconTheme oldWidget) => data != oldWidget.data;
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description.add(
-        new DiagnosticsProperty<IconThemeData>('data', data, showName: false));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<IconThemeData>('data', data, showName: false));
   }
 }

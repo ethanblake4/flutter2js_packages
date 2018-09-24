@@ -2,18 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'constants.dart';
 import 'debug.dart';
 import 'theme.dart';
+import 'theme_data.dart';
 import 'toggleable.dart';
 
-const double _kDiameter = 16.0;
-const double _kOuterRadius = _kDiameter / 2.0;
-const double _kInnerRadius = 5.0;
+const double _kOuterRadius = 8.0;
+const double _kInnerRadius = 4.5;
 
 /// A material design radio button.
 ///
@@ -51,13 +50,14 @@ class Radio<T> extends StatefulWidget {
   /// * [value] and [groupValue] together determine whether the radio button is
   ///   selected.
   /// * [onChanged] is called when the user selects this radio button.
-  const Radio(
-      {Key key,
-      @required this.value,
-      @required this.groupValue,
-      @required this.onChanged,
-      this.activeColor})
-      : super(key: key);
+  const Radio({
+    Key key,
+    @required this.value,
+    @required this.groupValue,
+    @required this.onChanged,
+    this.activeColor,
+    this.materialTapTargetSize,
+  }) : super(key: key);
 
   /// The value represented by this radio button.
   final T value;
@@ -81,7 +81,7 @@ class Radio<T> extends StatefulWidget {
   /// gets rebuilt; for example:
   ///
   /// ```dart
-  /// new Radio<SingingCharacter>(
+  /// Radio<SingingCharacter>(
   ///   value: SingingCharacter.lafayette,
   ///   groupValue: _character,
   ///   onChanged: (SingingCharacter newValue) {
@@ -95,14 +95,23 @@ class Radio<T> extends StatefulWidget {
 
   /// The color to use when this radio button is selected.
   ///
-  /// Defaults to accent color of the current [Theme].
+  /// Defaults to [ThemeData.toggleableActiveColor].
   final Color activeColor;
 
+  /// Configures the minimum size of the tap target.
+  ///
+  /// Defaults to [ThemeData.materialTapTargetSize].
+  ///
+  /// See also:
+  ///
+  ///   * [MaterialTapTargetSize], for a description of how this affects tap targets.
+  final MaterialTapTargetSize materialTapTargetSize;
+
   @override
-  _RadioState<T> createState() => new _RadioState<T>();
+  _RadioState<T> createState() => _RadioState<T>();
 }
 
-class _RadioState<T> extends TickerProviderStateMixin<Radio<T>> {
+class _RadioState<T> extends State<Radio<T>> with TickerProviderStateMixin {
   bool get _enabled => widget.onChanged != null;
 
   Color _getInactiveColor(ThemeData themeData) {
@@ -110,18 +119,30 @@ class _RadioState<T> extends TickerProviderStateMixin<Radio<T>> {
   }
 
   void _handleChanged(bool selected) {
-    if (selected) widget.onChanged(widget.value);
+    if (selected)
+      widget.onChanged(widget.value);
   }
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     final ThemeData themeData = Theme.of(context);
-    return new _RadioRenderObjectWidget(
+    Size size;
+    switch (widget.materialTapTargetSize ?? themeData.materialTapTargetSize) {
+      case MaterialTapTargetSize.padded:
+        size = const Size(2 * kRadialReactionRadius + 8.0, 2 * kRadialReactionRadius + 8.0);
+        break;
+      case MaterialTapTargetSize.shrinkWrap:
+        size = const Size(2 * kRadialReactionRadius, 2 * kRadialReactionRadius);
+        break;
+    }
+    final BoxConstraints additionalConstraints = BoxConstraints.tight(size);
+    return _RadioRenderObjectWidget(
       selected: widget.value == widget.groupValue,
-      activeColor: widget.activeColor ?? themeData.accentColor,
+      activeColor: widget.activeColor ?? themeData.toggleableActiveColor,
       inactiveColor: _getInactiveColor(themeData),
       onChanged: _enabled ? _handleChanged : null,
+      additionalConstraints: additionalConstraints,
       vsync: this,
     );
   }
@@ -133,25 +154,31 @@ class _RadioRenderObjectWidget extends LeafRenderObjectWidget {
     @required this.selected,
     @required this.activeColor,
     @required this.inactiveColor,
+    @required this.additionalConstraints,
     this.onChanged,
     @required this.vsync,
-  })
-      : super(key: key);
+  }) : assert(selected != null),
+       assert(activeColor != null),
+       assert(inactiveColor != null),
+       assert(vsync != null),
+       super(key: key);
 
   final bool selected;
   final Color inactiveColor;
   final Color activeColor;
   final ValueChanged<bool> onChanged;
   final TickerProvider vsync;
+  final BoxConstraints additionalConstraints;
 
   @override
-  _RenderRadio createRenderObject(BuildContext context) => new _RenderRadio(
-        value: selected,
-        activeColor: activeColor,
-        inactiveColor: inactiveColor,
-        onChanged: onChanged,
-        vsync: vsync,
-      );
+  _RenderRadio createRenderObject(BuildContext context) => _RenderRadio(
+    value: selected,
+    activeColor: activeColor,
+    inactiveColor: inactiveColor,
+    onChanged: onChanged,
+    vsync: vsync,
+    additionalConstraints: additionalConstraints,
+  );
 
   @override
   void updateRenderObject(BuildContext context, _RenderRadio renderObject) {
@@ -160,6 +187,7 @@ class _RadioRenderObjectWidget extends LeafRenderObjectWidget {
       ..activeColor = activeColor
       ..inactiveColor = inactiveColor
       ..onChanged = onChanged
+      ..additionalConstraints = additionalConstraints
       ..vsync = vsync;
   }
 }
@@ -170,30 +198,29 @@ class _RenderRadio extends RenderToggleable {
     Color activeColor,
     Color inactiveColor,
     ValueChanged<bool> onChanged,
+    BoxConstraints additionalConstraints,
     @required TickerProvider vsync,
-  })
-      : super(
-          value: value,
-          activeColor: activeColor,
-          inactiveColor: inactiveColor,
-          onChanged: onChanged,
-          size:
-              const Size(2 * kRadialReactionRadius, 2 * kRadialReactionRadius),
-          vsync: vsync,
-        );
+  }): super(
+    value: value,
+    tristate: false,
+    activeColor: activeColor,
+    inactiveColor: inactiveColor,
+    onChanged: onChanged,
+    additionalConstraints: additionalConstraints,
+    vsync: vsync,
+  );
 
   @override
   void paint(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
 
-    paintRadialReaction(canvas, offset,
-        const Offset(kRadialReactionRadius, kRadialReactionRadius));
+    paintRadialReaction(canvas, offset, const Offset(kRadialReactionRadius, kRadialReactionRadius));
 
     final Offset center = (offset & size).center;
     final Color radioColor = onChanged != null ? activeColor : inactiveColor;
 
     // Outer circle
-    final Paint paint = new Paint()
+    final Paint paint = Paint()
       ..color = Color.lerp(inactiveColor, radioColor, position.value)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
@@ -209,6 +236,8 @@ class _RenderRadio extends RenderToggleable {
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
-    config.isInMutuallyExclusiveGroup = true;
+    config
+      ..isInMutuallyExclusiveGroup = true
+      ..isChecked = value == true;
   }
 }

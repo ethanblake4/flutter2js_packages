@@ -43,11 +43,18 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
     @required this.textDirection,
     @required this.thickness,
     @required this.fadeoutOpacityAnimation,
-    this.mainAxisMargin: 0.0,
-    this.crossAxisMargin: 0.0,
+    this.mainAxisMargin = 0.0,
+    this.crossAxisMargin = 0.0,
     this.radius,
-    this.minLength: _kMinThumbExtent,
-  }) {
+    this.minLength = _kMinThumbExtent,
+    this.minOverscrollLength = _kMinThumbExtent,
+  }) : assert(color != null),
+       assert(textDirection != null),
+       assert(thickness != null),
+       assert(fadeoutOpacityAnimation != null),
+       assert(mainAxisMargin != null),
+       assert(crossAxisMargin != null),
+       assert(minLength != null) {
     fadeoutOpacityAnimation.addListener(notifyListeners);
   }
 
@@ -80,9 +87,13 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
   final Radius radius;
 
   /// The smallest size the scrollbar can shrink to when the total scrollable
-  /// extent is large and the current visible viewport is small. Mustn't be
-  /// null.
+  /// extent is large and the current visible viewport is small, and the
+  /// viewport is not overscrolled. Mustn't be null.
   final double minLength;
+
+  /// The smallest size the scrollbar can shrink to when viewport is
+  /// overscrolled. Mustn't be null.
+  final double minOverscrollLength;
 
   ScrollMetrics _lastMetrics;
   AxisDirection _lastAxisDirection;
@@ -101,9 +112,8 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
   }
 
   Paint get _paint {
-    return new Paint()
-      ..color =
-          color.withOpacity(color.opacity * fadeoutOpacityAnimation.value);
+    return Paint()..color =
+        color.withOpacity(color.opacity * fadeoutOpacityAnimation.value);
   }
 
   double _getThumbX(Size size) {
@@ -117,26 +127,24 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
     return null;
   }
 
-  void _paintVerticalThumb(
-      Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
-    final Offset thumbOrigin = new Offset(_getThumbX(size), thumbOffset);
-    final Size thumbSize = new Size(thickness, thumbExtent);
+  void _paintVerticalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
+    final Offset thumbOrigin = Offset(_getThumbX(size), thumbOffset);
+    final Size thumbSize = Size(thickness, thumbExtent);
     final Rect thumbRect = thumbOrigin & thumbSize;
     if (radius == null)
       canvas.drawRect(thumbRect, _paint);
     else
-      canvas.drawRRect(new RRect.fromRectAndRadius(thumbRect, radius), _paint);
+      canvas.drawRRect(RRect.fromRectAndRadius(thumbRect, radius), _paint);
   }
 
-  void _paintHorizontalThumb(
-      Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
-    final Offset thumbOrigin = new Offset(thumbOffset, size.height - thickness);
-    final Size thumbSize = new Size(thumbExtent, thickness);
+  void _paintHorizontalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
+    final Offset thumbOrigin = Offset(thumbOffset, size.height - thickness);
+    final Size thumbSize = Size(thumbExtent, thickness);
     final Rect thumbRect = thumbOrigin & thumbSize;
     if (radius == null)
       canvas.drawRect(thumbRect, _paint);
     else
-      canvas.drawRRect(new RRect.fromRectAndRadius(thumbRect, radius), _paint);
+      canvas.drawRRect(RRect.fromRectAndRadius(thumbRect, radius), _paint);
   }
 
   void _paintThumb(
@@ -146,23 +154,48 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
     double viewport,
     Canvas canvas,
     Size size,
-    void painter(
-        Canvas canvas, Size size, double thumbOffset, double thumbExtent),
+    void painter(Canvas canvas, Size size, double thumbOffset, double thumbExtent),
   ) {
     // Establish the minimum size possible.
-    double thumbExtent = math.min(viewport, minLength);
+    double thumbExtent = math.min(viewport, minOverscrollLength);
+
     if (before + inside + after > 0.0) {
+      // Thumb extent reflects fraction of content visible, as long as this
+      // isn't less than the absolute minimum size.
       final double fractionVisible = inside / (before + inside + after);
       thumbExtent = math.max(
         thumbExtent,
         viewport * fractionVisible - 2 * mainAxisMargin,
       );
+      // Thumb extent is no smaller than minLength if scrolling normally.
+      if (before != 0.0 && after != 0.0) {
+        thumbExtent = math.max(
+          minLength,
+          thumbExtent,
+        );
+      }
+      // User is overscrolling. Thumb extent can be less than minLength
+      // but no smaller than minOverscrollLength. We can't use the
+      // fractionVisible to produce intermediate values between minLength and
+      // minOverscrollLength when the user is transitioning from regular
+      // scrolling to overscrolling, so we instead use the percentage of the
+      // content that is still in the viewport to determine the size of the
+      // thumb. iOS behavior appears to have the thumb reach its minimum size
+      // with ~20% of overscroll. We map the percentage of minLength from
+      // [0.8, 1.0] to [0.0, 1.0], so 0% to 20% of overscroll will produce
+      // values for the thumb that range between minLength and the smallest
+      // possible value, minOverscrollLength.
+      else {
+        thumbExtent = math.max(
+          thumbExtent,
+          minLength * (((inside / viewport) - 0.8) / 0.2),
+        );
+      }
     }
 
     final double fractionPast = before / (before + after);
     final double thumbOffset = (before + after > 0.0)
-        ? fractionPast * (viewport - thumbExtent - 2 * mainAxisMargin) +
-            mainAxisMargin
+        ? fractionPast * (viewport - thumbExtent - 2 * mainAxisMargin) + mainAxisMargin
         : mainAxisMargin;
 
     painter(canvas, size, thumbOffset, thumbExtent);
@@ -176,49 +209,22 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (_lastAxisDirection == null ||
-        _lastMetrics == null ||
-        fadeoutOpacityAnimation.value == 0.0) return;
+    if (_lastAxisDirection == null
+        || _lastMetrics == null
+        || fadeoutOpacityAnimation.value == 0.0)
+      return;
     switch (_lastAxisDirection) {
       case AxisDirection.down:
-        _paintThumb(
-            _lastMetrics.extentBefore,
-            _lastMetrics.extentInside,
-            _lastMetrics.extentAfter,
-            size.height,
-            canvas,
-            size,
-            _paintVerticalThumb);
+        _paintThumb(_lastMetrics.extentBefore, _lastMetrics.extentInside, _lastMetrics.extentAfter, size.height, canvas, size, _paintVerticalThumb);
         break;
       case AxisDirection.up:
-        _paintThumb(
-            _lastMetrics.extentAfter,
-            _lastMetrics.extentInside,
-            _lastMetrics.extentBefore,
-            size.height,
-            canvas,
-            size,
-            _paintVerticalThumb);
+        _paintThumb(_lastMetrics.extentAfter, _lastMetrics.extentInside, _lastMetrics.extentBefore, size.height, canvas, size, _paintVerticalThumb);
         break;
       case AxisDirection.right:
-        _paintThumb(
-            _lastMetrics.extentBefore,
-            _lastMetrics.extentInside,
-            _lastMetrics.extentAfter,
-            size.width,
-            canvas,
-            size,
-            _paintHorizontalThumb);
+        _paintThumb(_lastMetrics.extentBefore, _lastMetrics.extentInside, _lastMetrics.extentAfter, size.width, canvas, size, _paintHorizontalThumb);
         break;
       case AxisDirection.left:
-        _paintThumb(
-            _lastMetrics.extentAfter,
-            _lastMetrics.extentInside,
-            _lastMetrics.extentBefore,
-            size.width,
-            canvas,
-            size,
-            _paintHorizontalThumb);
+        _paintThumb(_lastMetrics.extentAfter, _lastMetrics.extentInside, _lastMetrics.extentBefore, size.width, canvas, size, _paintHorizontalThumb);
         break;
     }
   }
@@ -230,14 +236,14 @@ class ScrollbarPainter extends ChangeNotifier implements CustomPainter {
   @override
   bool shouldRepaint(ScrollbarPainter old) {
     // Should repaint if any properties changed.
-    return color != old.color ||
-        textDirection != old.textDirection ||
-        thickness != old.thickness ||
-        fadeoutOpacityAnimation != old.fadeoutOpacityAnimation ||
-        mainAxisMargin != old.mainAxisMargin ||
-        crossAxisMargin != old.crossAxisMargin ||
-        radius != old.radius ||
-        minLength != old.minLength;
+    return color != old.color
+        || textDirection != old.textDirection
+        || thickness != old.thickness
+        || fadeoutOpacityAnimation != old.fadeoutOpacityAnimation
+        || mainAxisMargin != old.mainAxisMargin
+        || crossAxisMargin != old.crossAxisMargin
+        || radius != old.radius
+        || minLength != old.minLength;
   }
 
   @override

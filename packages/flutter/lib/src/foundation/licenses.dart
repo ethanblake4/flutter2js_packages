@@ -5,7 +5,7 @@
 import 'dart:async';
 
 /// Signature for callbacks passed to [LicenseRegistry.addLicense].
-typedef Stream<LicenseEntry> LicenseEntryCollector();
+typedef LicenseEntryCollector = Stream<LicenseEntry> Function();
 
 /// A string that represents one paragraph in a [LicenseEntry].
 ///
@@ -54,8 +54,7 @@ abstract class LicenseEntry {
 }
 
 enum _LicenseEntryWithLineBreaksParserState {
-  beforeParagraph,
-  inParagraph,
+  beforeParagraph, inParagraph,
 }
 
 /// Variant of [LicenseEntry] for licenses that separate paragraphs with blank
@@ -71,7 +70,7 @@ enum _LicenseEntryWithLineBreaksParserState {
 /// ```dart
 /// void initMyLibrary() {
 ///   LicenseRegistry.addLicense(() async* {
-///     yield new LicenseEntryWithLineBreaks(<String>['my_library'], '''
+///     yield LicenseEntryWithLineBreaks(<String>['my_library'], '''
 /// Copyright 2016 The Sample Authors. All rights reserved.
 ///
 /// Redistribution and use in source and binary forms, with or without
@@ -144,8 +143,7 @@ class LicenseEntryWithLineBreaks extends LicenseEntry {
     int lastLineIndent = 0;
     int currentLineIndent = 0;
     int currentParagraphIndentation;
-    _LicenseEntryWithLineBreaksParserState state =
-        _LicenseEntryWithLineBreaksParserState.beforeParagraph;
+    _LicenseEntryWithLineBreaksParserState state = _LicenseEntryWithLineBreaksParserState.beforeParagraph;
     final List<String> lines = <String>[];
 
     void addLine() {
@@ -156,8 +154,7 @@ class LicenseEntryWithLineBreaks extends LicenseEntry {
     LicenseParagraph getParagraph() {
       assert(lines.isNotEmpty);
       assert(currentParagraphIndentation != null);
-      final LicenseParagraph result =
-          new LicenseParagraph(lines.join(' '), currentParagraphIndentation);
+      final LicenseParagraph result = LicenseParagraph(lines.join(' '), currentParagraphIndentation);
       assert(result.text.trimLeft() == result.text);
       assert(result.text.isNotEmpty);
       lines.clear();
@@ -255,6 +252,7 @@ class LicenseEntryWithLineBreaks extends LicenseEntry {
   }
 }
 
+
 /// A registry for packages to add licenses to, so that they can be displayed
 /// together in an interface such as the [LicensePage].
 ///
@@ -301,7 +299,9 @@ class LicenseRegistry {
   ///
   /// Generating the list of licenses is expensive.
   static Stream<LicenseEntry> get licenses async* {
-    if (_collectors == null) return;
-    for (LicenseEntryCollector collector in _collectors) yield* collector();
+    if (_collectors == null)
+      return;
+    for (LicenseEntryCollector collector in _collectors)
+      yield* collector();
   }
 }

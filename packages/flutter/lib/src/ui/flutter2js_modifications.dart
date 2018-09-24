@@ -190,7 +190,20 @@ class Gradient extends Shader {
     List<Color> colors, [
     List<double> colorStops,
     TileMode tileMode,
+    Float64List matrix4,
+    Offset focal,
+    double focalRadius
   ]) = RadialGradient;
+
+  factory Gradient.sweep(
+      Offset center,
+      List<Color> colors, [
+        List<double> colorStops,
+        TileMode tileMode,
+        double startAngle,
+        double endAngle,
+        Float64List matrix4,
+      ])  = SweepGradient;
 
   void _validateColorStops(List<Color> colors, List<double> colorStops) {
     if (colorStops == null) {
@@ -235,6 +248,9 @@ class RadialGradient extends Gradient {
   final List<Color> colors;
   final List<double> colorStops;
   final TileMode tileMode;
+  final Float64List matrix4;
+  final Offset focal;
+  final double focalRadius;
 
   RadialGradient(
     this.center,
@@ -242,7 +258,36 @@ class RadialGradient extends Gradient {
     this.colors, [
     this.colorStops = null,
     this.tileMode = TileMode.clamp,
+    this.matrix4,
+    this.focal,
+    this.focalRadius = 0.0
   ]) {
+    assert(_offsetIsValid(center));
+    assert(colors != null);
+    assert(tileMode != null);
+    _validateColorStops(colors, colorStops);
+  }
+}
+
+/// The following class exists only in Flutter2js!
+class SweepGradient extends Gradient {
+  final Offset center;
+  final List<Color> colors;
+  final List<double> colorStops;
+  final TileMode tileMode;
+  final double startAngle;
+  final double endAngle;
+  final Float64List matrix4;
+
+  SweepGradient(
+      this.center,
+      this.colors, [
+        this.colorStops = null,
+        this.tileMode = TileMode.clamp,
+        this.startAngle = 0.0,
+        this.endAngle = math.pi * 2,
+        this.matrix4,
+      ]) {
     assert(_offsetIsValid(center));
     assert(colors != null);
     assert(tileMode != null);

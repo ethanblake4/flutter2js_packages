@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/ui.dart' show Color, Size, Rect, hashValues;
+
+import 'package:flutter/foundation.dart';
 
 import 'animation.dart';
 import 'animations.dart';
@@ -25,18 +26,17 @@ abstract class Animatable<T> {
   /// Returns a new Animation that is driven by the given animation but that
   /// takes on values determined by this object.
   Animation<T> animate(Animation<double> parent) {
-    return new _AnimatedEvaluation<T>(parent, this);
+    return _AnimatedEvaluation<T>(parent, this);
   }
 
   /// Returns a new Animatable whose value is determined by first evaluating
   /// the given parent and then evaluating this object.
   Animatable<T> chain(Animatable<double> parent) {
-    return new _ChainedEvaluation<T>(parent, this);
+    return _ChainedEvaluation<T>(parent, this);
   }
 }
 
-class _AnimatedEvaluation<T> extends Animation<T>
-    with AnimationWithParentMixin<double> {
+class _AnimatedEvaluation<T> extends Animation<T> with AnimationWithParentMixin<double> {
   _AnimatedEvaluation(this.parent, this._evaluatable);
 
   @override
@@ -67,7 +67,7 @@ class _ChainedEvaluation<T> extends Animatable<T> {
   @override
   T evaluate(Animation<double> animation) {
     final double value = _parent.evaluate(animation);
-    return _evaluatable.evaluate(new AlwaysStoppedAnimation<double>(value));
+    return _evaluatable.evaluate(AlwaysStoppedAnimation<double>(value));
   }
 
   @override
@@ -97,7 +97,7 @@ class _ChainedEvaluation<T> extends Animatable<T> {
 /// `_animation`:
 ///
 /// ```dart
-/// Animation<Offset> _animation = new Tween<Offset>(
+/// Animation<Offset> _animation = Tween<Offset>(
 ///   begin: const Offset(100.0, 50.0),
 ///   end: const Offset(200.0, 300.0),
 /// ).animate(_controller);
@@ -114,7 +114,7 @@ class Tween<T extends dynamic> extends Animatable<T> {
   /// The [begin] and [end] properties must be non-null before the tween is
   /// first used, but the arguments can be null if the values are going to be
   /// filled in later.
-  Tween({this.begin, this.end});
+  Tween({ this.begin, this.end });
 
   /// The value this variable has at the beginning of the animation.
   ///
@@ -153,17 +153,22 @@ class Tween<T extends dynamic> extends Animatable<T> {
   @override
   T evaluate(Animation<double> animation) {
     final double t = animation.value;
-    if (t == 0.0) return begin;
-    if (t == 1.0) return end;
+    if (t == 0.0)
+      return begin;
+    if (t == 1.0)
+      return end;
     return lerp(t);
   }
 
   @override
   bool operator ==(dynamic other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
+    if (identical(this, other))
+      return true;
+    if (other.runtimeType != runtimeType)
+      return false;
     final Tween<T> typedOther = other;
-    return begin == typedOther.begin && end == typedOther.end;
+    return begin == typedOther.begin
+        && end == typedOther.end;
   }
 
   @override
@@ -176,7 +181,7 @@ class Tween<T extends dynamic> extends Animatable<T> {
 /// A [Tween] that evaluates its [parent] in reverse.
 class ReverseTween<T> extends Tween<T> {
   /// Construct a [Tween] that evaluates its [parent] in reverse.
-  ReverseTween(this.parent) : super(begin: parent.end, end: parent.begin);
+  ReverseTween(this.parent) : assert(parent != null), super(begin: parent.end, end: parent.begin);
 
   /// This tween's value is the same as the parent's value evaluated in reverse.
   ///
@@ -199,8 +204,13 @@ class ColorTween extends Tween<Color> {
   /// Creates a [Color] tween.
   ///
   /// The [begin] and [end] properties may be null; the null value
-  /// is treated as transparent black.
-  ColorTween({Color begin, Color end}) : super(begin: begin, end: end);
+  /// is treated as transparent.
+  ///
+  /// We recommend that you do not pass [Colors.transparent] as [begin]
+  /// or [end] if you want the effect of fading in or out of transparent.
+  /// Instead prefer null. [Colors.transparent] refers to black transparent and
+  /// thus will fade out of or into black which is likely unwanted.
+  ColorTween({ Color begin, Color end }) : super(begin: begin, end: end);
 
   /// Returns the value this variable has at the given animation clock value.
   @override
@@ -218,7 +228,7 @@ class SizeTween extends Tween<Size> {
   ///
   /// The [begin] and [end] properties may be null; the null value
   /// is treated as an empty size.
-  SizeTween({Size begin, Size end}) : super(begin: begin, end: end);
+  SizeTween({ Size begin, Size end }) : super(begin: begin, end: end);
 
   /// Returns the value this variable has at the given animation clock value.
   @override
@@ -236,7 +246,7 @@ class RectTween extends Tween<Rect> {
   ///
   /// The [begin] and [end] properties may be null; the null value
   /// is treated as an empty rect at the top left corner.
-  RectTween({Rect begin, Rect end}) : super(begin: begin, end: end);
+  RectTween({ Rect begin, Rect end }) : super(begin: begin, end: end);
 
   /// Returns the value this variable has at the given animation clock value.
   @override
@@ -260,7 +270,7 @@ class IntTween extends Tween<int> {
   /// The [begin] and [end] properties must be non-null before the tween is
   /// first used, but the arguments can be null if the values are going to be
   /// filled in later.
-  IntTween({int begin, int end}) : super(begin: begin, end: end);
+  IntTween({ int begin, int end }) : super(begin: begin, end: end);
 
   // The inherited lerp() function doesn't work with ints because it multiplies
   // the begin and end types by a double, and int * double returns a double.
@@ -285,12 +295,25 @@ class StepTween extends Tween<int> {
   /// The [begin] and [end] properties must be non-null before the tween is
   /// first used, but the arguments can be null if the values are going to be
   /// filled in later.
-  StepTween({int begin, int end}) : super(begin: begin, end: end);
+  StepTween({ int begin, int end }) : super(begin: begin, end: end);
 
   // The inherited lerp() function doesn't work with ints because it multiplies
   // the begin and end types by a double, and int * double returns a double.
   @override
   int lerp(double t) => (begin + (end - begin) * t).floor();
+}
+
+/// A tween with a constant value.
+class ConstantTween<T> extends Tween<T> {
+  /// Create a tween whose [begin] and [end] values equal [value].
+  ConstantTween(T value) : super(begin: value, end: value);
+
+  /// This tween doesn't interpolate, it always returns [value].
+  @override
+  T lerp(double t) => begin;
+
+  @override
+  String toString() => '$runtimeType(value: begin)';
 }
 
 /// Transforms the value of the given animation by the given curve.
@@ -302,7 +325,8 @@ class CurveTween extends Animatable<double> {
   /// Creates a curve tween.
   ///
   /// The [curve] argument must not be null.
-  CurveTween({@required this.curve});
+  CurveTween({ @required this.curve })
+    : assert(curve != null);
 
   /// The curve to use when transforming the value of the animation.
   Curve curve;
@@ -316,4 +340,7 @@ class CurveTween extends Animatable<double> {
     }
     return curve.transform(t);
   }
+
+  @override
+  String toString() => '$runtimeType(curve: $curve)';
 }

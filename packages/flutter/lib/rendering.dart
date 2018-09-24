@@ -21,8 +21,12 @@
 /// binding, but relies on one being initialized with those features.
 library rendering;
 
-export 'package:flutter/foundation.dart'
-    show VoidCallback, ValueChanged, ValueGetter, ValueSetter, DiagnosticLevel;
+export 'package:flutter/foundation.dart' show
+  VoidCallback,
+  ValueChanged,
+  ValueGetter,
+  ValueSetter,
+  DiagnosticLevel;
 export 'package:flutter/semantics.dart';
 export 'package:vector_math/vector_math_64.dart' show Matrix4;
 
@@ -40,9 +44,11 @@ export 'src/rendering/flow.dart';
 export 'src/rendering/image.dart';
 export 'src/rendering/layer.dart';
 export 'src/rendering/list_body.dart';
+export 'src/rendering/list_wheel_viewport.dart';
 export 'src/rendering/object.dart';
 export 'src/rendering/paragraph.dart';
 export 'src/rendering/performance_overlay.dart';
+export 'src/rendering/platform_view.dart';
 export 'src/rendering/proxy_box.dart';
 export 'src/rendering/rotated_box.dart';
 export 'src/rendering/shifted_box.dart';

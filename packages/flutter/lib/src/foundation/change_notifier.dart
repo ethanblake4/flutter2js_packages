@@ -53,17 +53,40 @@ abstract class ValueListenable<T> extends Listenable {
 ///
 ///  * [ValueNotifier], which is a [ChangeNotifier] that wraps a single value.
 class ChangeNotifier extends Listenable {
-  ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
+  ObserverList<VoidCallback> _listeners = ObserverList<VoidCallback>();
 
   bool _debugAssertNotDisposed() {
     assert(() {
       if (_listeners == null) {
-        throw new FlutterError('A $runtimeType was used after being disposed.\n'
-            'Once you have called dispose() on a $runtimeType, it can no longer be used.');
+        throw FlutterError(
+          'A $runtimeType was used after being disposed.\n'
+          'Once you have called dispose() on a $runtimeType, it can no longer be used.'
+        );
       }
       return true;
     }());
     return true;
+  }
+
+  /// Whether any listeners are currently registered.
+  ///
+  /// Clients should not depend on this value for their behavior, because having
+  /// one listener's logic change when another listener happens to start or stop
+  /// listening will lead to extremely hard-to-track bugs. Subclasses might use
+  /// this information to determine whether to do any work when there are no
+  /// listeners, however; for example, resuming a [Stream] when a listener is
+  /// added and pausing it when a listener is removed.
+  ///
+  /// Typically this is used by overriding [addListener], checking if
+  /// [hasListeners] is false before calling `super.addListener()`, and if so,
+  /// starting whatever work is needed to determine when to call
+  /// [notifyListeners]; and similarly, by overriding [removeListener], checking
+  /// if [hasListeners] is false after calling `super.removeListener()`, and if
+  /// so, stopping that same work.
+  @protected
+  bool get hasListeners {
+    assert(_debugAssertNotDisposed());
+    return _listeners.isNotEmpty;
   }
 
   /// Register a closure to be called when the object changes.
@@ -131,22 +154,22 @@ class ChangeNotifier extends Listenable {
   void notifyListeners() {
     assert(_debugAssertNotDisposed());
     if (_listeners != null) {
-      final List<VoidCallback> localListeners =
-          new List<VoidCallback>.from(_listeners);
+      final List<VoidCallback> localListeners = List<VoidCallback>.from(_listeners);
       for (VoidCallback listener in localListeners) {
         try {
-          if (_listeners.contains(listener)) listener();
+          if (_listeners.contains(listener))
+            listener();
         } catch (exception, stack) {
-          FlutterError.reportError(new FlutterErrorDetails(
-              exception: exception,
-              stack: stack,
-              library: 'foundation library',
-              context: 'while dispatching notifications for $runtimeType',
-              informationCollector: (StringBuffer information) {
-                information
-                    .writeln('The $runtimeType sending notification was:');
-                information.write('  $this');
-              }));
+          FlutterError.reportError(FlutterErrorDetails(
+            exception: exception,
+            stack: stack,
+            library: 'foundation library',
+            context: 'while dispatching notifications for $runtimeType',
+            informationCollector: (StringBuffer information) {
+              information.writeln('The $runtimeType sending notification was:');
+              information.write('  $this');
+            }
+          ));
         }
       }
     }
@@ -155,14 +178,16 @@ class ChangeNotifier extends Listenable {
 
 class _MergingListenable extends ChangeNotifier {
   _MergingListenable(this._children) {
-    for (Listenable child in _children) child?.addListener(notifyListeners);
+    for (Listenable child in _children)
+      child?.addListener(notifyListeners);
   }
 
   final List<Listenable> _children;
 
   @override
   void dispose() {
-    for (Listenable child in _children) child?.removeListener(notifyListeners);
+    for (Listenable child in _children)
+      child?.removeListener(notifyListeners);
     super.dispose();
   }
 
@@ -185,9 +210,9 @@ class ValueNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   @override
   T get value => _value;
   T _value;
-
   set value(T newValue) {
-    if (_value == newValue) return;
+    if (_value == newValue)
+      return;
     _value = newValue;
     notifyListeners();
   }

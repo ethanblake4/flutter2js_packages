@@ -9,25 +9,7 @@ import 'framework.dart';
 import 'overscroll_indicator.dart';
 import 'scroll_physics.dart';
 
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-const Color _kDefaultGlowColor = const Color(0xFFFFFFFF);
+const Color _kDefaultGlowColor = Color(0xFFFFFFFF);
 
 /// Describes how [Scrollable] widgets should behave.
 ///
@@ -48,8 +30,7 @@ class ScrollBehavior {
   /// For example, on Android, this method wraps the given widget with a
   /// [GlowingOverscrollIndicator] to provide visual feedback when the user
   /// overscrolls.
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
+  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
     // When modifying this function, consider modifying the implementation in
     // _MaterialScrollBehavior as well.
     switch (getPlatform(context)) {
@@ -57,7 +38,7 @@ class ScrollBehavior {
         return child;
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
-        return new GlowingOverscrollIndicator(
+        return GlowingOverscrollIndicator(
           child: child,
           axisDirection: axisDirection,
           color: _kDefaultGlowColor,
@@ -100,7 +81,7 @@ class ScrollBehavior {
 /// Controls how [Scrollable] widgets behave in a subtree.
 ///
 /// The scroll configuration determines the [ScrollPhysics] and viewport
-/// decorations used by decendants of [child].
+/// decorations used by descendants of [child].
 class ScrollConfiguration extends InheritedWidget {
   /// Creates a widget that controls how [Scrollable] widgets behave in a subtree.
   ///
@@ -109,10 +90,9 @@ class ScrollConfiguration extends InheritedWidget {
     Key key,
     @required this.behavior,
     @required Widget child,
-  })
-      : super(key: key, child: child);
+  }) : super(key: key, child: child);
 
-  /// How [Scrollable] widgets that are decendants of [child] should behave.
+  /// How [Scrollable] widgets that are descendants of [child] should behave.
   final ScrollBehavior behavior;
 
   /// The [ScrollBehavior] for [Scrollable] widgets in the given [BuildContext].
@@ -120,23 +100,20 @@ class ScrollConfiguration extends InheritedWidget {
   /// If no [ScrollConfiguration] widget is in scope of the given `context`,
   /// a default [ScrollBehavior] instance is returned.
   static ScrollBehavior of(BuildContext context) {
-    final ScrollConfiguration configuration =
-        context.inheritFromWidgetOfExactType(ScrollConfiguration);
+    final ScrollConfiguration configuration = context.inheritFromWidgetOfExactType(ScrollConfiguration);
     return configuration?.behavior ?? const ScrollBehavior();
   }
 
   @override
   bool updateShouldNotify(ScrollConfiguration oldWidget) {
     assert(behavior != null);
-    return behavior.runtimeType != oldWidget.behavior.runtimeType ||
-        (behavior != oldWidget.behavior &&
-            behavior.shouldNotify(oldWidget.behavior));
+    return behavior.runtimeType != oldWidget.behavior.runtimeType
+        || (behavior != oldWidget.behavior && behavior.shouldNotify(oldWidget.behavior));
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description
-        .add(new DiagnosticsProperty<ScrollBehavior>('behavior', behavior));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ScrollBehavior>('behavior', behavior));
   }
 }

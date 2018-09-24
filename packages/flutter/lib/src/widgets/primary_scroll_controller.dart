@@ -18,14 +18,19 @@ import 'scroll_controller.dart';
 /// scroll-to-top gesture on iOS.
 class PrimaryScrollController extends InheritedWidget {
   /// Creates a widget that associates a [ScrollController] with a subtree.
-  const PrimaryScrollController(
-      {Key key, @required this.controller, @required Widget child})
-      : super(key: key, child: child);
+  const PrimaryScrollController({
+    Key key,
+    @required this.controller,
+    @required Widget child
+  }) : assert(controller != null),
+       super(key: key, child: child);
 
   /// Creates a subtree without an associated [ScrollController].
-  const PrimaryScrollController.none({Key key, @required Widget child})
-      : controller = null,
-        super(key: key, child: child);
+  const PrimaryScrollController.none({
+    Key key,
+    @required Widget child
+  }) : controller = null,
+       super(key: key, child: child);
 
   /// The [ScrollController] associated with the subtree.
   ///
@@ -41,20 +46,16 @@ class PrimaryScrollController extends InheritedWidget {
   /// Returns null if there is no [ScrollController] associated with the given
   /// context.
   static ScrollController of(BuildContext context) {
-    final PrimaryScrollController result =
-        context.inheritFromWidgetOfExactType(PrimaryScrollController);
+    final PrimaryScrollController result = context.inheritFromWidgetOfExactType(PrimaryScrollController);
     return result?.controller;
   }
 
   @override
-  bool updateShouldNotify(PrimaryScrollController old) =>
-      controller != old.controller;
+  bool updateShouldNotify(PrimaryScrollController oldWidget) => controller != oldWidget.controller;
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description.add(new DiagnosticsProperty<ScrollController>(
-        'controller', controller,
-        ifNull: 'no controller', showName: false));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ScrollController>('controller', controller, ifNull: 'no controller', showName: false));
   }
 }

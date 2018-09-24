@@ -5,8 +5,7 @@
 import 'events.dart';
 
 /// An object that can hit-test pointers.
-abstract class HitTestable {
-  // ignore: one_member_abstracts
+abstract class HitTestable { // ignore: one_member_abstracts
   // This class is intended to be used as an interface with the implements
   // keyword, and should not be extended directly.
   factory HitTestable._() => null;
@@ -19,8 +18,7 @@ abstract class HitTestable {
 }
 
 /// An object that can dispatch events.
-abstract class HitTestDispatcher {
-  // ignore: one_member_abstracts
+abstract class HitTestDispatcher { // ignore: one_member_abstracts
   // This class is intended to be used as an interface with the implements
   // keyword, and should not be extended directly.
   factory HitTestDispatcher._() => null;
@@ -30,8 +28,7 @@ abstract class HitTestDispatcher {
 }
 
 /// An object that can handle events.
-abstract class HitTestTarget {
-  // ignore: one_member_abstracts
+abstract class HitTestTarget { // ignore: one_member_abstracts
   // This class is intended to be used as an interface with the implements
   // keyword, and should not be extended directly.
   factory HitTestTarget._() => null;
@@ -61,14 +58,15 @@ class HitTestResult {
   ///
   /// If the [path] argument is null, the [path] field will be initialized with
   /// and empty list.
-  HitTestResult({List<HitTestEntry> path}) : _path = path ?? <HitTestEntry>[];
+  HitTestResult({ List<HitTestEntry> path })
+    : _path = path ?? <HitTestEntry>[];
 
   /// An unmodifiable list of [HitTestEntry] objects recorded during the hit test.
   ///
   /// The first entry in the path is the most specific, typically the one at
   /// the leaf of tree being hit tested. Event propagation starts with the most
   /// specific (i.e., first) entry and proceeds in order through the path.
-  List<HitTestEntry> get path => new List<HitTestEntry>.unmodifiable(_path);
+  List<HitTestEntry> get path => List<HitTestEntry>.unmodifiable(_path);
   final List<HitTestEntry> _path;
 
   /// Add a [HitTestEntry] to the path.
@@ -81,6 +79,5 @@ class HitTestResult {
   }
 
   @override
-  String toString() =>
-      'HitTestResult(${_path.isEmpty ? "<empty path>" : _path.join(", ")})';
+  String toString() => 'HitTestResult(${_path.isEmpty ? "<empty path>" : _path.join(", ")})';
 }

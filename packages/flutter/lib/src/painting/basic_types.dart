@@ -4,44 +4,46 @@
 
 import 'package:flutter/ui.dart' show TextDirection;
 
-export 'package:flutter/ui.dart'
-    show
-        BlendMode,
-        BlurStyle,
-        Canvas,
-        Color,
-        ColorFilter,
-        FilterQuality,
-        FontStyle,
-        FontWeight,
-        ImageShader,
-        MaskFilter,
-        Offset,
-        Paint,
-        PaintingStyle,
-        Path,
-        PathFillType,
-        Radius,
-        RRect,
-        RSTransform,
-        Rect,
-        Shader,
-        Size,
-        StrokeCap,
-        StrokeJoin,
-        TextAffinity,
-        TextAlign,
-        TextBaseline,
-        TextBox,
-        TextDecoration,
-        TextDecorationStyle,
-        TextDirection,
-        TextPosition,
-        TileMode,
-        VertexMode,
-        VoidCallback,
-        hashValues,
-        hashList;
+export 'package:flutter/ui.dart' show
+  BlendMode,
+  BlurStyle,
+  Canvas,
+  Clip,
+  Color,
+  ColorFilter,
+  FilterQuality,
+  FontStyle,
+  FontWeight,
+  ImageShader,
+  Locale,
+  MaskFilter,
+  Offset,
+  Paint,
+  PaintingStyle,
+  Path,
+  PathFillType,
+  PathOperation,
+  Radius,
+  RRect,
+  RSTransform,
+  Rect,
+  Shader,
+  Size,
+  StrokeCap,
+  StrokeJoin,
+  TextAffinity,
+  TextAlign,
+  TextBaseline,
+  TextBox,
+  TextDecoration,
+  TextDecorationStyle,
+  TextDirection,
+  TextPosition,
+  TileMode,
+  VertexMode,
+  VoidCallback,
+  hashValues,
+  hashList;
 
 // Intentionally not exported:
 //  - Image, instantiateImageCodec, decodeImageFromList:
@@ -255,7 +257,7 @@ AxisDirection flipAxisDirection(AxisDirection axisDirection) {
 /// along that axis in numerically decreasing order.
 ///
 /// Specifically, returns true for [AxisDirection.up] and [AxisDirection.left]
-/// and false for [AxisDirection.down] for [AxisDirection.right].
+/// and false for [AxisDirection.down] and [AxisDirection.right].
 bool axisDirectionIsReversed(AxisDirection axisDirection) {
   assert(axisDirection != null);
   switch (axisDirection) {

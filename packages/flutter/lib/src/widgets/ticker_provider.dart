@@ -19,8 +19,12 @@ class TickerMode extends InheritedWidget {
   /// Creates a widget that enables or disables tickers.
   ///
   /// The [enabled] argument must not be null.
-  const TickerMode({Key key, @required this.enabled, Widget child})
-      : super(key: key, child: child);
+  const TickerMode({
+    Key key,
+    @required this.enabled,
+    Widget child
+  }) : assert(enabled != null),
+       super(key: key, child: child);
 
   /// The current ticker mode of this subtree.
   ///
@@ -50,16 +54,12 @@ class TickerMode extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(TickerMode old) => enabled != old.enabled;
+  bool updateShouldNotify(TickerMode oldWidget) => enabled != oldWidget.enabled;
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description.add(new FlagProperty('mode',
-        value: enabled,
-        ifTrue: 'enabled',
-        ifFalse: 'disabled',
-        showName: true));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(FlagProperty('mode', value: enabled, ifTrue: 'enabled', ifFalse: 'disabled', showName: true));
   }
 }
 
@@ -73,22 +73,28 @@ class TickerMode extends InheritedWidget {
 /// This mixin only supports vending a single ticker. If you might have multiple
 /// [AnimationController] objects over the lifetime of the [State], use a full
 /// [TickerProviderStateMixin] instead.
-abstract class SingleTickerProviderStateMixin<T extends StatefulWidget>
-    extends State<T> implements TickerProvider {
+@optionalTypeArgs
+abstract class SingleTickerProviderStateMixin<T extends StatefulWidget> extends State<T> implements TickerProvider {
+  // This class is intended to be used as a mixin, and should not be
+  // extended directly.
+  factory SingleTickerProviderStateMixin._() => null;
+
   Ticker _ticker;
 
   @override
   Ticker createTicker(TickerCallback onTick) {
     assert(() {
-      if (_ticker == null) return true;
-      throw new FlutterError(
-          '$runtimeType is a SingleTickerProviderStateMixin but multiple tickers were created.\n'
-          'A SingleTickerProviderStateMixin can only be used as a TickerProvider once. If a '
-          'State is used for multiple AnimationController objects, or if it is passed to other '
-          'objects and those objects might use it more than one time in total, then instead of '
-          'mixing in a SingleTickerProviderStateMixin, use a regular TickerProviderStateMixin.');
+      if (_ticker == null)
+        return true;
+      throw FlutterError(
+        '$runtimeType is a SingleTickerProviderStateMixin but multiple tickers were created.\n'
+        'A SingleTickerProviderStateMixin can only be used as a TickerProvider once. If a '
+        'State is used for multiple AnimationController objects, or if it is passed to other '
+        'objects and those objects might use it more than one time in total, then instead of '
+        'mixing in a SingleTickerProviderStateMixin, use a regular TickerProviderStateMixin.'
+      );
     }());
-    _ticker = new Ticker(onTick, debugLabel: 'created by $this');
+    _ticker = Ticker(onTick, debugLabel: 'created by $this');
     // We assume that this is called from initState, build, or some sort of
     // event handler, and that thus TickerMode.of(context) would return true. We
     // can't actually check that here because if we're in initState then we're
@@ -99,28 +105,31 @@ abstract class SingleTickerProviderStateMixin<T extends StatefulWidget>
   @override
   void dispose() {
     assert(() {
-      if (_ticker == null || !_ticker.isActive) return true;
-      throw new FlutterError('$this was disposed with an active Ticker.\n'
-          '$runtimeType created a Ticker via its SingleTickerProviderStateMixin, but at the time '
-          'dispose() was called on the mixin, that Ticker was still active. The Ticker must '
-          'be disposed before calling super.dispose(). Tickers used by AnimationControllers '
-          'should be disposed by calling dispose() on the AnimationController itself. '
-          'Otherwise, the ticker will leak.\n'
-          'The offending ticker was: ${_ticker.toString(
-          debugIncludeStack: true)}');
+      if (_ticker == null || !_ticker.isActive)
+        return true;
+      throw FlutterError(
+        '$this was disposed with an active Ticker.\n'
+        '$runtimeType created a Ticker via its SingleTickerProviderStateMixin, but at the time '
+        'dispose() was called on the mixin, that Ticker was still active. The Ticker must '
+        'be disposed before calling super.dispose(). Tickers used by AnimationControllers '
+        'should be disposed by calling dispose() on the AnimationController itself. '
+        'Otherwise, the ticker will leak.\n'
+        'The offending ticker was: ${_ticker.toString(debugIncludeStack: true)}'
+      );
     }());
     super.dispose();
   }
 
   @override
   void didChangeDependencies() {
-    if (_ticker != null) _ticker.muted = !TickerMode.of(context);
+    if (_ticker != null)
+      _ticker.muted = !TickerMode.of(context);
     super.didChangeDependencies();
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
     String tickerDescription;
     if (_ticker != null) {
       if (_ticker.isActive && _ticker.muted)
@@ -132,10 +141,7 @@ abstract class SingleTickerProviderStateMixin<T extends StatefulWidget>
       else
         tickerDescription = 'inactive';
     }
-    description.add(new DiagnosticsProperty<Ticker>('ticker', _ticker,
-        description: tickerDescription,
-        showSeparator: false,
-        defaultValue: null));
+    properties.add(DiagnosticsProperty<Ticker>('ticker', _ticker, description: tickerDescription, showSeparator: false, defaultValue: null));
   }
 }
 
@@ -149,15 +155,18 @@ abstract class SingleTickerProviderStateMixin<T extends StatefulWidget>
 /// If you only have a single [Ticker] (for example only a single
 /// [AnimationController]) for the lifetime of your [State], then using a
 /// [SingleTickerProviderStateMixin] is more efficient. This is the common case.
-abstract class TickerProviderStateMixin<T extends StatefulWidget>
-    extends State<T> implements TickerProvider {
+@optionalTypeArgs
+abstract class TickerProviderStateMixin<T extends StatefulWidget> extends State<T> implements TickerProvider {
+  // This class is intended to be used as a mixin, and should not be
+  // extended directly.
+  factory TickerProviderStateMixin._() => null;
+
   Set<Ticker> _tickers;
 
   @override
   Ticker createTicker(TickerCallback onTick) {
-    _tickers ??= new Set<_WidgetTicker>();
-    final _WidgetTicker result =
-        new _WidgetTicker(onTick, this, debugLabel: 'created by $this');
+    _tickers ??= Set<_WidgetTicker>();
+    final _WidgetTicker result = _WidgetTicker(onTick, this, debugLabel: 'created by $this');
     _tickers.add(result);
     return result;
   }
@@ -174,14 +183,15 @@ abstract class TickerProviderStateMixin<T extends StatefulWidget>
       if (_tickers != null) {
         for (Ticker ticker in _tickers) {
           if (ticker.isActive) {
-            throw new FlutterError('$this was disposed with an active Ticker.\n'
-                '$runtimeType created a Ticker via its TickerProviderStateMixin, but at the time '
-                'dispose() was called on the mixin, that Ticker was still active. All Tickers must '
-                'be disposed before calling super.dispose(). Tickers used by AnimationControllers '
-                'should be disposed by calling dispose() on the AnimationController itself. '
-                'Otherwise, the ticker will leak.\n'
-                'The offending ticker was: ${ticker.toString(
-                debugIncludeStack: true)}');
+            throw FlutterError(
+              '$this was disposed with an active Ticker.\n'
+              '$runtimeType created a Ticker via its TickerProviderStateMixin, but at the time '
+              'dispose() was called on the mixin, that Ticker was still active. All Tickers must '
+              'be disposed before calling super.dispose(). Tickers used by AnimationControllers '
+              'should be disposed by calling dispose() on the AnimationController itself. '
+              'Otherwise, the ticker will leak.\n'
+              'The offending ticker was: ${ticker.toString(debugIncludeStack: true)}'
+            );
           }
         }
       }
@@ -194,22 +204,22 @@ abstract class TickerProviderStateMixin<T extends StatefulWidget>
   void didChangeDependencies() {
     final bool muted = !TickerMode.of(context);
     if (_tickers != null) {
-      for (Ticker ticker in _tickers) ticker.muted = muted;
+      for (Ticker ticker in _tickers) {
+        ticker.muted = muted;
+      }
     }
     super.didChangeDependencies();
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
-    description.add(new DiagnosticsProperty<Set<Ticker>>(
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<Set<Ticker>>(
       'tickers',
       _tickers,
-      description: _tickers != null
-          ? 'tracking ${_tickers.length} ticker${_tickers.length == 1
-          ? ""
-          : "s"}'
-          : null,
+      description: _tickers != null ?
+        'tracking ${_tickers.length} ticker${_tickers.length == 1 ? "" : "s"}' :
+        null,
       defaultValue: null,
     ));
   }
@@ -220,8 +230,7 @@ abstract class TickerProviderStateMixin<T extends StatefulWidget>
 // confusing. Instead we use the less precise but more anodyne "_WidgetTicker",
 // which attracts less attention.
 class _WidgetTicker extends Ticker {
-  _WidgetTicker(TickerCallback onTick, this._creator, {String debugLabel})
-      : super(onTick, debugLabel: debugLabel);
+  _WidgetTicker(TickerCallback onTick, this._creator, { String debugLabel }) : super(onTick, debugLabel: debugLabel);
 
   final TickerProviderStateMixin _creator;
 

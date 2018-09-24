@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/ui.dart' show Offset;
+
+import 'package:flutter/foundation.dart';
 
 import 'velocity_tracker.dart';
 
@@ -19,9 +20,8 @@ class DragDownDetails {
   /// Creates details for a [GestureDragDownCallback].
   ///
   /// The [globalPosition] argument must not be null.
-  DragDownDetails({this.globalPosition: Offset.zero}) {
-    assert(globalPosition != null);
-  }
+  DragDownDetails({ this.globalPosition = Offset.zero })
+    : assert(globalPosition != null);
 
   /// The global position at which the pointer contacted the screen.
   ///
@@ -38,7 +38,7 @@ class DragDownDetails {
 /// The `details` object provides the position of the touch.
 ///
 /// See [DragGestureRecognizer.onDown].
-typedef void GestureDragDownCallback(DragDownDetails details);
+typedef GestureDragDownCallback = void Function(DragDownDetails details);
 
 /// Details object for callbacks that use [GestureDragStartCallback].
 ///
@@ -52,9 +52,8 @@ class DragStartDetails {
   /// Creates details for a [GestureDragStartCallback].
   ///
   /// The [globalPosition] argument must not be null.
-  DragStartDetails({this.sourceTimeStamp, this.globalPosition: Offset.zero}) {
-    assert(globalPosition != null);
-  }
+  DragStartDetails({ this.sourceTimeStamp, this.globalPosition = Offset.zero })
+    : assert(globalPosition != null);
 
   /// Recorded timestamp of the source pointer event that triggered the drag
   /// event.
@@ -81,7 +80,7 @@ class DragStartDetails {
 /// touched the surface.
 ///
 /// See [DragGestureRecognizer.onStart].
-typedef void GestureDragStartCallback(DragStartDetails details);
+typedef GestureDragStartCallback = void Function(DragStartDetails details);
 
 /// Details object for callbacks that use [GestureDragUpdateCallback].
 ///
@@ -100,16 +99,15 @@ class DragUpdateDetails {
   /// coordinates of [delta] and the other coordinate must be zero.
   ///
   /// The [globalPosition] argument must be provided and must not be null.
-  DragUpdateDetails(
-      {this.sourceTimeStamp,
-      this.delta: Offset.zero,
-      this.primaryDelta,
-      @required this.globalPosition}) {
-    assert(delta != null);
-    assert(primaryDelta == null ||
-        (primaryDelta == delta.dx && delta.dy == 0.0) ||
-        (primaryDelta == delta.dy && delta.dx == 0.0));
-  }
+  DragUpdateDetails({
+    this.sourceTimeStamp,
+    this.delta = Offset.zero,
+    this.primaryDelta,
+    @required this.globalPosition
+  }) : assert(delta != null),
+       assert(primaryDelta == null
+           || (primaryDelta == delta.dx && delta.dy == 0.0)
+           || (primaryDelta == delta.dy && delta.dx == 0.0));
 
   /// Recorded timestamp of the source pointer event that triggered the drag
   /// event.
@@ -152,7 +150,7 @@ class DragUpdateDetails {
 /// has travelled since the last update.
 ///
 /// See [DragGestureRecognizer.onUpdate].
-typedef void GestureDragUpdateCallback(DragUpdateDetails details);
+typedef GestureDragUpdateCallback = void Function(DragUpdateDetails details);
 
 /// Details object for callbacks that use [GestureDragEndCallback].
 ///
@@ -167,14 +165,12 @@ class DragEndDetails {
   ///
   /// The [velocity] argument must not be null.
   DragEndDetails({
-    this.velocity: Velocity.zero,
+    this.velocity = Velocity.zero,
     this.primaryVelocity,
-  }) {
-    assert(velocity != null);
-    assert(primaryVelocity == null ||
-        primaryVelocity == velocity.pixelsPerSecond.dx ||
-        primaryVelocity == velocity.pixelsPerSecond.dy);
-  }
+  }) : assert(velocity != null),
+       assert(primaryVelocity == null
+           || primaryVelocity == velocity.pixelsPerSecond.dx
+           || primaryVelocity == velocity.pixelsPerSecond.dy);
 
   /// The velocity the pointer was moving when it stopped contacting the screen.
   ///

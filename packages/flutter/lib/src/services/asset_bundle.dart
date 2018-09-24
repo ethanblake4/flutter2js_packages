@@ -4,12 +4,11 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
-import 'http_client.dart';
 import 'platform_messages.dart';
 
 /// A collection of resources used by the application.
@@ -64,7 +63,21 @@ abstract class AssetBundle {
   /// caller is going to be doing its own caching. (It might not be cached if
   /// it's set to true either, that depends on the asset bundle
   /// implementation.)
-  Future<String> loadString(String key, {bool cache: true});
+  Future<String> loadString(String key, { bool cache = true }) async {
+    final ByteData data = await load(key);
+    if (data == null)
+      throw FlutterError('Unable to load asset: $key');
+    if (data.lengthInBytes < 10 * 1024) {
+      // 10KB takes about 3ms to parse on a Pixel 2 XL.
+      // See: https://github.com/dart-lang/sdk/issues/31954
+      return utf8.decode(data.buffer.asUint8List());
+    }
+    return compute(_utf8decode, data, debugLabel: 'UTF8 decode for "$key"');
+  }
+
+  static String _utf8decode(ByteData data) {
+    return utf8.decode(data.buffer.asUint8List());
+  }
 
   /// Retrieve a string from the asset bundle, parse it with the given function,
   /// and return the function's result.
@@ -76,7 +89,7 @@ abstract class AssetBundle {
   /// If this is a caching asset bundle, and the given key describes a cached
   /// asset, then evict the asset from the cache so that the next time it is
   /// loaded, the cache will be reread from the asset bundle.
-  void evict(String key) {}
+  void evict(String key) { }
 
   @override
   String toString() => '${describeIdentity(this)}()';
@@ -90,29 +103,25 @@ class NetworkAssetBundle extends AssetBundle {
   /// Creates an network asset bundle that resolves asset keys as URLs relative
   /// to the given base URL.
   NetworkAssetBundle(Uri baseUrl)
-      : _baseUrl = baseUrl,
-        _httpClient = createHttpClient();
+    : _baseUrl = baseUrl,
+      _httpClient = HttpClient();
 
   final Uri _baseUrl;
-  final http.Client _httpClient;
+  final HttpClient _httpClient;
 
-  String _urlFromKey(String key) => _baseUrl.resolve(key).toString();
+  Uri _urlFromKey(String key) => _baseUrl.resolve(key);
 
   @override
   Future<ByteData> load(String key) async {
-    final http.Response response = await _httpClient.get(_urlFromKey(key));
-    if (response.statusCode != 200)
-      throw new FlutterError('Unable to load asset: $key');
-    return response.bodyBytes.buffer.asByteData();
-  }
-
-  @override
-  Future<String> loadString(String key, {bool cache: true}) async {
-    final http.Response response = await _httpClient.get(_urlFromKey(key));
-    if (response.statusCode != 200)
-      throw new FlutterError('Unable to load asset: $key\n'
-          'HTTP status code: ${response.statusCode}');
-    return response.body;
+    final HttpClientRequest request = await _httpClient.getUrl(_urlFromKey(key));
+    final HttpClientResponse response = await request.close();
+    if (response.statusCode != HttpStatus.ok)
+      throw FlutterError(
+        'Unable to load asset: $key\n'
+        'HTTP status code: ${response.statusCode}'
+      );
+    final Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+    return bytes.buffer.asByteData();
   }
 
   /// Retrieve a string from the asset bundle, parse it with the given function,
@@ -121,8 +130,7 @@ class NetworkAssetBundle extends AssetBundle {
   /// The result is not cached. The parser is run each time the resource is
   /// fetched.
   @override
-  Future<T> loadStructuredData<T>(
-      String key, Future<T> parser(String value)) async {
+  Future<T> loadStructuredData<T>(String key, Future<T> parser(String value)) async {
     assert(key != null);
     assert(parser != null);
     return parser(await loadString(key));
@@ -146,19 +154,13 @@ class NetworkAssetBundle extends AssetBundle {
 abstract class CachingAssetBundle extends AssetBundle {
   // TODO(ianh): Replace this with an intelligent cache, see https://github.com/flutter/flutter/issues/3568
   final Map<String, Future<String>> _stringCache = <String, Future<String>>{};
-  final Map<String, Future<dynamic>> _structuredDataCache =
-      <String, Future<dynamic>>{};
+  final Map<String, Future<dynamic>> _structuredDataCache = <String, Future<dynamic>>{};
 
   @override
-  Future<String> loadString(String key, {bool cache: true}) {
-    if (cache) return _stringCache.putIfAbsent(key, () => _fetchString(key));
-    return _fetchString(key);
-  }
-
-  Future<String> _fetchString(String key) async {
-    final ByteData data = await load(key);
-    if (data == null) throw new FlutterError('Unable to load asset: $key');
-    return utf8.decode(data.buffer.asUint8List());
+  Future<String> loadString(String key, { bool cache = true }) {
+    if (cache)
+      return _stringCache.putIfAbsent(key, () => super.loadString(key));
+    return super.loadString(key);
   }
 
   /// Retrieve a string from the asset bundle, parse it with the given function,
@@ -175,11 +177,12 @@ abstract class CachingAssetBundle extends AssetBundle {
   Future<T> loadStructuredData<T>(String key, Future<T> parser(String value)) {
     assert(key != null);
     assert(parser != null);
-    if (_structuredDataCache.containsKey(key)) return _structuredDataCache[key];
+    if (_structuredDataCache.containsKey(key))
+      return _structuredDataCache[key];
     Completer<T> completer;
     Future<T> result;
-    loadString(key, cache: false).then<T>(parser).then<Null>((T value) {
-      result = new SynchronousFuture<T>(value);
+    loadString(key, cache: false).then<T>(parser).then<void>((T value) {
+      result = SynchronousFuture<T>(value);
       _structuredDataCache[key] = result;
       if (completer != null) {
         // We already returned from the loadStructuredData function, which means
@@ -195,7 +198,7 @@ abstract class CachingAssetBundle extends AssetBundle {
     }
     // The code above hasn't yet run its "then" handler yet. Let's prepare a
     // completer for it to use when it does run.
-    completer = new Completer<T>();
+    completer = Completer<T>();
     _structuredDataCache[key] = completer.future;
     return completer.future;
   }
@@ -211,16 +214,17 @@ abstract class CachingAssetBundle extends AssetBundle {
 class PlatformAssetBundle extends CachingAssetBundle {
   @override
   Future<ByteData> load(String key) async {
-    final Uint8List encoded = utf8.encoder.convert(key);
-    final ByteData asset = await BinaryMessages.send(
-        'flutter/assets', encoded.buffer.asByteData());
-    if (asset == null) throw new FlutterError('Unable to load asset: $key');
+    final Uint8List encoded = utf8.encoder.convert(Uri(path: Uri.encodeFull(key)).path);
+    final ByteData asset =
+        await BinaryMessages.send('flutter/assets', encoded.buffer.asByteData());
+    if (asset == null)
+      throw FlutterError('Unable to load asset: $key');
     return asset;
   }
 }
 
 AssetBundle _initRootBundle() {
-  return new PlatformAssetBundle();
+  return PlatformAssetBundle();
 }
 
 /// The [AssetBundle] from which this application was loaded.

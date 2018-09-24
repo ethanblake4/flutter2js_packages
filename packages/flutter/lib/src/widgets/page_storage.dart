@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
-
 import 'framework.dart';
 
 /// A [ValueKey] that defines where [PageStorage] values will be saved.
@@ -20,14 +18,14 @@ import 'framework.dart';
 ///
 /// For example, to ensure that the scroll offsets for the scrollable within
 /// each `MyScrollableTabView` below are restored when the [TabBarView]
-/// is recreated, we've specified [PageStorageKey]s whose values are the the
+/// is recreated, we've specified [PageStorageKey]s whose values are the
 /// tabs' string labels.
 ///
 /// ```dart
-/// new TabBarView(
+/// TabBarView(
 ///   children: myTabs.map((Tab tab) {
-///     new MyScrollableTabView(
-///       key: new PageStorageKey<String>(tab.text), // like 'Tab 1'
+///     MyScrollableTabView(
+///       key: PageStorageKey<String>(tab.text), // like 'Tab 1'
 ///       tab: tab,
 ///    ),
 ///  }),
@@ -39,9 +37,8 @@ class PageStorageKey<T> extends ValueKey<T> {
 }
 
 class _StorageEntryIdentifier {
-  _StorageEntryIdentifier(this.keys) {
-    assert(keys != null);
-  }
+  _StorageEntryIdentifier(this.keys)
+    : assert(keys != null);
 
   final List<PageStorageKey<dynamic>> keys;
 
@@ -49,10 +46,12 @@ class _StorageEntryIdentifier {
 
   @override
   bool operator ==(dynamic other) {
-    if (other.runtimeType != runtimeType) return false;
+    if (other.runtimeType != runtimeType)
+      return false;
     final _StorageEntryIdentifier typedOther = other;
     for (int index = 0; index < keys.length; index += 1) {
-      if (keys[index] != typedOther.keys[index]) return false;
+      if (keys[index] != typedOther.keys[index])
+        return false;
     }
     return true;
   }
@@ -71,11 +70,11 @@ class _StorageEntryIdentifier {
 /// Useful for storing per-page state that persists across navigations from one
 /// page to another.
 class PageStorageBucket {
-  static bool _maybeAddKey(
-      BuildContext context, List<PageStorageKey<dynamic>> keys) {
+  static bool _maybeAddKey(BuildContext context, List<PageStorageKey<dynamic>> keys) {
     final Widget widget = context.widget;
     final Key key = widget.key;
-    if (key is PageStorageKey) keys.add(key);
+    if (key is PageStorageKey)
+      keys.add(key);
     return widget is! PageStorage;
   }
 
@@ -90,7 +89,7 @@ class PageStorageBucket {
   }
 
   _StorageEntryIdentifier _computeIdentifier(BuildContext context) {
-    return new _StorageEntryIdentifier(_allKeys(context));
+    return _StorageEntryIdentifier(_allKeys(context));
   }
 
   Map<Object, dynamic> _storage;
@@ -103,14 +102,14 @@ class PageStorageBucket {
   ///
   /// If an explicit identifier is not provided and no [PageStorageKey]s
   /// are found, then the `data` is not saved.
-  void writeState(BuildContext context, dynamic data, {Object identifier}) {
+  void writeState(BuildContext context, dynamic data, { Object identifier }) {
     _storage ??= <Object, dynamic>{};
     if (identifier != null) {
       _storage[identifier] = data;
     } else {
-      final _StorageEntryIdentifier contextIdentifier =
-          _computeIdentifier(context);
-      if (contextIdentifier.isNotEmpty) _storage[contextIdentifier] = data;
+      final _StorageEntryIdentifier contextIdentifier = _computeIdentifier(context);
+      if (contextIdentifier.isNotEmpty)
+        _storage[contextIdentifier] = data;
     }
   }
 
@@ -122,11 +121,12 @@ class PageStorageBucket {
   ///
   /// If an explicit identifier is not provided and no [PageStorageKey]s
   /// are found, then null is returned.
-  dynamic readState(BuildContext context, {Object identifier}) {
-    if (_storage == null) return null;
-    if (identifier != null) return _storage[identifier];
-    final _StorageEntryIdentifier contextIdentifier =
-        _computeIdentifier(context);
+  dynamic readState(BuildContext context, { Object identifier }) {
+    if (_storage == null)
+      return null;
+    if (identifier != null)
+      return _storage[identifier];
+    final _StorageEntryIdentifier contextIdentifier = _computeIdentifier(context);
     return contextIdentifier.isNotEmpty ? _storage[contextIdentifier] : null;
   }
 }
@@ -136,10 +136,16 @@ class PageStorage extends StatelessWidget {
   /// Creates a widget that provides a storage bucket for its descendants.
   ///
   /// The [bucket] argument must not be null.
-  const PageStorage({Key key, @required this.bucket, @required this.child})
-      : super(key: key);
+  const PageStorage({
+    Key key,
+    @required this.bucket,
+    @required this.child
+  }) : assert(bucket != null),
+       super(key: key);
 
   /// The widget below this widget in the tree.
+  ///
+  /// {@macro flutter.widgets.child}
   final Widget child;
 
   /// The page storage bucket to use for this subtree.

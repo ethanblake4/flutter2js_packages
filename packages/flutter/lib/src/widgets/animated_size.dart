@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -18,12 +17,11 @@ class AnimatedSize extends SingleChildRenderObjectWidget {
   const AnimatedSize({
     Key key,
     Widget child,
-    this.alignment: Alignment.center,
-    this.curve: Curves.linear,
+    this.alignment = Alignment.center,
+    this.curve = Curves.linear,
     @required this.duration,
     @required this.vsync,
-  })
-      : super(key: key, child: child);
+  }) : super(key: key, child: child);
 
   /// The alignment of the child within the parent when the parent is not yet
   /// the same size as the child.
@@ -59,7 +57,7 @@ class AnimatedSize extends SingleChildRenderObjectWidget {
 
   @override
   RenderAnimatedSize createRenderObject(BuildContext context) {
-    return new RenderAnimatedSize(
+    return RenderAnimatedSize(
       alignment: alignment,
       duration: duration,
       curve: curve,
@@ -69,8 +67,7 @@ class AnimatedSize extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, RenderAnimatedSize renderObject) {
+  void updateRenderObject(BuildContext context, RenderAnimatedSize renderObject) {
     renderObject
       ..alignment = alignment
       ..duration = duration

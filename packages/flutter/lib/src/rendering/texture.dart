@@ -36,12 +36,11 @@ import 'object.dart';
 ///   for how to create and manage backend textures on iOS.
 class TextureBox extends RenderBox {
   /// Creates a box backed by the texture identified by [textureId].
-  TextureBox({@required int textureId}) : _textureId = textureId;
+  TextureBox({ @required int textureId }) : assert(textureId != null), _textureId = textureId;
 
   /// The identity of the backend texture.
   int get textureId => _textureId;
   int _textureId;
-
   set textureId(int value) {
     assert(value != null);
     if (value != _textureId) {
@@ -71,9 +70,10 @@ class TextureBox extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    if (_textureId == null) return;
-    context.addLayer(new TextureLayer(
-      rect: new Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height),
+    if (_textureId == null)
+      return;
+    context.addLayer(TextureLayer(
+      rect: Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height),
       textureId: _textureId,
     ));
   }

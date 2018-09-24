@@ -3,14 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:developer' show Timeline;
+import 'dart:developer' show Timeline, Flow;
 import 'dart:isolate';
 
 import 'package:meta/meta.dart';
 
 import 'profile.dart';
-
-var flowId = 0;
 
 /// Signature for the callback passed to [compute].
 ///
@@ -20,7 +18,7 @@ var flowId = 0;
 /// of classes, not closures or instance methods of objects.
 ///
 /// {@macro flutter.foundation.compute.limitations}
-typedef R ComputeCallback<Q, R>(Q message);
+typedef ComputeCallback<Q, R> = R Function(Q message);
 
 /// Spawn an isolate, run `callback` on that isolate, passing it `message`, and
 /// (eventually) return the value returned by `callback`.
@@ -46,28 +44,26 @@ typedef R ComputeCallback<Q, R>(Q message);
 ///
 /// The `debugLabel` argument can be specified to provide a name to add to the
 /// [Timeline]. This is useful when profiling an application.
-Future<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message,
-    {String debugLabel}) async {
-  profile(() {
-    debugLabel ??= callback.toString();
-  });
-  Timeline.startSync('$debugLabel: start');
-  final ReceivePort resultPort = new ReceivePort();
+Future<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, { String debugLabel }) async {
+  profile(() { debugLabel ??= callback.toString(); });
+  final Flow flow = Flow.begin();
+  Timeline.startSync('$debugLabel: start', flow: flow);
+  final ReceivePort resultPort = ReceivePort();
   Timeline.finishSync();
   final Isolate isolate = await Isolate.spawn(
     _spawn,
-    new _IsolateConfiguration<Q, R>(
+    _IsolateConfiguration<Q, R>(
       callback,
       message,
       resultPort.sendPort,
       debugLabel,
-      flowId++,
+      flow.id,
     ),
     errorsAreFatal: true,
     onExit: resultPort.sendPort,
   );
   final R result = await resultPort.first;
-  Timeline.startSync('$debugLabel: end');
+  Timeline.startSync('$debugLabel: end', flow: Flow.end(flow.id));
   resultPort.close();
   isolate.kill();
   Timeline.finishSync();
@@ -83,12 +79,13 @@ class _IsolateConfiguration<Q, R> {
     this.debugLabel,
     this.flowId,
   );
-
   final ComputeCallback<Q, R> callback;
   final Q message;
   final SendPort resultPort;
   final String debugLabel;
   final int flowId;
+
+  R apply() => callback(message);
 }
 
 void _spawn<Q, R>(_IsolateConfiguration<Q, R> configuration) {
@@ -96,13 +93,13 @@ void _spawn<Q, R>(_IsolateConfiguration<Q, R> configuration) {
   Timeline.timeSync(
     '${configuration.debugLabel}',
     () {
-      result = configuration.callback(configuration.message);
+      result = configuration.apply();
     },
+    flow: Flow.step(configuration.flowId),
   );
   Timeline.timeSync(
     '${configuration.debugLabel}: returning result',
-    () {
-      configuration.resultPort.send(result);
-    },
+    () { configuration.resultPort.send(result); },
+    flow: Flow.step(configuration.flowId),
   );
 }

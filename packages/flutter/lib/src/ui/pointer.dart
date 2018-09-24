@@ -1,3 +1,7 @@
+// Copyright 2015 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 part of dart.ui;
 
 /// How the pointer has changed since the last report.
@@ -45,31 +49,35 @@ enum PointerDeviceKind {
 
   /// A pointer device with a stylus that has been inverted.
   invertedStylus,
+
+  /// An unknown pointer device.
+  unknown
 }
 
 /// Information about the state of a pointer.
 class PointerData {
   /// Creates an object that represents the state of a pointer.
-  const PointerData(
-      {this.timeStamp: Duration.zero,
-      this.change: PointerChange.cancel,
-      this.kind: PointerDeviceKind.touch,
-      this.device: 0,
-      this.physicalX: 0.0,
-      this.physicalY: 0.0,
-      this.buttons: 0,
-      this.obscured: false,
-      this.pressure: 0.0,
-      this.pressureMin: 0.0,
-      this.pressureMax: 0.0,
-      this.distance: 0.0,
-      this.distanceMax: 0.0,
-      this.radiusMajor: 0.0,
-      this.radiusMinor: 0.0,
-      this.radiusMin: 0.0,
-      this.radiusMax: 0.0,
-      this.orientation: 0.0,
-      this.tilt: 0.0});
+  const PointerData({
+    this.timeStamp: Duration.zero,
+    this.change: PointerChange.cancel,
+    this.kind: PointerDeviceKind.touch,
+    this.device: 0,
+    this.physicalX: 0.0,
+    this.physicalY: 0.0,
+    this.buttons: 0,
+    this.obscured: false,
+    this.pressure: 0.0,
+    this.pressureMin: 0.0,
+    this.pressureMax: 0.0,
+    this.distance: 0.0,
+    this.distanceMax: 0.0,
+    this.radiusMajor: 0.0,
+    this.radiusMinor: 0.0,
+    this.radiusMin: 0.0,
+    this.radiusMax: 0.0,
+    this.orientation: 0.0,
+    this.tilt: 0.0
+  });
 
   /// Time of event dispatch, relative to an arbitrary timeline.
   final Duration timeStamp;
@@ -213,7 +221,7 @@ class PointerData {
 /// A sequence of reports about the state of pointers.
 class PointerDataPacket {
   /// Creates a packet of pointer data reports.
-  const PointerDataPacket({this.data: const <PointerData>[]});
+  const PointerDataPacket({ this.data: const <PointerData>[] });
 
   /// Data about the individual pointers in this packet.
   ///

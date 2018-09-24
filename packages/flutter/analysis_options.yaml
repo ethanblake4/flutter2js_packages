@@ -1,5 +1,7 @@
 analyzer:
   strong-mode: true
+  language:
+    enableSuperMixins: true
 #   exclude:
 #     - path/to/excluded/files/**
 

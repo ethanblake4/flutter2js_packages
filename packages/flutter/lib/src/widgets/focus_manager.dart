@@ -74,7 +74,8 @@ class FocusNode extends ChangeNotifier {
   ///
   /// Returns whether this function successfully consumes a keyboard token.
   bool consumeKeyboardToken() {
-    if (!_hasKeyboardToken) return false;
+    if (!_hasKeyboardToken)
+      return false;
     _hasKeyboardToken = false;
     return true;
   }
@@ -103,8 +104,7 @@ class FocusNode extends ChangeNotifier {
   }
 
   @override
-  String toString() =>
-      '${describeIdentity(this)}${hasFocus ? '(FOCUSED)' : ''}';
+  String toString() => '${describeIdentity(this)}${hasFocus ? '(FOCUSED)' : ''}';
 }
 
 /// An interior node in the focus tree.
@@ -154,13 +154,15 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
     assert(child._previousSibling == null);
     assert(() {
       FocusScopeNode node = this;
-      while (node._parent != null) node = node._parent;
+      while (node._parent != null)
+        node = node._parent;
       assert(node != child); // indicates we are about to create a cycle
       return true;
     }());
     child._parent = this;
     child._nextSibling = _firstChild;
-    if (_firstChild != null) _firstChild._previousSibling = child;
+    if (_firstChild != null)
+      _firstChild._previousSibling = child;
     _firstChild = child;
     _lastChild ??= child;
     child._updateManager(_manager);
@@ -168,12 +170,14 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
 
   void _updateManager(FocusManager manager) {
     void update(FocusScopeNode child) {
-      if (child._manager == manager) return;
+      if (child._manager == manager)
+        return;
       child._manager = manager;
       // We don't proactively null out the manager for FocusNodes because the
       // manager holds the currently active focus node until the end of the
       // microtask, even if that node is detached from the focus tree.
-      if (manager != null) child._focus?._manager = manager;
+      if (manager != null)
+        child._focus?._manager = manager;
       child._visitChildren(update);
     }
 
@@ -188,8 +192,7 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
     }
   }
 
-  bool _debugUltimatePreviousSiblingOf(FocusScopeNode child,
-      {FocusScopeNode equals}) {
+  bool _debugUltimatePreviousSiblingOf(FocusScopeNode child, { FocusScopeNode equals }) {
     while (child._previousSibling != null) {
       assert(child._previousSibling != child);
       child = child._previousSibling;
@@ -197,8 +200,7 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
     return child == equals;
   }
 
-  bool _debugUltimateNextSiblingOf(FocusScopeNode child,
-      {FocusScopeNode equals}) {
+  bool _debugUltimateNextSiblingOf(FocusScopeNode child, { FocusScopeNode equals }) {
     while (child._nextSibling != null) {
       assert(child._nextSibling != child);
       child = child._nextSibling;
@@ -230,7 +232,8 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   }
 
   void _didChangeFocusChain() {
-    if (isFirstFocus) _manager?._markNeedsUpdate();
+    if (isFirstFocus)
+      _manager?._markNeedsUpdate();
   }
 
   /// Requests that the given node becomes the focus for this scope.
@@ -243,7 +246,8 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// has received the overall focus in a microtask.
   void requestFocus(FocusNode node) {
     assert(node != null);
-    if (_focus == node) return;
+    if (_focus == node)
+      return;
     _focus?.unfocus();
     node._hasKeyboardToken = true;
     _setFocus(node);
@@ -272,10 +276,12 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// in the tree to another location that has a different focus scope.
   void reparentIfNeeded(FocusNode node) {
     assert(node != null);
-    if (node._parent == null || node._parent == this) return;
+    if (node._parent == null || node._parent == this)
+      return;
     node.unfocus();
     assert(node._parent == null);
-    if (_focus == null) _setFocus(node);
+    if (_focus == null)
+      _setFocus(node);
   }
 
   void _setFocus(FocusNode node) {
@@ -291,7 +297,8 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
 
   void _resignFocus(FocusNode node) {
     assert(node != null);
-    if (_focus != node) return;
+    if (_focus != node)
+      return;
     _focus._parent = null;
     _focus._manager = null;
     _focus = null;
@@ -306,7 +313,8 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   void setFirstFocus(FocusScopeNode child) {
     assert(child != null);
     assert(child._parent == null || child._parent == this);
-    if (_firstChild == child) return;
+    if (_firstChild == child)
+      return;
     child.detach();
     _prepend(child);
     assert(child._parent == this);
@@ -324,7 +332,8 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// is simply detached from its old parent.
   void reparentScopeIfNeeded(FocusScopeNode child) {
     assert(child != null);
-    if (child._parent == null || child._parent == this) return;
+    if (child._parent == null || child._parent == this)
+      return;
     if (child.isFirstFocus)
       setFirstFocus(child);
     else
@@ -345,10 +354,10 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
     if (_focus != null)
-      description.add(new DiagnosticsProperty<FocusNode>('focus', _focus));
+      properties.add(DiagnosticsProperty<FocusNode>('focus', _focus));
   }
 
   @override
@@ -358,8 +367,9 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
       FocusScopeNode child = _firstChild;
       int count = 1;
       while (true) {
-        children.add(child.toDiagnosticsNode(name: "child $count"));
-        if (child == _lastChild) break;
+        children.add(child.toDiagnosticsNode(name: 'child $count'));
+        if (child == _lastChild)
+          break;
         child = child._nextSibling;
         count += 1;
       }
@@ -404,33 +414,36 @@ class FocusManager {
   ///
   /// This field is rarely used direction. Instead, to find the
   /// [FocusScopeNode] for a given [BuildContext], use [FocusScope.of].
-  final FocusScopeNode rootScope = new FocusScopeNode();
+  final FocusScopeNode rootScope = FocusScopeNode();
 
   FocusNode _currentFocus;
 
   void _willDisposeFocusNode(FocusNode node) {
     assert(node != null);
-    if (_currentFocus == node) _currentFocus = null;
+    if (_currentFocus == node)
+      _currentFocus = null;
   }
 
   bool _haveScheduledUpdate = false;
-
   void _markNeedsUpdate() {
-    if (_haveScheduledUpdate) return;
+    if (_haveScheduledUpdate)
+      return;
     _haveScheduledUpdate = true;
     scheduleMicrotask(_update);
   }
 
   FocusNode _findNextFocus() {
     FocusScopeNode scope = rootScope;
-    while (scope._firstChild != null) scope = scope._firstChild;
+    while (scope._firstChild != null)
+      scope = scope._firstChild;
     return scope._focus;
   }
 
   void _update() {
     _haveScheduledUpdate = false;
     final FocusNode nextFocus = _findNextFocus();
-    if (_currentFocus == nextFocus) return;
+    if (_currentFocus == nextFocus)
+      return;
     final FocusNode previousFocus = _currentFocus;
     _currentFocus = nextFocus;
     previousFocus?._notify();
@@ -440,10 +453,9 @@ class FocusManager {
   @override
   String toString() {
     final String status = _haveScheduledUpdate ? ' UPDATE SCHEDULED' : '';
-    final String indent = '  ';
+    const String indent = '  ';
     return '${describeIdentity(this)}$status\n'
-        '${indent}currentFocus: $_currentFocus\n'
-        '${rootScope.toStringDeep(
-        prefixLineOne: indent, prefixOtherLines: indent)}';
+      '${indent}currentFocus: $_currentFocus\n'
+      '${rootScope.toStringDeep(prefixLineOne: indent, prefixOtherLines: indent)}';
   }
 }

@@ -4,7 +4,6 @@
 
 import 'package:flutter/rendering.dart';
 
-import 'basic.dart';
 import 'framework.dart';
 
 /// Displays performance statistics.
@@ -21,7 +20,7 @@ import 'framework.dart';
 /// The simplest way to show the performance overlay is to set
 /// [MaterialApp.showPerformanceOverlay] or [WidgetsApp.showPerformanceOverlay]
 /// to true.
-class PerformanceOverlay extends StatelessWidget {
+class PerformanceOverlay extends LeafRenderObjectWidget {
   // TODO(abarth): We should have a page on the web site with a screenshot and
   // an explanation of all the various readouts.
 
@@ -30,25 +29,23 @@ class PerformanceOverlay extends StatelessWidget {
   /// [PerformanceOverlayOption] to enable.
   const PerformanceOverlay({
     Key key,
-    this.optionsMask: 0,
-    this.rasterizerThreshold: 0,
-    this.checkerboardRasterCacheImages: false,
-    this.checkerboardOffscreenLayers: false,
-  })
-      : super(key: key);
+    this.optionsMask = 0,
+    this.rasterizerThreshold = 0,
+    this.checkerboardRasterCacheImages = false,
+    this.checkerboardOffscreenLayers = false,
+  }) : super(key: key);
 
   /// Create a performance overlay that displays all available statistics
-  PerformanceOverlay.allEnabled(
-      {Key key,
-      this.rasterizerThreshold: 0,
-      this.checkerboardRasterCacheImages: false,
-      this.checkerboardOffscreenLayers: false})
-      : optionsMask = (1 <<
-                PerformanceOverlayOption.displayRasterizerStatistics.index |
-            1 << PerformanceOverlayOption.visualizeRasterizerStatistics.index |
-            1 << PerformanceOverlayOption.displayEngineStatistics.index |
-            1 << PerformanceOverlayOption.visualizeEngineStatistics.index),
-        super(key: key);
+  PerformanceOverlay.allEnabled({ Key key,
+                                  this.rasterizerThreshold = 0,
+                                  this.checkerboardRasterCacheImages = false,
+                                  this.checkerboardOffscreenLayers = false })
+    : optionsMask =
+        1 << PerformanceOverlayOption.displayRasterizerStatistics.index |
+        1 << PerformanceOverlayOption.visualizeRasterizerStatistics.index |
+        1 << PerformanceOverlayOption.displayEngineStatistics.index |
+        1 << PerformanceOverlayOption.visualizeEngineStatistics.index,
+      super(key: key);
 
   /// The mask is created by shifting 1 by the index of the specific
   /// [PerformanceOverlayOption] to enable.
@@ -59,7 +56,7 @@ class PerformanceOverlay extends StatelessWidget {
   /// is suitable for capturing an SkPicture trace for further analysis.
   ///
   /// For example, if you want a trace of all pictures that could not be
-  /// renderered by the rasterizer within the frame boundary (and hence caused
+  /// rendered by the rasterizer within the frame boundary (and hence caused
   /// jank), specify 1. Specifying 2 will trace all pictures that took more
   /// more than 2 frame intervals to render. Adjust this value to only capture
   /// the particularly expensive pictures while skipping the others. Specifying
@@ -106,5 +103,17 @@ class PerformanceOverlay extends StatelessWidget {
   final bool checkerboardOffscreenLayers;
 
   @override
-  Widget build(BuildContext context) => new Offstage();
+  RenderPerformanceOverlay createRenderObject(BuildContext context) => RenderPerformanceOverlay(
+    optionsMask: optionsMask,
+    rasterizerThreshold: rasterizerThreshold,
+    checkerboardRasterCacheImages: checkerboardRasterCacheImages,
+    checkerboardOffscreenLayers: checkerboardOffscreenLayers,
+  );
+
+  @override
+  void updateRenderObject(BuildContext context, RenderPerformanceOverlay renderObject) {
+    renderObject
+      ..optionsMask = optionsMask
+      ..rasterizerThreshold = rasterizerThreshold;
+  }
 }

@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/ui.dart' show VoidCallback;
+
+import 'package:flutter/foundation.dart';
 
 import 'animation.dart';
 
@@ -13,12 +14,11 @@ abstract class _ListenerMixin {
   factory _ListenerMixin._() => null;
 
   void didRegisterListener();
-
   void didUnregisterListener();
 }
 
 /// A mixin that helps listen to another object only when this object has registered listeners.
-abstract class AnimationLazyListenerMixin implements _ListenerMixin {
+abstract class AnimationLazyListenerMixin extends _ListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory AnimationLazyListenerMixin._() => null;
@@ -28,7 +28,8 @@ abstract class AnimationLazyListenerMixin implements _ListenerMixin {
   @override
   void didRegisterListener() {
     assert(_listenerCounter >= 0);
-    if (_listenerCounter == 0) didStartListening();
+    if (_listenerCounter == 0)
+      didStartListening();
     _listenerCounter += 1;
   }
 
@@ -36,7 +37,8 @@ abstract class AnimationLazyListenerMixin implements _ListenerMixin {
   void didUnregisterListener() {
     assert(_listenerCounter >= 1);
     _listenerCounter -= 1;
-    if (_listenerCounter == 0) didStopListening();
+    if (_listenerCounter == 0)
+      didStopListening();
   }
 
   /// Called when the number of listeners changes from zero to one.
@@ -53,32 +55,31 @@ abstract class AnimationLazyListenerMixin implements _ListenerMixin {
 
 /// A mixin that replaces the didRegisterListener/didUnregisterListener contract
 /// with a dispose contract.
-abstract class AnimationEagerListenerMixin implements _ListenerMixin {
+abstract class AnimationEagerListenerMixin extends _ListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory AnimationEagerListenerMixin._() => null;
 
   @override
-  void didRegisterListener() {}
+  void didRegisterListener() { }
 
   @override
-  void didUnregisterListener() {}
+  void didUnregisterListener() { }
 
   /// Release the resources used by this object. The object is no longer usable
   /// after this method is called.
   @mustCallSuper
-  void dispose() {}
+  void dispose() { }
 }
 
 /// A mixin that implements the [addListener]/[removeListener] protocol and notifies
 /// all the registered listeners when [notifyListeners] is called.
-abstract class AnimationLocalListenersMixin implements _ListenerMixin {
+abstract class AnimationLocalListenersMixin extends _ListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory AnimationLocalListenersMixin._() => null;
 
-  final ObserverList<VoidCallback> _listeners =
-      new ObserverList<VoidCallback>();
+  final ObserverList<VoidCallback> _listeners = ObserverList<VoidCallback>();
 
   /// Calls the listener every time the value of the animation changes.
   ///
@@ -101,21 +102,22 @@ abstract class AnimationLocalListenersMixin implements _ListenerMixin {
   /// If listeners are added or removed during this function, the modifications
   /// will not change which listeners are called during this iteration.
   void notifyListeners() {
-    final List<VoidCallback> localListeners =
-        new List<VoidCallback>.from(_listeners);
+    final List<VoidCallback> localListeners = List<VoidCallback>.from(_listeners);
     for (VoidCallback listener in localListeners) {
       try {
-        if (_listeners.contains(listener)) listener();
+        if (_listeners.contains(listener))
+          listener();
       } catch (exception, stack) {
-        FlutterError.reportError(new FlutterErrorDetails(
-            exception: exception,
-            stack: stack,
-            library: 'animation library',
-            context: 'while notifying listeners for $runtimeType',
-            informationCollector: (StringBuffer information) {
-              information.writeln('The $runtimeType notifying listeners was:');
-              information.write('  $this');
-            }));
+        FlutterError.reportError(FlutterErrorDetails(
+          exception: exception,
+          stack: stack,
+          library: 'animation library',
+          context: 'while notifying listeners for $runtimeType',
+          informationCollector: (StringBuffer information) {
+            information.writeln('The $runtimeType notifying listeners was:');
+            information.write('  $this');
+          }
+        ));
       }
     }
   }
@@ -124,13 +126,12 @@ abstract class AnimationLocalListenersMixin implements _ListenerMixin {
 /// A mixin that implements the addStatusListener/removeStatusListener protocol
 /// and notifies all the registered listeners when notifyStatusListeners is
 /// called.
-abstract class AnimationLocalStatusListenersMixin implements _ListenerMixin {
+abstract class AnimationLocalStatusListenersMixin extends _ListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory AnimationLocalStatusListenersMixin._() => null;
 
-  final ObserverList<AnimationStatusListener> _statusListeners =
-      new ObserverList<AnimationStatusListener>();
+  final ObserverList<AnimationStatusListener> _statusListeners = ObserverList<AnimationStatusListener>();
 
   /// Calls listener every time the status of the animation changes.
   ///
@@ -153,22 +154,22 @@ abstract class AnimationLocalStatusListenersMixin implements _ListenerMixin {
   /// If listeners are added or removed during this function, the modifications
   /// will not change which listeners are called during this iteration.
   void notifyStatusListeners(AnimationStatus status) {
-    final List<AnimationStatusListener> localListeners =
-        new List<AnimationStatusListener>.from(_statusListeners);
+    final List<AnimationStatusListener> localListeners = List<AnimationStatusListener>.from(_statusListeners);
     for (AnimationStatusListener listener in localListeners) {
       try {
-        if (_statusListeners.contains(listener)) listener(status);
+        if (_statusListeners.contains(listener))
+          listener(status);
       } catch (exception, stack) {
-        FlutterError.reportError(new FlutterErrorDetails(
-            exception: exception,
-            stack: stack,
-            library: 'animation library',
-            context: 'while notifying status listeners for $runtimeType',
-            informationCollector: (StringBuffer information) {
-              information
-                  .writeln('The $runtimeType notifying status listeners was:');
-              information.write('  $this');
-            }));
+        FlutterError.reportError(FlutterErrorDetails(
+          exception: exception,
+          stack: stack,
+          library: 'animation library',
+          context: 'while notifying status listeners for $runtimeType',
+          informationCollector: (StringBuffer information) {
+            information.writeln('The $runtimeType notifying status listeners was:');
+            information.write('  $this');
+          }
+        ));
       }
     }
   }

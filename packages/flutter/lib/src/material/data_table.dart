@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'checkbox.dart';
 import 'colors.dart';
 import 'debug.dart';
+import 'divider.dart';
 import 'dropdown.dart';
 import 'icons.dart';
 import 'ink_well.dart';
@@ -20,7 +21,7 @@ import 'theme_data.dart';
 import 'tooltip.dart';
 
 /// Signature for [DataColumn.onSort] callback.
-typedef void DataColumnSortCallback(int columnIndex, bool ascending);
+typedef DataColumnSortCallback = void Function(int columnIndex, bool ascending);
 
 /// Column configuration for a [DataTable].
 ///
@@ -35,9 +36,9 @@ class DataColumn {
   const DataColumn({
     @required this.label,
     this.tooltip,
-    this.numeric: false,
+    this.numeric = false,
     this.onSort,
-  });
+  }) : assert(label != null);
 
   /// The column heading.
   ///
@@ -86,10 +87,10 @@ class DataRow {
   /// The [cells] argument must not be null.
   const DataRow({
     this.key,
-    this.selected: false,
+    this.selected = false,
     this.onSelectChanged,
     @required this.cells,
-  });
+  }) : assert(cells != null);
 
   /// Creates the configuration for a row of a [DataTable], deriving
   /// the key from a row index.
@@ -97,11 +98,11 @@ class DataRow {
   /// The [cells] argument must not be null.
   DataRow.byIndex({
     int index,
-    this.selected: false,
+    this.selected = false,
     this.onSelectChanged,
     @required this.cells,
-  })
-      : key = new ValueKey<int>(index);
+  }) : assert(cells != null),
+       key = ValueKey<int>(index);
 
   /// A [Key] that uniquely identifies this row. This is used to
   /// ensure that if a row is added or removed, any stateful widgets
@@ -142,9 +143,7 @@ class DataRow {
   /// table.
   final List<DataCell> cells;
 
-  bool get _debugInteractive =>
-      onSelectChanged != null ||
-      cells.any((DataCell cell) => cell._debugInteractive);
+  bool get _debugInteractive => onSelectChanged != null || cells.any((DataCell cell) => cell._debugInteractive);
 }
 
 /// The data for a cell of a [DataTable].
@@ -163,16 +162,14 @@ class DataCell {
   /// If the cell has no data, then a [Text] widget with placeholder
   /// text should be provided instead, and then the [placeholder]
   /// argument should be set to true.
-  const DataCell(
-    this.child, {
-    this.placeholder: false,
-    this.showEditIcon: false,
+  const DataCell(this.child, {
+    this.placeholder = false,
+    this.showEditIcon = false,
     this.onTap,
-  });
+  }) : assert(child != null);
 
   /// A cell that has no content and has zero width and height.
-  static final DataCell empty =
-      new DataCell(new Container(width: 0.0, height: 0.0));
+  static final DataCell empty = DataCell(Container(width: 0.0, height: 0.0));
 
   /// The data for the row.
   ///
@@ -262,12 +259,17 @@ class DataTable extends StatelessWidget {
     Key key,
     @required this.columns,
     this.sortColumnIndex,
-    this.sortAscending: true,
+    this.sortAscending = true,
     this.onSelectAll,
     @required this.rows,
-  })
-      : _onlyTextColumn = _initOnlyTextColumn(columns),
-        super(key: key);
+  }) : assert(columns != null),
+       assert(columns.isNotEmpty),
+       assert(sortColumnIndex == null || (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
+       assert(sortAscending != null),
+       assert(rows != null),
+       assert(!rows.any((DataRow row) => row.cells.length != columns.length)),
+       _onlyTextColumn = _initOnlyTextColumn(columns),
+       super(key: key);
 
   /// The configuration and labels for the columns in the table.
   final List<DataColumn> columns;
@@ -315,13 +317,13 @@ class DataTable extends StatelessWidget {
   // Set by the constructor to the index of the only Column that is
   // non-numeric, if there is exactly one, otherwise null.
   final int _onlyTextColumn;
-
   static int _initOnlyTextColumn(List<DataColumn> columns) {
     int result;
     for (int index = 0; index < columns.length; index += 1) {
       final DataColumn column = columns[index];
       if (!column.numeric) {
-        if (result != null) return null;
+        if (result != null)
+          return null;
         result = index;
       }
     }
@@ -329,11 +331,11 @@ class DataTable extends StatelessWidget {
   }
 
   bool get _debugInteractive {
-    return columns.any((DataColumn column) => column._debugInteractive) ||
-        rows.any((DataRow row) => row._debugInteractive);
+    return columns.any((DataColumn column) => column._debugInteractive)
+        || rows.any((DataRow row) => row._debugInteractive);
   }
 
-  static final LocalKey _headingRowKey = new UniqueKey();
+  static final LocalKey _headingRowKey = UniqueKey();
 
   void _handleSelectAll(bool checked) {
     if (onSelectAll != null) {
@@ -346,42 +348,42 @@ class DataTable extends StatelessWidget {
     }
   }
 
-  static const double _kHeadingRowHeight = 56.0;
-  static const double _kDataRowHeight = 48.0;
-  static const double _kTablePadding = 24.0;
-  static const double _kColumnSpacing = 56.0;
-  static const double _kSortArrowPadding = 2.0;
-  static const double _kHeadingFontSize = 12.0;
-  static const Duration _kSortArrowAnimationDuration =
-      const Duration(milliseconds: 150);
-  static const Color _kGrey100Opacity =
-      const Color(0x0A000000); // Grey 100 as opacity instead of solid color
-  static const Color _kGrey300Opacity =
-      const Color(0x1E000000); // Dark theme variant is just a guess.
+  static const double _headingRowHeight = 56.0;
+  static const double _dataRowHeight = 48.0;
+  static const double _tablePadding = 24.0;
+  static const double _columnSpacing = 56.0;
+  static const double _sortArrowPadding = 2.0;
+  static const double _headingFontSize = 12.0;
+  static const Duration _sortArrowAnimationDuration = Duration(milliseconds: 150);
+  static const Color _grey100Opacity = Color(0x0A000000); // Grey 100 as opacity instead of solid color
+  static const Color _grey300Opacity = Color(0x1E000000); // Dark theme variant is just a guess.
 
-  Widget _buildCheckbox(
-      {Color color,
-      bool checked,
-      VoidCallback onRowTap,
-      ValueChanged<bool> onCheckboxChanged}) {
-    Widget contents = new Padding(
-      padding: const EdgeInsetsDirectional.only(
-          start: _kTablePadding, end: _kTablePadding / 2.0),
-      child: new Center(
-        child: new Checkbox(
-          activeColor: color,
-          value: checked,
-          onChanged: onCheckboxChanged,
+  Widget _buildCheckbox({
+    Color color,
+    bool checked,
+    VoidCallback onRowTap,
+    ValueChanged<bool> onCheckboxChanged
+  }) {
+    Widget contents = Semantics(
+      container: true,
+      child: Padding(
+        padding: const EdgeInsetsDirectional.only(start: _tablePadding, end: _tablePadding / 2.0),
+        child: Center(
+          child: Checkbox(
+            activeColor: color,
+            value: checked,
+            onChanged: onCheckboxChanged,
+          ),
         ),
       ),
     );
     if (onRowTap != null) {
-      contents = new TableRowInkWell(
+      contents = TableRowInkWell(
         onTap: onRowTap,
         child: contents,
       );
     }
-    return new TableCell(
+    return TableCell(
       verticalAlignment: TableCellVerticalAlignment.fill,
       child: contents,
     );
@@ -398,45 +400,44 @@ class DataTable extends StatelessWidget {
     bool ascending,
   }) {
     if (onSort != null) {
-      final Widget arrow = new _SortArrow(
+      final Widget arrow = _SortArrow(
         visible: sorted,
         down: sorted ? ascending : null,
-        duration: _kSortArrowAnimationDuration,
+        duration: _sortArrowAnimationDuration,
       );
-      final Widget arrowPadding = const SizedBox(width: _kSortArrowPadding);
-      label = new Row(
+      const Widget arrowPadding = SizedBox(width: _sortArrowPadding);
+      label = Row(
         textDirection: numeric ? TextDirection.rtl : null,
-        children: <Widget>[label, arrowPadding, arrow],
+        children: <Widget>[ label, arrowPadding, arrow ],
       );
     }
-    label = new Container(
+    label = Container(
       padding: padding,
-      height: _kHeadingRowHeight,
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
-      child: new AnimatedDefaultTextStyle(
-        style: new TextStyle(
+      height: _headingRowHeight,
+      alignment: numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      child: AnimatedDefaultTextStyle(
+        style: TextStyle(
           // TODO(ianh): font family should match Theme; see https://github.com/flutter/flutter/issues/3116
           fontWeight: FontWeight.w500,
-          fontSize: _kHeadingFontSize,
-          height: math.min(1.0, _kHeadingRowHeight / _kHeadingFontSize),
+          fontSize: _headingFontSize,
+          height: math.min(1.0, _headingRowHeight / _headingFontSize),
           color: (Theme.of(context).brightness == Brightness.light)
-              ? ((onSort != null && sorted) ? Colors.black87 : Colors.black54)
-              : ((onSort != null && sorted) ? Colors.white : Colors.white70),
+            ? ((onSort != null && sorted) ? Colors.black87 : Colors.black54)
+            : ((onSort != null && sorted) ? Colors.white : Colors.white70),
         ),
         softWrap: false,
-        duration: _kSortArrowAnimationDuration,
+        duration: _sortArrowAnimationDuration,
         child: label,
       ),
     );
     if (tooltip != null) {
-      label = new Tooltip(
+      label = Tooltip(
         message: tooltip,
         child: label,
       );
     }
     if (onSort != null) {
-      label = new InkWell(
+      label = InkWell(
         onTap: onSort,
         child: label,
       );
@@ -456,39 +457,40 @@ class DataTable extends StatelessWidget {
   }) {
     final bool isLightTheme = Theme.of(context).brightness == Brightness.light;
     if (showEditIcon) {
-      final Widget icon = const Icon(Icons.edit, size: 18.0);
-      label = new Expanded(child: label);
-      label = new Row(
+      const Widget icon = Icon(Icons.edit, size: 18.0);
+      label = Expanded(child: label);
+      label = Row(
         textDirection: numeric ? TextDirection.rtl : null,
-        children: <Widget>[label, icon],
+        children: <Widget>[ label, icon ],
       );
     }
-    label = new Container(
-        padding: padding,
-        height: _kDataRowHeight,
-        alignment:
-            numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
-        child: new DefaultTextStyle(
-            style: new TextStyle(
-              // TODO(ianh): font family should be Roboto; see https://github.com/flutter/flutter/issues/3116
-              fontSize: 13.0,
-              color: isLightTheme
-                  ? (placeholder ? Colors.black38 : Colors.black87)
-                  : (placeholder ? Colors.white30 : Colors.white70),
-            ),
-            child: IconTheme.merge(
-              data: new IconThemeData(
-                color: isLightTheme ? Colors.black54 : Colors.white70,
-              ),
-              child: new DropdownButtonHideUnderline(child: label),
-            )));
+    label = Container(
+      padding: padding,
+      height: _dataRowHeight,
+      alignment: numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      child: DefaultTextStyle(
+        style: TextStyle(
+          // TODO(ianh): font family should be Roboto; see https://github.com/flutter/flutter/issues/3116
+          fontSize: 13.0,
+          color: isLightTheme
+            ? (placeholder ? Colors.black38 : Colors.black87)
+            : (placeholder ? Colors.white30 : Colors.white70),
+        ),
+        child: IconTheme.merge(
+          data: IconThemeData(
+            color: isLightTheme ? Colors.black54 : Colors.white70,
+          ),
+          child: DropdownButtonHideUnderline(child: label),
+        )
+      )
+    );
     if (onTap != null) {
-      label = new InkWell(
+      label = InkWell(
         onTap: onTap,
         child: label,
       );
     } else if (onSelectChanged != null) {
-      label = new TableRowInkWell(
+      label = TableRowInkWell(
         onTap: onSelectChanged,
         child: label,
       );
@@ -501,34 +503,28 @@ class DataTable extends StatelessWidget {
     assert(!_debugInteractive || debugCheckHasMaterial(context));
 
     final ThemeData theme = Theme.of(context);
-    final BoxDecoration _kSelectedDecoration = new BoxDecoration(
-      border: new Border(bottom: new BorderSide(color: theme.dividerColor)),
+    final BoxDecoration _kSelectedDecoration = BoxDecoration(
+      border: Border(bottom: Divider.createBorderSide(context, width: 1.0)),
       // The backgroundColor has to be transparent so you can see the ink on the material
-      color: (Theme.of(context).brightness == Brightness.light)
-          ? _kGrey100Opacity
-          : _kGrey300Opacity,
+      color: (Theme.of(context).brightness == Brightness.light) ? _grey100Opacity : _grey300Opacity,
     );
-    final BoxDecoration _kUnselectedDecoration = new BoxDecoration(
-      border: new Border(bottom: new BorderSide(color: theme.dividerColor)),
+    final BoxDecoration _kUnselectedDecoration = BoxDecoration(
+      border: Border(bottom: Divider.createBorderSide(context, width: 1.0)),
     );
 
-    final bool showCheckboxColumn =
-        rows.any((DataRow row) => row.onSelectChanged != null);
-    final bool allChecked = showCheckboxColumn &&
-        !rows
-            .any((DataRow row) => row.onSelectChanged != null && !row.selected);
+    final bool showCheckboxColumn = rows.any((DataRow row) => row.onSelectChanged != null);
+    final bool allChecked = showCheckboxColumn && !rows.any((DataRow row) => row.onSelectChanged != null && !row.selected);
 
-    final List<TableColumnWidth> tableColumns = new List<TableColumnWidth>(
-        columns.length + (showCheckboxColumn ? 1 : 0));
-    final List<TableRow> tableRows = new List<TableRow>.generate(
+    final List<TableColumnWidth> tableColumns = List<TableColumnWidth>(columns.length + (showCheckboxColumn ? 1 : 0));
+    final List<TableRow> tableRows = List<TableRow>.generate(
       rows.length + 1, // the +1 is for the header row
       (int index) {
-        return new TableRow(
-            key: index == 0 ? _headingRowKey : rows[index - 1].key,
-            decoration: index > 0 && rows[index - 1].selected
-                ? _kSelectedDecoration
-                : _kUnselectedDecoration,
-            children: new List<Widget>(tableColumns.length));
+        return TableRow(
+          key: index == 0 ? _headingRowKey : rows[index - 1].key,
+          decoration: index > 0 && rows[index - 1].selected ? _kSelectedDecoration
+                                                            : _kUnselectedDecoration,
+          children: List<Widget>(tableColumns.length)
+        );
       },
     );
 
@@ -536,8 +532,7 @@ class DataTable extends StatelessWidget {
 
     int displayColumnIndex = 0;
     if (showCheckboxColumn) {
-      tableColumns[0] = const FixedColumnWidth(
-          _kTablePadding + Checkbox.width + _kTablePadding / 2.0);
+      tableColumns[0] = const FixedColumnWidth(_tablePadding + Checkbox.width + _tablePadding / 2.0);
       tableRows[0].children[0] = _buildCheckbox(
         color: theme.accentColor,
         checked: allChecked,
@@ -556,21 +551,14 @@ class DataTable extends StatelessWidget {
       displayColumnIndex += 1;
     }
 
-    for (int dataColumnIndex = 0;
-        dataColumnIndex < columns.length;
-        dataColumnIndex += 1) {
+    for (int dataColumnIndex = 0; dataColumnIndex < columns.length; dataColumnIndex += 1) {
       final DataColumn column = columns[dataColumnIndex];
-      final EdgeInsetsDirectional padding = new EdgeInsetsDirectional.only(
-        start: dataColumnIndex == 0
-            ? showCheckboxColumn ? _kTablePadding / 2.0 : _kTablePadding
-            : _kColumnSpacing / 2.0,
-        end: dataColumnIndex == columns.length - 1
-            ? _kTablePadding
-            : _kColumnSpacing / 2.0,
+      final EdgeInsetsDirectional padding = EdgeInsetsDirectional.only(
+        start: dataColumnIndex == 0 ? showCheckboxColumn ? _tablePadding / 2.0 : _tablePadding : _columnSpacing / 2.0,
+        end: dataColumnIndex == columns.length - 1 ? _tablePadding : _columnSpacing / 2.0,
       );
       if (dataColumnIndex == _onlyTextColumn) {
-        tableColumns[displayColumnIndex] =
-            const IntrinsicColumnWidth(flex: 1.0);
+        tableColumns[displayColumnIndex] = const IntrinsicColumnWidth(flex: 1.0);
       } else {
         tableColumns[displayColumnIndex] = const IntrinsicColumnWidth();
       }
@@ -580,8 +568,7 @@ class DataTable extends StatelessWidget {
         label: column.label,
         tooltip: column.tooltip,
         numeric: column.numeric,
-        onSort: () => column.onSort(dataColumnIndex,
-            sortColumnIndex == dataColumnIndex ? !sortAscending : true),
+        onSort: () => column.onSort(dataColumnIndex, sortColumnIndex == dataColumnIndex ? !sortAscending : true),
         sorted: dataColumnIndex == sortColumnIndex,
         ascending: sortAscending,
       );
@@ -603,7 +590,7 @@ class DataTable extends StatelessWidget {
       displayColumnIndex += 1;
     }
 
-    return new Table(
+    return Table(
       columnWidths: tableColumns.asMap(),
       children: tableRows,
     );
@@ -632,24 +619,23 @@ class TableRowInkWell extends InkResponse {
     GestureTapCallback onDoubleTap,
     GestureLongPressCallback onLongPress,
     ValueChanged<bool> onHighlightChanged,
-  })
-      : super(
-          key: key,
-          child: child,
-          onTap: onTap,
-          onDoubleTap: onDoubleTap,
-          onLongPress: onLongPress,
-          onHighlightChanged: onHighlightChanged,
-          containedInkWell: true,
-          highlightShape: BoxShape.rectangle,
-        );
+  }) : super(
+    key: key,
+    child: child,
+    onTap: onTap,
+    onDoubleTap: onDoubleTap,
+    onLongPress: onLongPress,
+    onHighlightChanged: onHighlightChanged,
+    containedInkWell: true,
+    highlightShape: BoxShape.rectangle,
+  );
 
   @override
   RectCallback getRectCallback(RenderBox referenceBox) {
     return () {
       RenderObject cell = referenceBox;
       AbstractNode table = cell.parent;
-      final Matrix4 transform = new Matrix4.identity();
+      final Matrix4 transform = Matrix4.identity();
       while (table is RenderObject && table is! RenderTable) {
         final RenderTable parentBox = table;
         parentBox.applyPaintTransform(cell, transform);
@@ -665,7 +651,8 @@ class TableRowInkWell extends InkResponse {
         // TableRowInkWell's coordinate space.
         table.applyPaintTransform(cell, transform);
         final Offset offset = MatrixUtils.getAsTranslation(transform);
-        if (offset != null) return rect.shift(-offset);
+        if (offset != null)
+          return rect.shift(-offset);
       }
       return Rect.zero;
     };
@@ -684,8 +671,7 @@ class _SortArrow extends StatefulWidget {
     this.visible,
     this.down,
     this.duration,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   final bool visible;
 
@@ -694,10 +680,11 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   @override
-  _SortArrowState createState() => new _SortArrowState();
+  _SortArrowState createState() => _SortArrowState();
 }
 
-class _SortArrowState extends TickerProviderStateMixin<_SortArrow> {
+class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
+
   AnimationController _opacityController;
   Animation<double> _opacityAnimation;
 
@@ -710,27 +697,29 @@ class _SortArrowState extends TickerProviderStateMixin<_SortArrow> {
   @override
   void initState() {
     super.initState();
-    _opacityAnimation = new CurvedAnimation(
-        parent: _opacityController = new AnimationController(
-          duration: widget.duration,
-          vsync: this,
-        ),
-        curve: Curves.fastOutSlowIn)
-      ..addListener(_rebuild);
+    _opacityAnimation = CurvedAnimation(
+      parent: _opacityController = AnimationController(
+        duration: widget.duration,
+        vsync: this,
+      ),
+      curve: Curves.fastOutSlowIn
+    )
+    ..addListener(_rebuild);
     _opacityController.value = widget.visible ? 1.0 : 0.0;
-    _orientationAnimation = new Tween<double>(
+    _orientationAnimation = Tween<double>(
       begin: 0.0,
       end: math.pi,
-    )
-        .animate(new CurvedAnimation(
-            parent: _orientationController = new AnimationController(
-              duration: widget.duration,
-              vsync: this,
-            ),
-            curve: Curves.easeIn))
-          ..addListener(_rebuild)
-          ..addStatusListener(_resetOrientationAnimation);
-    if (widget.visible) _orientationOffset = widget.down ? 0.0 : math.pi;
+    ).animate(CurvedAnimation(
+      parent: _orientationController = AnimationController(
+        duration: widget.duration,
+        vsync: this,
+      ),
+      curve: Curves.easeIn
+    ))
+    ..addListener(_rebuild)
+    ..addStatusListener(_resetOrientationAnimation);
+    if (widget.visible)
+      _orientationOffset = widget.down ? 0.0 : math.pi;
   }
 
   void _rebuild() {
@@ -743,8 +732,7 @@ class _SortArrowState extends TickerProviderStateMixin<_SortArrow> {
     if (status == AnimationStatus.completed) {
       assert(_orientationAnimation.value == math.pi);
       _orientationOffset += math.pi;
-      _orientationController.value =
-          0.0; // TODO(ianh): This triggers a pointless rebuild.
+      _orientationController.value = 0.0; // TODO(ianh): This triggers a pointless rebuild.
     }
   }
 
@@ -754,8 +742,7 @@ class _SortArrowState extends TickerProviderStateMixin<_SortArrow> {
     bool skipArrow = false;
     final bool newDown = widget.down != null ? widget.down : _down;
     if (oldWidget.visible != widget.visible) {
-      if (widget.visible &&
-          (_opacityController.status == AnimationStatus.dismissed)) {
+      if (widget.visible && (_opacityController.status == AnimationStatus.dismissed)) {
         _orientationController.stop();
         _orientationController.value = 0.0;
         _orientationOffset = newDown ? 0.0 : math.pi;
@@ -784,26 +771,24 @@ class _SortArrowState extends TickerProviderStateMixin<_SortArrow> {
     super.dispose();
   }
 
-  static const double _kArrowIconBaselineOffset = -1.5;
-  static const double _kArrowIconSize = 16.0;
+  static const double _arrowIconBaselineOffset = -1.5;
+  static const double _arrowIconSize = 16.0;
 
   @override
   Widget build(BuildContext context) {
-    return new Opacity(
+    return Opacity(
       opacity: _opacityAnimation.value,
-      child: new Transform(
-        transform: new Matrix4.rotationZ(
-            _orientationOffset + _orientationAnimation.value)
-          ..setTranslationRaw(0.0, _kArrowIconBaselineOffset, 0.0),
+      child: Transform(
+        transform: Matrix4.rotationZ(_orientationOffset + _orientationAnimation.value)
+                             ..setTranslationRaw(0.0, _arrowIconBaselineOffset, 0.0),
         alignment: Alignment.center,
-        child: new Icon(
+        child: Icon(
           Icons.arrow_downward,
-          size: _kArrowIconSize,
-          color: (Theme.of(context).brightness == Brightness.light)
-              ? Colors.black87
-              : Colors.white70,
+          size: _arrowIconSize,
+          color: (Theme.of(context).brightness == Brightness.light) ? Colors.black87 : Colors.white70,
         ),
       ),
     );
   }
+
 }

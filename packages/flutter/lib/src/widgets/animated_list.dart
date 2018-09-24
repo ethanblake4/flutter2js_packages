@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:collection/collection.dart' show binarySearch;
+
 import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart';
 
 import 'basic.dart';
 import 'framework.dart';
@@ -14,27 +14,19 @@ import 'scroll_view.dart';
 import 'ticker_provider.dart';
 
 /// Signature for the builder callback used by [AnimatedList].
-typedef Widget AnimatedListItemBuilder(
-    BuildContext context, int index, Animation<double> animation);
+typedef AnimatedListItemBuilder = Widget Function(BuildContext context, int index, Animation<double> animation);
 
 /// Signature for the builder callback used by [AnimatedListState.removeItem].
-typedef Widget AnimatedListRemovedItemBuilder(
-    BuildContext context, Animation<double> animation);
+typedef AnimatedListRemovedItemBuilder = Widget Function(BuildContext context, Animation<double> animation);
 
 // The default insert/remove animation duration.
-const Duration _kDuration = const Duration(milliseconds: 300);
+const Duration _kDuration = Duration(milliseconds: 300);
 
 // Incoming and outgoing AnimatedList items.
 class _ActiveItem implements Comparable<_ActiveItem> {
-  _ActiveItem.incoming(this.controller, this.itemIndex)
-      : removedItemBuilder = null;
-
-  _ActiveItem.outgoing(
-      this.controller, this.itemIndex, this.removedItemBuilder);
-
-  _ActiveItem.index(this.itemIndex)
-      : controller = null,
-        removedItemBuilder = null;
+  _ActiveItem.incoming(this.controller, this.itemIndex) : removedItemBuilder = null;
+  _ActiveItem.outgoing(this.controller, this.itemIndex, this.removedItemBuilder);
+  _ActiveItem.index(this.itemIndex) : controller = null, removedItemBuilder = null;
 
   final AnimationController controller;
   final AnimatedListRemovedItemBuilder removedItemBuilder;
@@ -46,7 +38,7 @@ class _ActiveItem implements Comparable<_ActiveItem> {
 
 /// A scrolling container that animates items when they are inserted or removed.
 ///
-/// This widget's [AnimatedListState] can be used to dynmically insert or remove
+/// This widget's [AnimatedListState] can be used to dynamically insert or remove
 /// items. To refer to the [AnimatedListState] either provide a [GlobalKey] or
 /// use the static [of] method from an item's input callback.
 ///
@@ -56,23 +48,24 @@ class AnimatedList extends StatefulWidget {
   const AnimatedList({
     Key key,
     @required this.itemBuilder,
-    this.initialItemCount: 0,
-    this.scrollDirection: Axis.vertical,
-    this.reverse: false,
+    this.initialItemCount = 0,
+    this.scrollDirection = Axis.vertical,
+    this.reverse = false,
     this.controller,
     this.primary,
     this.physics,
-    this.shrinkWrap: false,
+    this.shrinkWrap = false,
     this.padding,
-  })
-      : super(key: key);
+  }) : assert(itemBuilder != null),
+       assert(initialItemCount != null && initialItemCount >= 0),
+       super(key: key);
 
   /// Called, as needed, to build list item widgets.
   ///
   /// List items are only built when they're scrolled into view.
   ///
   /// The [AnimatedListItemBuilder] index parameter indicates the item's
-  /// posiition in the list. The value of the index parameter will be between 0
+  /// position in the list. The value of the index parameter will be between 0
   /// and [initialItemCount] plus the total number of items that have been
   /// inserted with [AnimatedListState.insertItem] and less the total number of
   /// items that have been removed with [AnimatedListState.removeItem].
@@ -83,8 +76,8 @@ class AnimatedList extends StatefulWidget {
 
   /// The number of items the list will start with.
   ///
-  /// The appareance of the initial items is not animated. They
-  /// are created, as needed, by [itemBuilder] with an animation paramter
+  /// The appearance of the initial items is not animated. They
+  /// are created, as needed, by [itemBuilder] with an animation parameter
   /// of [kAlwaysCompleteAnimation].
   final int initialItemCount;
 
@@ -166,25 +159,26 @@ class AnimatedList extends StatefulWidget {
   /// ```dart
   /// AnimatedListState animatedList = AnimatedList.of(context);
   /// ```
-  static AnimatedListState of(BuildContext context, {bool nullOk: false}) {
-    assert(nullOk != null);
+  static AnimatedListState of(BuildContext context, { bool nullOk = false }) {
     assert(context != null);
-    final AnimatedListState result =
-        context.ancestorStateOfType(const TypeMatcher<AnimatedListState>());
-    if (nullOk || result != null) return result;
-    throw new FlutterError(
-        'AnimatedList.of() called with a context that does not contain a AnimatedList.\n'
-        'No AnimatedList ancestor could be found starting from the context that was passed to AnimatedList.of(). '
-        'This can happen when the context provided is from the same StatefulWidget that '
-        'built the AnimatedList. Please see the AnimatedList documentation for examples '
-        'of how to refer to an AnimatedListState object: '
-        '  https://docs.flutter.io/flutter/widgets/AnimatedState-class.html\n'
-        'The context used was:\n'
-        '  $context');
+    assert(nullOk != null);
+    final AnimatedListState result = context.ancestorStateOfType(const TypeMatcher<AnimatedListState>());
+    if (nullOk || result != null)
+      return result;
+    throw FlutterError(
+      'AnimatedList.of() called with a context that does not contain an AnimatedList.\n'
+      'No AnimatedList ancestor could be found starting from the context that was passed to AnimatedList.of(). '
+      'This can happen when the context provided is from the same StatefulWidget that '
+      'built the AnimatedList. Please see the AnimatedList documentation for examples '
+      'of how to refer to an AnimatedListState object: '
+      '  https://docs.flutter.io/flutter/widgets/AnimatedListState-class.html \n'
+      'The context used was:\n'
+      '  $context'
+    );
   }
 
   @override
-  AnimatedListState createState() => new AnimatedListState();
+  AnimatedListState createState() => AnimatedListState();
 }
 
 /// The state for a scrolling container that animates items when they are
@@ -195,23 +189,23 @@ class AnimatedList extends StatefulWidget {
 /// is needed.
 ///
 /// When an item is removed with [removeItem] its animation is reversed.
-/// The removed item's animation  is passed to the [removeItem] builder
+/// The removed item's animation is passed to the [removeItem] builder
 /// parameter.
 ///
 /// An app that needs to insert or remove items in response to an event
 /// can refer to the [AnimatedList]'s state with a global key:
 ///
 /// ```dart
-/// GlobalKey<AnimatedListState> listKey = new GlobalKey<AnimatedListState>();
+/// GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 /// ...
-/// new AnimatedList(key: listKey, ...);
+/// AnimatedList(key: listKey, ...);
 /// ...
 /// listKey.currentState.insert(123);
 /// ```
 ///
 /// [AnimatedList] item input handlers can also refer to their [AnimatedListState]
 /// with the static [AnimatedList.of] method.
-class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
+class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixin {
   final List<_ActiveItem> _incomingItems = <_ActiveItem>[];
   final List<_ActiveItem> _outgoingItems = <_ActiveItem>[];
   int _itemsCount = 0;
@@ -224,18 +218,20 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
 
   @override
   void dispose() {
-    for (_ActiveItem item in _incomingItems) item.controller.dispose();
-    for (_ActiveItem item in _outgoingItems) item.controller.dispose();
+    for (_ActiveItem item in _incomingItems)
+      item.controller.dispose();
+    for (_ActiveItem item in _outgoingItems)
+      item.controller.dispose();
     super.dispose();
   }
 
   _ActiveItem _removeActiveItemAt(List<_ActiveItem> items, int itemIndex) {
-    final int i = binarySearch(items, new _ActiveItem.index(itemIndex));
+    final int i = binarySearch(items, _ActiveItem.index(itemIndex));
     return i == -1 ? null : items.removeAt(i);
   }
 
   _ActiveItem _activeItemAt(List<_ActiveItem> items, int itemIndex) {
-    final int i = binarySearch(items, new _ActiveItem.index(itemIndex));
+    final int i = binarySearch(items, _ActiveItem.index(itemIndex));
     return i == -1 ? null : items[i];
   }
 
@@ -274,7 +270,7 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
   /// This method's semantics are the same as Dart's [List.insert] method:
   /// it increases the length of the list by one and shifts all items at or
   /// after [index] towards the end of the list.
-  void insertItem(int index, {Duration duration: _kDuration}) {
+  void insertItem(int index, { Duration duration = _kDuration }) {
     assert(index != null && index >= 0);
     assert(duration != null);
 
@@ -284,16 +280,16 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
     // Increment the incoming and outgoing item indices to account
     // for the insertion.
     for (_ActiveItem item in _incomingItems) {
-      if (item.itemIndex >= itemIndex) item.itemIndex += 1;
+      if (item.itemIndex >= itemIndex)
+        item.itemIndex += 1;
     }
     for (_ActiveItem item in _outgoingItems) {
-      if (item.itemIndex >= itemIndex) item.itemIndex += 1;
+      if (item.itemIndex >= itemIndex)
+        item.itemIndex += 1;
     }
 
-    final AnimationController controller =
-        new AnimationController(duration: duration, vsync: this);
-    final _ActiveItem incomingItem =
-        new _ActiveItem.incoming(controller, itemIndex);
+    final AnimationController controller = AnimationController(duration: duration, vsync: this);
+    final _ActiveItem incomingItem = _ActiveItem.incoming(controller, itemIndex);
     setState(() {
       _incomingItems
         ..add(incomingItem)
@@ -301,10 +297,8 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
       _itemsCount += 1;
     });
 
-    controller.forward().then<Null>((Null value) {
-      _removeActiveItemAt(_incomingItems, incomingItem.itemIndex)
-          .controller
-          .dispose();
+    controller.forward().then<void>((Null value) {
+      _removeActiveItemAt(_incomingItems, incomingItem.itemIndex).controller.dispose();
     });
   }
 
@@ -319,8 +313,7 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
   /// This method's semantics are the same as Dart's [List.remove] method:
   /// it decreases the length of the list by one and shifts all items at or
   /// before [index] towards the beginning of the list.
-  void removeItem(int index, AnimatedListRemovedItemBuilder builder,
-      {Duration duration: _kDuration}) {
+  void removeItem(int index, AnimatedListRemovedItemBuilder builder, { Duration duration = _kDuration }) {
     assert(index != null && index >= 0);
     assert(builder != null);
     assert(duration != null);
@@ -329,30 +322,28 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
     assert(itemIndex >= 0 && itemIndex < _itemsCount);
     assert(_activeItemAt(_outgoingItems, itemIndex) == null);
 
-    final _ActiveItem incomingItem =
-        _removeActiveItemAt(_incomingItems, itemIndex);
-    final AnimationController controller = incomingItem?.controller ??
-        new AnimationController(duration: duration, value: 1.0, vsync: this);
-    final _ActiveItem outgoingItem =
-        new _ActiveItem.outgoing(controller, itemIndex, builder);
+    final _ActiveItem incomingItem = _removeActiveItemAt(_incomingItems, itemIndex);
+    final AnimationController controller = incomingItem?.controller
+      ?? AnimationController(duration: duration, value: 1.0, vsync: this);
+    final _ActiveItem outgoingItem = _ActiveItem.outgoing(controller, itemIndex, builder);
     setState(() {
       _outgoingItems
         ..add(outgoingItem)
         ..sort();
     });
 
-    controller.reverse().then<Null>((Null value) {
-      _removeActiveItemAt(_outgoingItems, outgoingItem.itemIndex)
-          .controller
-          .dispose();
+    controller.reverse().then<void>((Null value) {
+      _removeActiveItemAt(_outgoingItems, outgoingItem.itemIndex).controller.dispose();
 
       // Decrement the incoming and outgoing item indices to account
       // for the removal.
       for (_ActiveItem item in _incomingItems) {
-        if (item.itemIndex > outgoingItem.itemIndex) item.itemIndex -= 1;
+        if (item.itemIndex > outgoingItem.itemIndex)
+          item.itemIndex -= 1;
       }
       for (_ActiveItem item in _outgoingItems) {
-        if (item.itemIndex > outgoingItem.itemIndex) item.itemIndex -= 1;
+        if (item.itemIndex > outgoingItem.itemIndex)
+          item.itemIndex -= 1;
       }
 
       setState(() {
@@ -364,18 +355,16 @@ class AnimatedListState extends TickerProviderStateMixin<AnimatedList> {
   Widget _itemBuilder(BuildContext context, int itemIndex) {
     final _ActiveItem outgoingItem = _activeItemAt(_outgoingItems, itemIndex);
     if (outgoingItem != null)
-      return outgoingItem.removedItemBuilder(
-          context, outgoingItem.controller.view);
+      return outgoingItem.removedItemBuilder(context, outgoingItem.controller.view);
 
     final _ActiveItem incomingItem = _activeItemAt(_incomingItems, itemIndex);
-    final Animation<double> animation =
-        incomingItem?.controller?.view ?? kAlwaysCompleteAnimation;
+    final Animation<double> animation = incomingItem?.controller?.view ?? kAlwaysCompleteAnimation;
     return widget.itemBuilder(context, _itemIndexToIndex(itemIndex), animation);
   }
 
   @override
   Widget build(BuildContext context) {
-    return new ListView.builder(
+    return ListView.builder(
       itemBuilder: _itemBuilder,
       itemCount: _itemsCount,
       scrollDirection: widget.scrollDirection,

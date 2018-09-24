@@ -5,13 +5,14 @@
 import 'dart:async';
 import 'dart:collection';
 
-export 'package:flutter/ui.dart' show VoidCallback;
 // COMMON SIGNATURES
+
+export 'package:flutter/ui.dart' show VoidCallback;
 
 /// Signature for callbacks that report that an underlying value has changed.
 ///
 /// See also [ValueSetter].
-typedef void ValueChanged<T>(T value);
+typedef ValueChanged<T> = void Function(T value);
 
 /// Signature for callbacks that report that a value has been set.
 ///
@@ -22,61 +23,70 @@ typedef void ValueChanged<T>(T value);
 /// value, regardless of whether the given value is new or not.
 ///
 /// See also:
+///
 ///  * [ValueGetter], the getter equivalent of this signature.
 ///  * [AsyncValueSetter], an asynchronous version of this signature.
-typedef void ValueSetter<T>(T value);
+typedef ValueSetter<T> = void Function(T value);
 
 /// Signature for callbacks that are to report a value on demand.
 ///
 /// See also:
+///
 ///  * [ValueSetter], the setter equivalent of this signature.
 ///  * [AsyncValueGetter], an asynchronous version of this signature.
-typedef T ValueGetter<T>();
+typedef ValueGetter<T> = T Function();
 
 /// Signature for callbacks that filter an iterable.
-typedef Iterable<T> IterableFilter<T>(Iterable<T> input);
+typedef IterableFilter<T> = Iterable<T> Function(Iterable<T> input);
 
 /// Signature of callbacks that have no arguments and return no data, but that
 /// return a [Future] to indicate when their work is complete.
 ///
 /// See also:
+///
 ///  * [VoidCallback], a synchronous version of this signature.
 ///  * [AsyncValueGetter], a signature for asynchronous getters.
 ///  * [AsyncValueSetter], a signature for asynchronous setters.
-typedef Future<Null> AsyncCallback();
+typedef AsyncCallback = Future<Null> Function();
 
 /// Signature for callbacks that report that a value has been set and return a
 /// [Future] that completes when the value has been saved.
 ///
 /// See also:
+///
 ///  * [ValueSetter], a synchronous version of this signature.
 ///  * [AsyncValueGetter], the getter equivalent of this signature.
-typedef Future<Null> AsyncValueSetter<T>(T value);
+typedef AsyncValueSetter<T> = Future<Null> Function(T value);
 
 /// Signature for callbacks that are to asynchronously report a value on demand.
 ///
 /// See also:
+///
 ///  * [ValueGetter], a synchronous version of this signature.
 ///  * [AsyncValueSetter], the setter equivalent of this signature.
-typedef Future<T> AsyncValueGetter<T>();
+typedef AsyncValueGetter<T> = Future<T> Function();
+
 
 // BITFIELD
 
 /// The largest SMI value.
 ///
 /// See <https://www.dartlang.org/articles/numeric-computation/#smis-and-mints>
-const int kMaxUnsignedSMI = 0x4000000000000000 - 1;
+const int kMaxUnsignedSMI = 0x3FFFFFFFFFFFFFFF;
 
 /// A BitField over an enum (or other class whose values implement "index").
 /// Only the first 62 values of the enum can be used as indices.
 class BitField<T extends dynamic> {
-  static const int _kAllZeros = 0;
-  static const int _kAllOnes = kMaxUnsignedSMI; // 2^(_kSMIBits+1)-1
+  static const int _smiBits = 62; // see https://www.dartlang.org/articles/numeric-computation/#smis-and-mints
+  static const int _allZeros = 0;
+  static const int _allOnes = kMaxUnsignedSMI; // 2^(_kSMIBits+1)-1
 
   /// Creates a bit field of all zeros.
   ///
   /// The given length must be at most 62.
-  BitField(this._length) : _bits = _kAllZeros;
+  BitField(this._length)
+    : assert(_length <= _smiBits),
+      _bits = _allZeros;
 
   /// Creates a bit field filled with a particular value.
   ///
@@ -85,7 +95,8 @@ class BitField<T extends dynamic> {
   ///
   /// The given length must be at most 62.
   BitField.filled(this._length, bool value)
-      : _bits = value ? _kAllOnes : _kAllZeros;
+    : assert(_length <= _smiBits),
+      _bits = value ? _allOnes : _allZeros;
 
   final int _length;
   int _bits;
@@ -112,10 +123,11 @@ class BitField<T extends dynamic> {
   ///
   /// If the value is true, the bits are all set to one. Otherwise, the bits are
   /// all set to zero. Defaults to setting all the bits to zero.
-  void reset([bool value = false]) {
-    _bits = value ? _kAllOnes : _kAllZeros;
+  void reset([ bool value = false ]) {
+    _bits = value ? _allOnes : _allZeros;
   }
 }
+
 
 // LAZY CACHING ITERATOR
 
@@ -171,7 +183,7 @@ class CachingIterable<E> extends IterableBase<E> {
   ///     yield index;
   ///  }
   ///
-  /// Iterable<int> i = new CachingIterable<int>(range(1, 5).iterator);
+  /// Iterable<int> i = CachingIterable<int>(range(1, 5).iterator);
   /// print(i.length); // walks the list
   /// print(i.length); // efficient
   /// ```
@@ -182,42 +194,42 @@ class CachingIterable<E> extends IterableBase<E> {
 
   @override
   Iterator<E> get iterator {
-    return new _LazyListIterator<E>(this);
+    return _LazyListIterator<E>(this);
   }
 
   @override
   Iterable<T> map<T>(T f(E e)) {
-    return new CachingIterable<T>(super.map<T>(f).iterator);
+    return CachingIterable<T>(super.map<T>(f).iterator);
   }
 
   @override
-  Iterable<E> where(bool f(E element)) {
-    return new CachingIterable<E>(super.where(f).iterator);
+  Iterable<E> where(bool test(E element)) {
+    return CachingIterable<E>(super.where(test).iterator);
   }
 
   @override
   Iterable<T> expand<T>(Iterable<T> f(E element)) {
-    return new CachingIterable<T>(super.expand<T>(f).iterator);
+    return CachingIterable<T>(super.expand<T>(f).iterator);
   }
 
   @override
   Iterable<E> take(int count) {
-    return new CachingIterable<E>(super.take(count).iterator);
+    return CachingIterable<E>(super.take(count).iterator);
   }
 
   @override
   Iterable<E> takeWhile(bool test(E value)) {
-    return new CachingIterable<E>(super.takeWhile(test).iterator);
+    return CachingIterable<E>(super.takeWhile(test).iterator);
   }
 
   @override
   Iterable<E> skip(int count) {
-    return new CachingIterable<E>(super.skip(count).iterator);
+    return CachingIterable<E>(super.skip(count).iterator);
   }
 
   @override
   Iterable<E> skipWhile(bool test(E value)) {
-    return new CachingIterable<E>(super.skipWhile(test).iterator);
+    return CachingIterable<E>(super.skipWhile(test).iterator);
   }
 
   @override
@@ -227,17 +239,18 @@ class CachingIterable<E> extends IterableBase<E> {
   }
 
   @override
-  List<E> toList({bool growable: true}) {
+  List<E> toList({ bool growable = true }) {
     _precacheEntireList();
-    return new List<E>.from(_results, growable: growable);
+    return List<E>.from(_results, growable: growable);
   }
 
   void _precacheEntireList() {
-    while (_fillNext()) {}
+    while (_fillNext()) { }
   }
 
   bool _fillNext() {
-    if (!_prefillIterator.moveNext()) return false;
+    if (!_prefillIterator.moveNext())
+      return false;
     _results.add(_prefillIterator.current);
     return true;
   }
@@ -252,15 +265,18 @@ class _LazyListIterator<E> implements Iterator<E> {
   @override
   E get current {
     assert(_index >= 0); // called "current" before "moveNext()"
-    if (_index < 0 || _index == _owner._results.length) return null;
+    if (_index < 0 || _index == _owner._results.length)
+      return null;
     return _owner._results[_index];
   }
 
   @override
   bool moveNext() {
-    if (_index >= _owner._results.length) return false;
+    if (_index >= _owner._results.length)
+      return false;
     _index += 1;
-    if (_index == _owner._results.length) return _owner._fillNext();
+    if (_index == _owner._results.length)
+      return _owner._fillNext();
     return true;
   }
 }

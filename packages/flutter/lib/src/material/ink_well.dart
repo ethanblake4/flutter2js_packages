@@ -38,31 +38,31 @@ abstract class InteractiveInkFeature extends InkFeature {
     @required RenderBox referenceBox,
     Color color,
     VoidCallback onRemoved,
-  })
-      : _color = color,
-        super(
-            controller: controller,
-            referenceBox: referenceBox,
-            onRemoved: onRemoved);
+  }) : assert(controller != null),
+       assert(referenceBox != null),
+       _color = color,
+       super(controller: controller, referenceBox: referenceBox, onRemoved: onRemoved);
 
   /// Called when the user input that triggered this feature's appearance was confirmed.
   ///
   /// Typically causes the ink to propagate faster across the material. By default this
   /// method does nothing.
-  void confirm() {}
+  void confirm() {
+  }
 
   /// Called when the user input that triggered this feature's appearance was canceled.
   ///
   /// Typically causes the ink to gradually disappear. By default this method does
   /// nothing.
-  void cancel() {}
+  void cancel() {
+  }
 
   /// The ink's color.
   Color get color => _color;
   Color _color;
-
   set color(Color value) {
-    if (value == _color) return;
+    if (value == _color)
+      return;
     _color = value;
     controller.markNeedsPaint();
   }
@@ -92,9 +92,11 @@ abstract class InteractiveInkFeatureFactory {
     @required RenderBox referenceBox,
     @required Offset position,
     @required Color color,
-    bool containedInkWell: false,
+    @required TextDirection textDirection,
+    bool containedInkWell = false,
     RectCallback rectCallback,
     BorderRadius borderRadius,
+    ShapeBorder customBorder,
     double radius,
     VoidCallback onRemoved,
   });
@@ -129,11 +131,11 @@ abstract class InteractiveInkFeatureFactory {
 /// The first diagram shows how it looks if the [InkResponse] is relatively
 /// large:
 ///
-/// ![The highlight is a disc centered in the box, smaller than the child widget.](https://flutter.github.io/assets-for-api-docs/material/ink_response_large.png)
+/// ![The highlight is a disc centered in the box, smaller than the child widget.](https://flutter.github.io/assets-for-api-docs/assets/material/ink_response_large.png)
 ///
 /// The second diagram shows how it looks if the [InkResponse] is small:
 ///
-/// ![The highlight is a disc overflowing the box, centered on the child.](https://flutter.github.io/assets-for-api-docs/material/ink_response_small.png)
+/// ![The highlight is a disc overflowing the box, centered on the child.](https://flutter.github.io/assets-for-api-docs/assets/material/ink_response_small.png)
 ///
 /// The main thing to notice from these diagrams is that the splashes happily
 /// exceed the bounds of the widget (because [containedInkWell] is false).
@@ -142,7 +144,7 @@ abstract class InteractiveInkFeatureFactory {
 /// [highlightShape] of [BoxShape.rectangle] with [containedInkWell] set to
 /// true. These are the values used by [InkWell].
 ///
-/// ![The highlight is a rectangle the size of the box.](https://flutter.github.io/assets-for-api-docs/material/ink_well.png)
+/// ![The highlight is a rectangle the size of the box.](https://flutter.github.io/assets-for-api-docs/assets/material/ink_well.png)
 ///
 /// The [InkResponse] widget must have a [Material] widget as an ancestor. The
 /// [Material] widget is where the ink reactions are actually painted. This
@@ -162,9 +164,19 @@ abstract class InteractiveInkFeatureFactory {
 ///
 /// If there is an opaque graphic, e.g. painted using a [Container], [Image], or
 /// [DecoratedBox], between the [Material] widget and the [InkResponse] widget,
-/// then the splash won't be visible because it will be under the opaque
-/// graphic. To avoid this problem, consider using an [Ink] widget to draw the
-/// opaque graphic itself on the [Material], under the ink splash.
+/// then the splash won't be visible because it will be under the opaque graphic.
+/// This is because ink splashes draw on the underlying [Material] itself, as
+/// if the ink was spreading inside the material.
+///
+/// The [Ink] widget can be used as a replacement for [Image], [Container], or
+/// [DecoratedBox] to ensure that the image or decoration also paints in the
+/// [Material] itself, below the ink.
+///
+/// If this is not possible for some reason, e.g. because you are using an
+/// opaque [CustomPaint] widget, alternatively consider using a second
+/// [Material] above the opaque widget but below the [InkResponse] (as an
+/// ancestor to the ink response). The [MaterialType.transparency] material
+/// kind can be used for this purpose.
 ///
 /// See also:
 ///
@@ -182,20 +194,26 @@ class InkResponse extends StatefulWidget {
     Key key,
     this.child,
     this.onTap,
+    this.onTapDown,
+    this.onTapCancel,
     this.onDoubleTap,
     this.onLongPress,
     this.onHighlightChanged,
-    this.containedInkWell: false,
-    this.highlightShape: BoxShape.circle,
+    this.containedInkWell = false,
+    this.highlightShape = BoxShape.circle,
     this.radius,
     this.borderRadius,
+    this.customBorder,
     this.highlightColor,
     this.splashColor,
     this.splashFactory,
-    this.enableFeedback: true,
-    this.excludeFromSemantics: false,
-  })
-      : super(key: key);
+    this.enableFeedback = true,
+    this.excludeFromSemantics = false,
+  }) : assert(containedInkWell != null),
+       assert(highlightShape != null),
+       assert(enableFeedback != null),
+       assert(excludeFromSemantics != null),
+       super(key: key);
 
   /// The widget below this widget in the tree.
   ///
@@ -204,6 +222,13 @@ class InkResponse extends StatefulWidget {
 
   /// Called when the user taps this part of the material.
   final GestureTapCallback onTap;
+
+  /// Called when the user taps down this part of the material.
+  final GestureTapDownCallback onTapDown;
+
+  /// Called when the user cancels a tap that was started on this part of the
+  /// material.
+  final GestureTapCallback onTapCancel;
 
   /// Called when the user double taps this part of the material.
   final GestureTapCallback onDoubleTap;
@@ -263,10 +288,14 @@ class InkResponse extends StatefulWidget {
   ///  * [splashFactory], which defines the appearance of the splash.
   final double radius;
 
-  /// The clipping radius of the containing rect.
+  /// The clipping radius of the containing rect. This is effective only if
+  /// [customBorder] is null.
   ///
   /// If this is null, it is interpreted as [BorderRadius.zero].
   final BorderRadius borderRadius;
+
+  /// The custom clip border which overrides [borderRadius].
+  final ShapeBorder customBorder;
 
   /// The highlight color of the ink response. If this property is null then the
   /// highlight color of the theme, [ThemeData.highlightColor], will be used.
@@ -299,7 +328,7 @@ class InkResponse extends StatefulWidget {
   ///  * [highlightColor], the color of the highlight.
   ///  * [InkSplash.splashFactory], which defines the default splash.
   ///  * [InkRipple.splashFactory], which defines a splash that spreads out
-  ///    more aggresively than the default.
+  ///    more aggressively than the default.
   final InteractiveInkFeatureFactory splashFactory;
 
   /// Whether detected gestures should provide acoustic and/or haptic feedback.
@@ -344,26 +373,30 @@ class InkResponse extends StatefulWidget {
   @mustCallSuper
   bool debugCheckContext(BuildContext context) {
     assert(debugCheckHasMaterial(context));
+    assert(debugCheckHasDirectionality(context));
     return true;
   }
 
   @override
-  _InkResponseState<InkResponse> createState() =>
-      new _InkResponseState<InkResponse>();
+  _InkResponseState<InkResponse> createState() => _InkResponseState<InkResponse>();
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
     final List<String> gestures = <String>[];
-    if (onTap != null) gestures.add('tap');
-    if (onDoubleTap != null) gestures.add('double tap');
-    if (onLongPress != null) gestures.add('long press');
-    description.add(
-        new IterableProperty<String>('gestures', gestures, ifEmpty: '<none>'));
-    description.add(new DiagnosticsProperty<bool>(
-        'containedInkWell', containedInkWell,
-        level: DiagnosticLevel.fine));
-    description.add(new DiagnosticsProperty<BoxShape>(
+    if (onTap != null)
+      gestures.add('tap');
+    if (onDoubleTap != null)
+      gestures.add('double tap');
+    if (onLongPress != null)
+      gestures.add('long press');
+    if (onTapDown != null)
+      gestures.add('tap down');
+    if (onTapCancel != null)
+      gestures.add('tap cancel');
+    properties.add(IterableProperty<String>('gestures', gestures, ifEmpty: '<none>'));
+    properties.add(DiagnosticsProperty<bool>('containedInkWell', containedInkWell, level: DiagnosticLevel.fine));
+    properties.add(DiagnosticsProperty<BoxShape>(
       'highlightShape',
       highlightShape,
       description: '${containedInkWell ? "clipped to " : ""}$highlightShape',
@@ -372,29 +405,30 @@ class InkResponse extends StatefulWidget {
   }
 }
 
-class _InkResponseState<T extends InkResponse>
-    extends AutomaticKeepAliveClientMixin<T> {
+class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKeepAliveClientMixin {
   Set<InteractiveInkFeature> _splashes;
   InteractiveInkFeature _currentSplash;
   InkHighlight _lastHighlight;
 
   @override
-  bool get wantKeepAlive =>
-      _lastHighlight != null || (_splashes != null && _splashes.isNotEmpty);
+  bool get wantKeepAlive => _lastHighlight != null || (_splashes != null && _splashes.isNotEmpty);
 
   void updateHighlight(bool value) {
-    if (value == (_lastHighlight != null && _lastHighlight.active)) return;
+    if (value == (_lastHighlight != null && _lastHighlight.active))
+      return;
     if (value) {
       if (_lastHighlight == null) {
         final RenderBox referenceBox = context.findRenderObject();
-        _lastHighlight = new InkHighlight(
+        _lastHighlight = InkHighlight(
           controller: Material.of(context),
           referenceBox: referenceBox,
           color: widget.highlightColor ?? Theme.of(context).highlightColor,
           shape: widget.highlightShape,
           borderRadius: widget.borderRadius,
+          customBorder: widget.customBorder,
           rectCallback: widget.getRectCallback(referenceBox),
           onRemoved: _handleInkHighlightRemoval,
+          textDirection: Directionality.of(context),
         );
         updateKeepAlive();
       } else {
@@ -404,7 +438,8 @@ class _InkResponseState<T extends InkResponse>
       _lastHighlight.deactivate();
     }
     assert(value == (_lastHighlight != null && _lastHighlight.active));
-    if (widget.onHighlightChanged != null) widget.onHighlightChanged(value);
+    if (widget.onHighlightChanged != null)
+      widget.onHighlightChanged(value);
   }
 
   void _handleInkHighlightRemoval() {
@@ -418,16 +453,17 @@ class _InkResponseState<T extends InkResponse>
     final RenderBox referenceBox = context.findRenderObject();
     final Offset position = referenceBox.globalToLocal(details.globalPosition);
     final Color color = widget.splashColor ?? Theme.of(context).splashColor;
-    final RectCallback rectCallback =
-        widget.containedInkWell ? widget.getRectCallback(referenceBox) : null;
+    final RectCallback rectCallback = widget.containedInkWell ? widget.getRectCallback(referenceBox) : null;
     final BorderRadius borderRadius = widget.borderRadius;
+    final ShapeBorder customBorder = widget.customBorder;
 
     InteractiveInkFeature splash;
     void onRemoved() {
       if (_splashes != null) {
         assert(_splashes.contains(splash));
         _splashes.remove(splash);
-        if (_currentSplash == splash) _currentSplash = null;
+        if (_currentSplash == splash)
+          _currentSplash = null;
         updateKeepAlive();
       } // else we're probably in deactivate()
     }
@@ -441,7 +477,9 @@ class _InkResponseState<T extends InkResponse>
       rectCallback: rectCallback,
       radius: widget.radius,
       borderRadius: borderRadius,
+      customBorder: customBorder,
       onRemoved: onRemoved,
+      textDirection: Directionality.of(context),
     );
 
     return splash;
@@ -449,9 +487,12 @@ class _InkResponseState<T extends InkResponse>
 
   void _handleTapDown(TapDownDetails details) {
     final InteractiveInkFeature splash = _createInkFeature(details);
-    _splashes ??= new HashSet<InteractiveInkFeature>();
+    _splashes ??= HashSet<InteractiveInkFeature>();
     _splashes.add(splash);
     _currentSplash = splash;
+    if (widget.onTapDown != null) {
+      widget.onTapDown(details);
+    }
     updateKeepAlive();
     updateHighlight(true);
   }
@@ -461,7 +502,8 @@ class _InkResponseState<T extends InkResponse>
     _currentSplash = null;
     updateHighlight(false);
     if (widget.onTap != null) {
-      if (widget.enableFeedback) Feedback.forTap(context);
+      if (widget.enableFeedback)
+        Feedback.forTap(context);
       widget.onTap();
     }
   }
@@ -469,20 +511,25 @@ class _InkResponseState<T extends InkResponse>
   void _handleTapCancel() {
     _currentSplash?.cancel();
     _currentSplash = null;
+    if (widget.onTapCancel != null) {
+      widget.onTapCancel();
+    }
     updateHighlight(false);
   }
 
   void _handleDoubleTap() {
     _currentSplash?.confirm();
     _currentSplash = null;
-    if (widget.onDoubleTap != null) widget.onDoubleTap();
+    if (widget.onDoubleTap != null)
+      widget.onDoubleTap();
   }
 
   void _handleLongPress(BuildContext context) {
     _currentSplash?.confirm();
     _currentSplash = null;
     if (widget.onLongPress != null) {
-      if (widget.enableFeedback) Feedback.forLongPress(context);
+      if (widget.enableFeedback)
+        Feedback.forLongPress(context);
       widget.onLongPress();
     }
   }
@@ -492,7 +539,8 @@ class _InkResponseState<T extends InkResponse>
     if (_splashes != null) {
       final Set<InteractiveInkFeature> splashes = _splashes;
       _splashes = null;
-      for (InteractiveInkFeature splash in splashes) splash.dispose();
+      for (InteractiveInkFeature splash in splashes)
+        splash.dispose();
       _currentSplash = null;
     }
     assert(_currentSplash == null);
@@ -508,21 +556,19 @@ class _InkResponseState<T extends InkResponse>
     final ThemeData themeData = Theme.of(context);
     _lastHighlight?.color = widget.highlightColor ?? themeData.highlightColor;
     _currentSplash?.color = widget.splashColor ?? themeData.splashColor;
-    final bool enabled = widget.onTap != null ||
-        widget.onDoubleTap != null ||
-        widget.onLongPress != null;
-    return new GestureDetector(
+    final bool enabled = widget.onTap != null || widget.onDoubleTap != null || widget.onLongPress != null;
+    return GestureDetector(
       onTapDown: enabled ? _handleTapDown : null,
       onTap: enabled ? () => _handleTap(context) : null,
       onTapCancel: enabled ? _handleTapCancel : null,
       onDoubleTap: widget.onDoubleTap != null ? _handleDoubleTap : null,
-      onLongPress:
-          widget.onLongPress != null ? () => _handleLongPress(context) : null,
+      onLongPress: widget.onLongPress != null ? () => _handleLongPress(context) : null,
       behavior: HitTestBehavior.opaque,
       child: widget.child,
       excludeFromSemantics: widget.excludeFromSemantics,
     );
   }
+
 }
 
 /// A rectangular area of a [Material] that responds to touch.
@@ -532,9 +578,9 @@ class _InkResponseState<T extends InkResponse>
 /// The following diagram shows how an [InkWell] looks when tapped, when using
 /// default values.
 ///
-/// ![The highlight is a rectangle the size of the box.](https://flutter.github.io/assets-for-api-docs/material/ink_well.png)
+/// ![The highlight is a rectangle the size of the box.](https://flutter.github.io/assets-for-api-docs/assets/material/ink_well.png)
 ///
-/// The [InkResponse] widget must have a [Material] widget as an ancestor. The
+/// The [InkWell] widget must have a [Material] widget as an ancestor. The
 /// [Material] widget is where the ink reactions are actually painted. This
 /// matches the material design premise wherein the [Material] is what is
 /// actually reacting to touches by spreading ink.
@@ -552,9 +598,19 @@ class _InkResponseState<T extends InkResponse>
 ///
 /// If there is an opaque graphic, e.g. painted using a [Container], [Image], or
 /// [DecoratedBox], between the [Material] widget and the [InkWell] widget, then
-/// the splash won't be visible because it will be under the opaque graphic. To
-/// avoid this problem, consider using an [Ink] widget to draw the opaque
-/// graphic itself on the [Material], under the ink splash.
+/// the splash won't be visible because it will be under the opaque graphic.
+/// This is because ink splashes draw on the underlying [Material] itself, as
+/// if the ink was spreading inside the material.
+///
+/// The [Ink] widget can be used as a replacement for [Image], [Container], or
+/// [DecoratedBox] to ensure that the image or decoration also paints in the
+/// [Material] itself, below the ink.
+///
+/// If this is not possible for some reason, e.g. because you are using an
+/// opaque [CustomPaint] widget, alternatively consider using a second
+/// [Material] above the opaque widget but below the [InkWell] (as an
+/// ancestor to the ink well). The [MaterialType.transparency] material
+/// kind can be used for this purpose.
 ///
 /// See also:
 ///
@@ -575,30 +631,35 @@ class InkWell extends InkResponse {
     GestureTapCallback onTap,
     GestureTapCallback onDoubleTap,
     GestureLongPressCallback onLongPress,
+    GestureTapDownCallback onTapDown,
+    GestureTapCancelCallback onTapCancel,
     ValueChanged<bool> onHighlightChanged,
     Color highlightColor,
     Color splashColor,
     InteractiveInkFeatureFactory splashFactory,
     double radius,
     BorderRadius borderRadius,
-    bool enableFeedback: true,
-    bool excludeFromSemantics: false,
-  })
-      : super(
-          key: key,
-          child: child,
-          onTap: onTap,
-          onDoubleTap: onDoubleTap,
-          onLongPress: onLongPress,
-          onHighlightChanged: onHighlightChanged,
-          containedInkWell: true,
-          highlightShape: BoxShape.rectangle,
-          highlightColor: highlightColor,
-          splashColor: splashColor,
-          splashFactory: splashFactory,
-          radius: radius,
-          borderRadius: borderRadius,
-          enableFeedback: enableFeedback,
-          excludeFromSemantics: excludeFromSemantics,
-        );
+    ShapeBorder customBorder,
+    bool enableFeedback = true,
+    bool excludeFromSemantics = false,
+  }) : super(
+    key: key,
+    child: child,
+    onTap: onTap,
+    onDoubleTap: onDoubleTap,
+    onLongPress: onLongPress,
+    onTapDown: onTapDown,
+    onTapCancel: onTapCancel,
+    onHighlightChanged: onHighlightChanged,
+    containedInkWell: true,
+    highlightShape: BoxShape.rectangle,
+    highlightColor: highlightColor,
+    splashColor: splashColor,
+    splashFactory: splashFactory,
+    radius: radius,
+    borderRadius: borderRadius,
+    customBorder: customBorder,
+    enableFeedback: enableFeedback,
+    excludeFromSemantics: excludeFromSemantics,
+  );
 }

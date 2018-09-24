@@ -28,8 +28,7 @@ class AutomaticKeepAlive extends StatefulWidget {
   const AutomaticKeepAlive({
     Key key,
     this.child,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   /// The widget below this widget in the tree.
   ///
@@ -37,7 +36,7 @@ class AutomaticKeepAlive extends StatefulWidget {
   final Widget child;
 
   @override
-  _AutomaticKeepAliveState createState() => new _AutomaticKeepAliveState();
+  _AutomaticKeepAliveState createState() => _AutomaticKeepAliveState();
 }
 
 class _AutomaticKeepAliveState extends State<AutomaticKeepAlive> {
@@ -58,7 +57,7 @@ class _AutomaticKeepAliveState extends State<AutomaticKeepAlive> {
   }
 
   void _updateChild() {
-    _child = new NotificationListener<KeepAliveNotification>(
+    _child = NotificationListener<KeepAliveNotification>(
       onNotification: _addClient,
       child: widget.child,
     );
@@ -81,51 +80,84 @@ class _AutomaticKeepAliveState extends State<AutomaticKeepAlive> {
     handle.addListener(_handles[handle]);
     if (!_keepingAlive) {
       _keepingAlive = true;
-      // We use Element.visitChildren rather than context.visitChildElements
-      // because we might be called during build, and context.visitChildElements
-      // verifies that it is not called during build. Element.visitChildren does
-      // not, instead it assumes that the caller will be careful. (See the
-      // documentation for these methods for more details.)
-      //
-      // Here we know it's safe because we just received a notification, which
-      // we wouldn't be able to do if we hadn't built our child and its child --
-      // our build method always builds the same subtree and it always includes
-      // the node we're looking for (KeepAlive) as the parent of the node that
-      // reports the notifications (NotificationListener).
-      //
-      // (We're only going down one level, to get our direct child.)
-      final Element element = context;
-      element.visitChildren((Element child) {
-        assert(child is ParentDataElement<SliverMultiBoxAdaptorWidget>);
-        final ParentDataElement<SliverMultiBoxAdaptorWidget> childElement =
-            child;
-        childElement.applyWidgetOutOfTurn(build(context));
-      });
+      final ParentDataElement<SliverMultiBoxAdaptorWidget> childElement = _getChildElement();
+      if (childElement != null) {
+        // If the child already exists, update it synchronously.
+        _updateParentDataOfChild(childElement);
+      } else {
+        // If the child doesn't exist yet, we got called during the very first
+        // build of this subtree. Wait until the end of the frame to update
+        // the child when the child is guaranteed to be present.
+        SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
+          if (!mounted) {
+            return;
+          }
+          final ParentDataElement<SliverMultiBoxAdaptorWidget> childElement = _getChildElement();
+          assert(childElement != null);
+          _updateParentDataOfChild(childElement);
+        });
+      }
     }
     return false;
+  }
+
+  /// Get the [Element] for the only [KeepAlive] child.
+  ///
+  /// While this widget is guaranteed to have a child, this may return null if
+  /// the first build of that child has not completed yet.
+  ParentDataElement<SliverMultiBoxAdaptorWidget> _getChildElement() {
+    assert(mounted);
+    final Element element = context;
+    Element childElement;
+    // We use Element.visitChildren rather than context.visitChildElements
+    // because we might be called during build, and context.visitChildElements
+    // verifies that it is not called during build. Element.visitChildren does
+    // not, instead it assumes that the caller will be careful. (See the
+    // documentation for these methods for more details.)
+    //
+    // Here we know it's safe (with the exception outlined below) because we
+    // just received a notification, which we wouldn't be able to do if we
+    // hadn't built our child and its child -- our build method always builds
+    // the same subtree and it always includes the node we're looking for
+    // (KeepAlive) as the parent of the node that reports the notifications
+    // (NotificationListener).
+    //
+    // If we are called during the first build of this subtree the links to the
+    // children will not be hooked up yet. In that case this method returns
+    // null despite the fact that we will have a child after the build
+    // completes. It's the caller's responsibility to deal with this case.
+    //
+    // (We're only going down one level, to get our direct child.)
+    element.visitChildren((Element child) {
+      childElement = child;
+    });
+    assert(childElement == null || childElement is ParentDataElement<SliverMultiBoxAdaptorWidget>);
+    return childElement;
+  }
+
+  void _updateParentDataOfChild(ParentDataElement<SliverMultiBoxAdaptorWidget> childElement) {
+    childElement.applyWidgetOutOfTurn(build(context));
   }
 
   VoidCallback _createCallback(Listenable handle) {
     return () {
       assert(() {
         if (!mounted) {
-          throw new FlutterError(
-              'AutomaticKeepAlive handle triggered after AutomaticKeepAlive was disposed.'
-              'Widgets should always trigger their KeepAliveNotification handle when they are '
-              'deactivated, so that they (or their handle) do not send spurious events later '
-              'when they are no longer in the tree.');
+          throw FlutterError(
+            'AutomaticKeepAlive handle triggered after AutomaticKeepAlive was disposed.'
+            'Widgets should always trigger their KeepAliveNotification handle when they are '
+            'deactivated, so that they (or their handle) do not send spurious events later '
+            'when they are no longer in the tree.'
+          );
         }
         return true;
       }());
       _handles.remove(handle);
       if (_handles.isEmpty) {
-        if (SchedulerBinding.instance.schedulerPhase.index <
-            SchedulerPhase.persistentCallbacks.index) {
+        if (SchedulerBinding.instance.schedulerPhase.index < SchedulerPhase.persistentCallbacks.index) {
           // Build/layout haven't started yet so let's just schedule this for
           // the next frame.
-          setState(() {
-            _keepingAlive = false;
-          });
+          setState(() { _keepingAlive = false; });
         } else {
           // We were probably notified by a descendant when they were yanked out
           // of our subtree somehow. We're probably in the middle of build or
@@ -196,25 +228,23 @@ class _AutomaticKeepAliveState extends State<AutomaticKeepAlive> {
   @override
   Widget build(BuildContext context) {
     assert(_child != null);
-    return new KeepAlive(
+    return KeepAlive(
       keepAlive: _keepingAlive,
       child: _child,
     );
   }
 
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(new FlagProperty('_keepingAlive',
-        value: _keepingAlive, ifTrue: 'keeping subtree alive'));
-    description.add(new DiagnosticsProperty<Map<Listenable, VoidCallback>>(
+    description.add(FlagProperty('_keepingAlive', value: _keepingAlive, ifTrue: 'keeping subtree alive'));
+    description.add(DiagnosticsProperty<Map<Listenable, VoidCallback>>(
       'handles',
       _handles,
-      description: _handles != null
-          ? '${_handles.length} active client${ _handles.length == 1
-          ? ""
-          : "s" }'
-          : null,
+      description: _handles != null ?
+        '${_handles.length} active client${ _handles.length == 1 ? "" : "s" }' :
+        null,
       ifNull: 'no notifications ever received',
     ));
   }
@@ -261,7 +291,7 @@ class KeepAliveNotification extends Notification {
   /// Creates a notification to indicate that a subtree must be kept alive.
   ///
   /// The [handle] must not be null.
-  const KeepAliveNotification(this.handle);
+  const KeepAliveNotification(this.handle) : assert(handle != null);
 
   /// A [Listenable] that will inform its clients when the widget that fired the
   /// notification no longer needs to be kept alive.
@@ -293,26 +323,35 @@ class KeepAliveHandle extends ChangeNotifier {
   }
 }
 
-/// A mixin with convenience methods for clients of [AutomaticKeepAlive].
+/// A mixin with convenience methods for clients of [AutomaticKeepAlive]. Used
+/// with [State] subclasses.
 ///
 /// Subclasses must implement [wantKeepAlive], and their [build] methods must
-/// call `super.build` (which will always return null).
+/// call `super.build` (the return value will always return null, and should be
+/// ignored).
 ///
 /// Then, whenever [wantKeepAlive]'s value changes (or might change), the
 /// subclass should call [updateKeepAlive].
+///
+/// The type argument `T` is the type of the [StatefulWidget] subclass of the
+/// [State] into which this class is being mixed.
 ///
 /// See also:
 ///
 ///  * [AutomaticKeepAlive], which listens to messages from this mixin.
 ///  * [KeepAliveNotification], the notifications sent by this mixin.
-abstract class AutomaticKeepAliveClientMixin<T extends StatefulWidget>
-    extends State<T> {
+@optionalTypeArgs
+abstract class AutomaticKeepAliveClientMixin<T extends StatefulWidget> extends State<T> {
+  // This class is intended to be used as a mixin, and should not be
+  // extended directly.
+  factory AutomaticKeepAliveClientMixin._() => null;
+
   KeepAliveHandle _keepAliveHandle;
 
   void _ensureKeepAlive() {
     assert(_keepAliveHandle == null);
-    _keepAliveHandle = new KeepAliveHandle();
-    new KeepAliveNotification(_keepAliveHandle).dispatch(context);
+    _keepAliveHandle = KeepAliveHandle();
+    KeepAliveNotification(_keepAliveHandle).dispatch(context);
   }
 
   void _releaseKeepAlive() {
@@ -332,28 +371,33 @@ abstract class AutomaticKeepAliveClientMixin<T extends StatefulWidget>
   @protected
   void updateKeepAlive() {
     if (wantKeepAlive) {
-      if (_keepAliveHandle == null) _ensureKeepAlive();
+      if (_keepAliveHandle == null)
+        _ensureKeepAlive();
     } else {
-      if (_keepAliveHandle != null) _releaseKeepAlive();
+      if (_keepAliveHandle != null)
+        _releaseKeepAlive();
     }
   }
 
   @override
   void initState() {
     super.initState();
-    if (wantKeepAlive) _ensureKeepAlive();
+    if (wantKeepAlive)
+      _ensureKeepAlive();
   }
 
   @override
   void deactivate() {
-    if (_keepAliveHandle != null) _releaseKeepAlive();
+    if (_keepAliveHandle != null)
+      _releaseKeepAlive();
     super.deactivate();
   }
 
   @mustCallSuper
   @override
   Widget build(BuildContext context) {
-    if (wantKeepAlive && _keepAliveHandle == null) _ensureKeepAlive();
+    if (wantKeepAlive && _keepAliveHandle == null)
+      _ensureKeepAlive();
     return null;
   }
 }

@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/ui.dart' as ui
-    show Paragraph, ParagraphBuilder, ParagraphConstraints, ParagraphStyle;
+import 'package:flutter/ui.dart' as ui show Paragraph, ParagraphBuilder, ParagraphConstraints, ParagraphStyle;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -13,8 +12,6 @@ import 'basic_types.dart';
 import 'text_span.dart';
 
 export 'package:flutter/services.dart' show TextRange, TextSelection;
-
-final String _kZeroWidthSpace = new String.fromCharCode(0x200B);
 
 /// An object that paints a [TextSpan] tree into a [Canvas].
 ///
@@ -44,18 +41,23 @@ class TextPainter {
   /// The [maxLines] property, if non-null, must be greater than zero.
   TextPainter({
     TextSpan text,
-    TextAlign textAlign: TextAlign.start,
+    TextAlign textAlign = TextAlign.start,
     TextDirection textDirection,
-    double textScaleFactor: 1.0,
+    double textScaleFactor = 1.0,
     int maxLines,
     String ellipsis,
-  })
-      : _text = text,
-        _textAlign = textAlign,
-        _textDirection = textDirection,
-        _textScaleFactor = textScaleFactor,
-        _maxLines = maxLines,
-        _ellipsis = ellipsis;
+    Locale locale,
+  }) : assert(text == null || text.debugAssertIsValid()),
+       assert(textAlign != null),
+       assert(textScaleFactor != null),
+       assert(maxLines == null || maxLines > 0),
+       _text = text,
+       _textAlign = textAlign,
+       _textDirection = textDirection,
+       _textScaleFactor = textScaleFactor,
+       _maxLines = maxLines,
+       _ellipsis = ellipsis,
+       _locale = locale;
 
   ui.Paragraph _paragraph;
   bool _needsLayout = true;
@@ -67,11 +69,12 @@ class TextPainter {
   /// This and [textDirection] must be non-null before you call [layout].
   TextSpan get text => _text;
   TextSpan _text;
-
   set text(TextSpan value) {
     assert(value == null || value.debugAssertIsValid());
-    if (_text == value) return;
-    if (_text?.style != value?.style) _layoutTemplate = null;
+    if (_text == value)
+      return;
+    if (_text?.style != value?.style)
+      _layoutTemplate = null;
     _text = value;
     _paragraph = null;
     _needsLayout = true;
@@ -84,10 +87,10 @@ class TextPainter {
   /// The [textAlign] property must not be null. It defaults to [TextAlign.start].
   TextAlign get textAlign => _textAlign;
   TextAlign _textAlign;
-
   set textAlign(TextAlign value) {
     assert(value != null);
-    if (_textAlign == value) return;
+    if (_textAlign == value)
+      return;
     _textAlign = value;
     _paragraph = null;
     _needsLayout = true;
@@ -110,13 +113,12 @@ class TextPainter {
   /// This and [text] must be non-null before you call [layout].
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
-
   set textDirection(TextDirection value) {
-    if (_textDirection == value) return;
+    if (_textDirection == value)
+      return;
     _textDirection = value;
     _paragraph = null;
-    _layoutTemplate =
-        null; // Shouldn't really matter, but for strict correctness...
+    _layoutTemplate = null; // Shouldn't really matter, but for strict correctness...
     _needsLayout = true;
   }
 
@@ -128,10 +130,10 @@ class TextPainter {
   /// After this is set, you must call [layout] before the next call to [paint].
   double get textScaleFactor => _textScaleFactor;
   double _textScaleFactor;
-
   set textScaleFactor(double value) {
     assert(value != null);
-    if (_textScaleFactor == value) return;
+    if (_textScaleFactor == value)
+      return;
     _textScaleFactor = value;
     _paragraph = null;
     _layoutTemplate = null;
@@ -156,11 +158,22 @@ class TextPainter {
   /// U+2026 HORIZONTAL ELLIPSIS (…).
   String get ellipsis => _ellipsis;
   String _ellipsis;
-
   set ellipsis(String value) {
     assert(value == null || value.isNotEmpty);
-    if (_ellipsis == value) return;
+    if (_ellipsis == value)
+      return;
     _ellipsis = value;
+    _paragraph = null;
+    _needsLayout = true;
+  }
+
+  /// The locale used to select region-specific glyphs.
+  Locale get locale => _locale;
+  Locale _locale;
+  set locale(Locale value) {
+    if (_locale == value)
+      return;
+    _locale = value;
     _paragraph = null;
     _needsLayout = true;
   }
@@ -174,11 +187,11 @@ class TextPainter {
   /// After this is set, you must call [layout] before the next call to [paint].
   int get maxLines => _maxLines;
   int _maxLines;
-
   /// The value may be null. If it is not null, then it must be greater than zero.
   set maxLines(int value) {
     assert(value == null || value > 0);
-    if (_maxLines == value) return;
+    if (_maxLines == value)
+      return;
     _maxLines = value;
     _paragraph = null;
     _needsLayout = true;
@@ -186,29 +199,27 @@ class TextPainter {
 
   ui.Paragraph _layoutTemplate;
 
-  ui.ParagraphStyle _createParagraphStyle(
-      [TextDirection defaultTextDirection]) {
+  ui.ParagraphStyle _createParagraphStyle([TextDirection defaultTextDirection]) {
     // The defaultTextDirection argument is used for preferredLineHeight in case
     // textDirection hasn't yet been set.
     assert(textAlign != null);
-    assert(textDirection != null || defaultTextDirection != null,
-        'TextPainter.textDirection must be set to a non-null value before using the TextPainter.');
+    assert(textDirection != null || defaultTextDirection != null, 'TextPainter.textDirection must be set to a non-null value before using the TextPainter.');
     return _text.style?.getParagraphStyle(
-          textAlign: textAlign,
-          textDirection: textDirection ?? defaultTextDirection,
-          textScaleFactor: textScaleFactor,
-          maxLines: _maxLines,
-          ellipsis: _ellipsis,
-        ) ??
-        new ui.ParagraphStyle(
-          textAlign: textAlign,
-          textDirection: textDirection ?? defaultTextDirection,
-          maxLines: maxLines,
-          ellipsis: ellipsis,
-        );
+      textAlign: textAlign,
+      textDirection: textDirection ?? defaultTextDirection,
+      textScaleFactor: textScaleFactor,
+      maxLines: _maxLines,
+      ellipsis: _ellipsis,
+      locale: _locale,
+    ) ?? ui.ParagraphStyle(
+      textAlign: textAlign,
+      textDirection: textDirection ?? defaultTextDirection,
+      maxLines: maxLines,
+      ellipsis: ellipsis,
+    );
   }
 
-  /// The height of a zero-width space in [text] in logical pixels.
+  /// The height of a space in [text] in logical pixels.
   ///
   /// Not every line of text in [text] will have this height, but this height
   /// is "typical" for text in [text] and useful for sizing other objects
@@ -222,15 +233,14 @@ class TextPainter {
   /// sans-serif font).
   double get preferredLineHeight {
     if (_layoutTemplate == null) {
-      final ui.ParagraphBuilder builder = new ui.ParagraphBuilder(
+      final ui.ParagraphBuilder builder = ui.ParagraphBuilder(
         _createParagraphStyle(TextDirection.rtl),
-      ); // direction doesn't matter, text is just a zero width space
+      ); // direction doesn't matter, text is just a space
       if (text?.style != null)
-        builder.pushStyle(
-            text.style.getTextStyle(textScaleFactor: textScaleFactor));
-      builder.addText(_kZeroWidthSpace);
+        builder.pushStyle(text.style.getTextStyle(textScaleFactor: textScaleFactor));
+      builder.addText(' ');
       _layoutTemplate = builder.build()
-        ..layout(new ui.ParagraphConstraints(width: double.infinity));
+        ..layout(ui.ParagraphConstraints(width: double.infinity));
     }
     return _layoutTemplate.height;
   }
@@ -284,30 +294,7 @@ class TextPainter {
   /// Valid only after [layout] has been called.
   Size get size {
     assert(!_needsLayout);
-    return new Size(width, height);
-  }
-
-  // Workaround for https://github.com/flutter/flutter/issues/13303
-  double _workaroundBaselineBug(double value, TextBaseline baseline) {
-    if (value >= 0.0) return value;
-
-    final ui.ParagraphBuilder builder = new ui.ParagraphBuilder(
-      _createParagraphStyle(TextDirection.ltr),
-    );
-    if (text?.style != null)
-      builder
-          .pushStyle(text.style.getTextStyle(textScaleFactor: textScaleFactor));
-    builder.addText(_kZeroWidthSpace);
-    final ui.Paragraph paragraph = builder.build()
-      ..layout(new ui.ParagraphConstraints(width: double.infinity));
-
-    switch (baseline) {
-      case TextBaseline.alphabetic:
-        return paragraph.alphabeticBaseline;
-      case TextBaseline.ideographic:
-        return paragraph.ideographicBaseline;
-    }
-    return null;
+    return Size(width, height);
   }
 
   /// Returns the distance from the top of the text to the first baseline of the
@@ -319,9 +306,9 @@ class TextPainter {
     assert(baseline != null);
     switch (baseline) {
       case TextBaseline.alphabetic:
-        return _workaroundBaselineBug(_paragraph.alphabeticBaseline, baseline);
+        return _paragraph.alphabeticBaseline;
       case TextBaseline.ideographic:
-        return _workaroundBaselineBug(_paragraph.ideographicBaseline, baseline);
+        return _paragraph.ideographicBaseline;
     }
     return null;
   }
@@ -353,27 +340,24 @@ class TextPainter {
   ///
   /// The [text] and [textDirection] properties must be non-null before this is
   /// called.
-  void layout({double minWidth: 0.0, double maxWidth: double.infinity}) {
-    assert(text != null,
-        'TextPainter.text must be set to a non-null value before using the TextPainter.');
-    assert(textDirection != null,
-        'TextPainter.textDirection must be set to a non-null value before using the TextPainter.');
+  void layout({ double minWidth = 0.0, double maxWidth = double.infinity }) {
+    assert(text != null, 'TextPainter.text must be set to a non-null value before using the TextPainter.');
+    assert(textDirection != null, 'TextPainter.textDirection must be set to a non-null value before using the TextPainter.');
     if (!_needsLayout && minWidth == _lastMinWidth && maxWidth == _lastMaxWidth)
       return;
     _needsLayout = false;
     if (_paragraph == null) {
-      final ui.ParagraphBuilder builder =
-          new ui.ParagraphBuilder(_createParagraphStyle());
+      final ui.ParagraphBuilder builder = ui.ParagraphBuilder(_createParagraphStyle());
       _text.build(builder, textScaleFactor: textScaleFactor);
       _paragraph = builder.build();
     }
     _lastMinWidth = minWidth;
     _lastMaxWidth = maxWidth;
-    _paragraph.layout(new ui.ParagraphConstraints(width: maxWidth));
+    _paragraph.layout(ui.ParagraphConstraints(width: maxWidth));
     if (minWidth != maxWidth) {
       final double newWidth = maxIntrinsicWidth.clamp(minWidth, maxWidth);
       if (newWidth != width)
-        _paragraph.layout(new ui.ParagraphConstraints(width: newWidth));
+        _paragraph.layout(ui.ParagraphConstraints(width: newWidth));
     }
   }
 
@@ -392,9 +376,10 @@ class TextPainter {
   void paint(Canvas canvas, Offset offset) {
     assert(() {
       if (_needsLayout) {
-        throw new FlutterError(
-            'TextPainter.paint called when text geometry was not yet calculated.\n'
-            'Please call layout() before paint() to position the text before painting it.');
+        throw FlutterError(
+          'TextPainter.paint called when text geometry was not yet calculated.\n'
+          'Please call layout() before paint() to position the text before painting it.'
+        );
       }
       return true;
     }());
@@ -405,11 +390,12 @@ class TextPainter {
     return value & 0xF800 == 0xD800;
   }
 
-  /// Returns the closest offset after `offset` at which the inout cursor can be
+  /// Returns the closest offset after `offset` at which the input cursor can be
   /// positioned.
   int getOffsetAfter(int offset) {
     final int nextCodeUnit = _text.codeUnitAt(offset);
-    if (nextCodeUnit == null) return null;
+    if (nextCodeUnit == null)
+      return null;
     // TODO(goderbauer): doesn't handle extended grapheme clusters with more than one Unicode scalar value (https://github.com/flutter/flutter/issues/13404).
     return _isUtf16Surrogate(nextCodeUnit) ? offset + 2 : offset + 1;
   }
@@ -418,41 +404,38 @@ class TextPainter {
   /// be positioned.
   int getOffsetBefore(int offset) {
     final int prevCodeUnit = _text.codeUnitAt(offset - 1);
-    if (prevCodeUnit == null) return null;
+    if (prevCodeUnit == null)
+      return null;
     // TODO(goderbauer): doesn't handle extended grapheme clusters with more than one Unicode scalar value (https://github.com/flutter/flutter/issues/13404).
     return _isUtf16Surrogate(prevCodeUnit) ? offset - 2 : offset - 1;
   }
 
   Offset _getOffsetFromUpstream(int offset, Rect caretPrototype) {
     final int prevCodeUnit = _text.codeUnitAt(offset - 1);
-    if (prevCodeUnit == null) return null;
-    final int prevRuneOffset =
-        _isUtf16Surrogate(prevCodeUnit) ? offset - 2 : offset - 1;
-    final List<TextBox> boxes =
-        _paragraph.getBoxesForRange(prevRuneOffset, offset);
-    if (boxes.isEmpty) return null;
+    if (prevCodeUnit == null)
+      return null;
+    final int prevRuneOffset = _isUtf16Surrogate(prevCodeUnit) ? offset - 2 : offset - 1;
+    final List<TextBox> boxes = _paragraph.getBoxesForRange(prevRuneOffset, offset);
+    if (boxes.isEmpty)
+      return null;
     final TextBox box = boxes[0];
     final double caretEnd = box.end;
-    final double dx = box.direction == TextDirection.rtl
-        ? caretEnd
-        : caretEnd - caretPrototype.width;
-    return new Offset(dx, box.top);
+    final double dx = box.direction == TextDirection.rtl ? caretEnd : caretEnd - caretPrototype.width;
+    return Offset(dx, box.top);
   }
 
   Offset _getOffsetFromDownstream(int offset, Rect caretPrototype) {
-    final int nextCodeUnit = _text.codeUnitAt(offset);
-    if (nextCodeUnit == null) return null;
-    final int nextRuneOffset =
-        _isUtf16Surrogate(nextCodeUnit) ? offset + 2 : offset + 1;
-    final List<TextBox> boxes =
-        _paragraph.getBoxesForRange(offset, nextRuneOffset);
-    if (boxes.isEmpty) return null;
+    final int nextCodeUnit = _text.codeUnitAt(offset - 1);
+    if (nextCodeUnit == null)
+      return null;
+    final int nextRuneOffset = _isUtf16Surrogate(nextCodeUnit) ? offset + 2 : offset + 1;
+    final List<TextBox> boxes = _paragraph.getBoxesForRange(offset, nextRuneOffset);
+    if (boxes.isEmpty)
+      return null;
     final TextBox box = boxes[0];
     final double caretStart = box.start;
-    final double dx = box.direction == TextDirection.rtl
-        ? caretStart - caretPrototype.width
-        : caretStart;
-    return new Offset(dx, box.top);
+    final double dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
+    return Offset(dx, box.top);
   }
 
   Offset get _emptyOffset {
@@ -462,15 +445,15 @@ class TextPainter {
       case TextAlign.left:
         return Offset.zero;
       case TextAlign.right:
-        return new Offset(width, 0.0);
+        return Offset(width, 0.0);
       case TextAlign.center:
-        return new Offset(width / 2.0, 0.0);
+        return Offset(width / 2.0, 0.0);
       case TextAlign.justify:
       case TextAlign.start:
         assert(textDirection != null);
         switch (textDirection) {
           case TextDirection.rtl:
-            return new Offset(width, 0.0);
+            return Offset(width, 0.0);
           case TextDirection.ltr:
             return Offset.zero;
         }
@@ -481,7 +464,7 @@ class TextPainter {
           case TextDirection.rtl:
             return Offset.zero;
           case TextDirection.ltr:
-            return new Offset(width, 0.0);
+            return Offset(width, 0.0);
         }
         return null;
     }
@@ -497,13 +480,13 @@ class TextPainter {
     assert(position.affinity != null);
     switch (position.affinity) {
       case TextAffinity.upstream:
-        return _getOffsetFromUpstream(offset, caretPrototype) ??
-            _getOffsetFromDownstream(offset, caretPrototype) ??
-            _emptyOffset;
+        return _getOffsetFromUpstream(offset, caretPrototype)
+            ?? _getOffsetFromDownstream(offset, caretPrototype)
+            ?? _emptyOffset;
       case TextAffinity.downstream:
-        return _getOffsetFromDownstream(offset, caretPrototype) ??
-            _getOffsetFromUpstream(offset, caretPrototype) ??
-            _emptyOffset;
+        return _getOffsetFromDownstream(offset, caretPrototype)
+            ?? _getOffsetFromUpstream(offset, caretPrototype)
+            ?? _emptyOffset;
     }
     return null;
   }
@@ -534,6 +517,6 @@ class TextPainter {
   TextRange getWordBoundary(TextPosition position) {
     assert(!_needsLayout);
     final List<int> indices = _paragraph.getWordBoundary(position.offset);
-    return new TextRange(start: indices[0], end: indices[1]);
+    return TextRange(start: indices[0], end: indices[1]);
   }
 }

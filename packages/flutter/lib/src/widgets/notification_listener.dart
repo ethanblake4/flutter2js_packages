@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
-
 import 'framework.dart';
 
 /// Signature for [Notification] listeners.
@@ -12,8 +10,7 @@ import 'framework.dart';
 /// notification to continue to be dispatched to further ancestors.
 ///
 /// Used by [NotificationListener.onNotification].
-typedef bool NotificationListenerCallback<T extends Notification>(
-    T notification);
+typedef NotificationListenerCallback<T extends Notification> = bool Function(T notification);
 
 /// A notification that can bubble up the widget tree.
 ///
@@ -45,8 +42,7 @@ abstract class Notification {
     if (element is StatelessElement) {
       final StatelessWidget widget = element.widget;
       if (widget is NotificationListener<Notification>) {
-        if (widget._dispatch(
-            this, element)) // that function checks the type dynamically
+        if (widget._dispatch(this, element)) // that function checks the type dynamically
           return false;
       }
     }
@@ -59,8 +55,7 @@ abstract class Notification {
   /// with the appropriate type parameters that are ancestors of the given
   /// [BuildContext].
   void dispatch(BuildContext target) {
-    assert(target !=
-        null); // Only call dispatch if the widget's State is still mounted.
+    assert(target != null); // Only call dispatch if the widget's State is still mounted.
     target.visitAncestorElements(visitAncestor);
   }
 
@@ -82,7 +77,7 @@ abstract class Notification {
   /// `super.debugFillDescription(description)`.
   @protected
   @mustCallSuper
-  void debugFillDescription(List<String> description) {}
+  void debugFillDescription(List<String> description) { }
 }
 
 /// A widget that listens for [Notification]s bubbling up the tree.
@@ -97,12 +92,13 @@ class NotificationListener<T extends Notification> extends StatelessWidget {
     Key key,
     @required this.child,
     this.onNotification,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   /// The widget directly below this widget in the tree.
   ///
   /// This is not necessarily the widget that dispatched the notification.
+  ///
+  /// {@macro flutter.widgets.child}
   final Widget child;
 
   /// Called when a notification of the appropriate type arrives at this
@@ -164,4 +160,4 @@ class NotificationListener<T extends Notification> extends StatelessWidget {
 /// useful for paint effects that depend on the layout. If you were to use this
 /// notification to change the build, for instance, you would always be one
 /// frame behind, which would look really ugly and laggy.
-class LayoutChangedNotification extends Notification {}
+class LayoutChangedNotification extends Notification { }

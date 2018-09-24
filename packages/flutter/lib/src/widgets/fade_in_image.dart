@@ -12,6 +12,9 @@ import 'framework.dart';
 import 'image.dart';
 import 'ticker_provider.dart';
 
+// Examples can assume:
+// Uint8List bytes;
+
 /// An image that shows a [placeholder] image while the target [image] is
 /// loading, then fades in the new image when it loads.
 ///
@@ -46,36 +49,46 @@ import 'ticker_provider.dart';
 /// different image. This is known as "gapless playback" (see also
 /// [Image.gaplessPlayback]).
 ///
-/// ## Sample code:
+/// ## Sample code
 ///
 /// ```dart
-/// return new FadeInImage(
+/// FadeInImage(
 ///   // here `bytes` is a Uint8List containing the bytes for the in-memory image
-///   placeholder: new MemoryImage(bytes),
-///   image: new NetworkImage('https://backend.example.com/image.png'),
-/// );
+///   placeholder: MemoryImage(bytes),
+///   image: NetworkImage('https://backend.example.com/image.png'),
+/// )
 /// ```
 class FadeInImage extends StatefulWidget {
   /// Creates a widget that displays a [placeholder] while an [image] is loading
   /// then cross-fades to display the [image].
   ///
   /// The [placeholder], [image], [fadeOutDuration], [fadeOutCurve],
-  /// [fadeInDuration], [fadeInCurve] and [repeat] arguments must not be null.
+  /// [fadeInDuration], [fadeInCurve], [alignment], [repeat], and
+  /// [matchTextDirection] arguments must not be null.
   const FadeInImage({
     Key key,
     @required this.placeholder,
     @required this.image,
-    this.fadeOutDuration: const Duration(milliseconds: 300),
-    this.fadeOutCurve: Curves.easeOut,
-    this.fadeInDuration: const Duration(milliseconds: 700),
-    this.fadeInCurve: Curves.easeIn,
+    this.fadeOutDuration = const Duration(milliseconds: 300),
+    this.fadeOutCurve = Curves.easeOut,
+    this.fadeInDuration = const Duration(milliseconds: 700),
+    this.fadeInCurve = Curves.easeIn,
     this.width,
     this.height,
     this.fit,
-    this.alignment,
-    this.repeat: ImageRepeat.noRepeat,
-  })
-      : super(key: key);
+    this.alignment = Alignment.center,
+    this.repeat = ImageRepeat.noRepeat,
+    this.matchTextDirection = false,
+  }) : assert(placeholder != null),
+       assert(image != null),
+       assert(fadeOutDuration != null),
+       assert(fadeOutCurve != null),
+       assert(fadeInDuration != null),
+       assert(fadeInCurve != null),
+       assert(alignment != null),
+       assert(repeat != null),
+       assert(matchTextDirection != null),
+       super(key: key);
 
   /// Creates a widget that uses a placeholder image stored in memory while
   /// loading the final image from the network.
@@ -88,8 +101,9 @@ class FadeInImage extends StatefulWidget {
   /// [ImageProvider]s (see also [ImageInfo.scale]).
   ///
   /// The [placeholder], [image], [placeholderScale], [imageScale],
-  /// [fadeOutDuration], [fadeOutCurve], [fadeInDuration], [fadeInCurve] and
-  /// [repeat] arguments must not be null.
+  /// [fadeOutDuration], [fadeOutCurve], [fadeInDuration], [fadeInCurve],
+  /// [alignment], [repeat], and [matchTextDirection] arguments must not be
+  /// null.
   ///
   /// See also:
   ///
@@ -101,21 +115,32 @@ class FadeInImage extends StatefulWidget {
     Key key,
     @required Uint8List placeholder,
     @required String image,
-    double placeholderScale: 1.0,
-    double imageScale: 1.0,
-    this.fadeOutDuration: const Duration(milliseconds: 300),
-    this.fadeOutCurve: Curves.easeOut,
-    this.fadeInDuration: const Duration(milliseconds: 700),
-    this.fadeInCurve: Curves.easeIn,
+    double placeholderScale = 1.0,
+    double imageScale = 1.0,
+    this.fadeOutDuration = const Duration(milliseconds: 300),
+    this.fadeOutCurve = Curves.easeOut,
+    this.fadeInDuration = const Duration(milliseconds: 700),
+    this.fadeInCurve = Curves.easeIn,
     this.width,
     this.height,
     this.fit,
-    this.alignment,
-    this.repeat: ImageRepeat.noRepeat,
-  })
-      : placeholder = new MemoryImage(placeholder, scale: placeholderScale),
-        image = new NetworkImage(image, scale: imageScale),
-        super(key: key);
+    this.alignment = Alignment.center,
+    this.repeat = ImageRepeat.noRepeat,
+    this.matchTextDirection = false,
+  }) : assert(placeholder != null),
+       assert(image != null),
+       assert(placeholderScale != null),
+       assert(imageScale != null),
+       assert(fadeOutDuration != null),
+       assert(fadeOutCurve != null),
+       assert(fadeInDuration != null),
+       assert(fadeInCurve != null),
+       assert(alignment != null),
+       assert(repeat != null),
+       assert(matchTextDirection != null),
+       placeholder = MemoryImage(placeholder, scale: placeholderScale),
+       image = NetworkImage(image, scale: imageScale),
+       super(key: key);
 
   /// Creates a widget that uses a placeholder image stored in an asset bundle
   /// while loading the final image from the network.
@@ -132,8 +157,8 @@ class FadeInImage extends StatefulWidget {
   /// exact asset specified will be used.
   ///
   /// The [placeholder], [image], [imageScale], [fadeOutDuration],
-  /// [fadeOutCurve], [fadeInDuration], [fadeInCurve] and [repeat] arguments
-  /// must not be null.
+  /// [fadeOutCurve], [fadeInDuration], [fadeInCurve], [alignment], [repeat],
+  /// and [matchTextDirection] arguments must not be null.
   ///
   /// See also:
   ///
@@ -147,23 +172,32 @@ class FadeInImage extends StatefulWidget {
     @required String image,
     AssetBundle bundle,
     double placeholderScale,
-    double imageScale: 1.0,
-    this.fadeOutDuration: const Duration(milliseconds: 300),
-    this.fadeOutCurve: Curves.easeOut,
-    this.fadeInDuration: const Duration(milliseconds: 700),
-    this.fadeInCurve: Curves.easeIn,
+    double imageScale = 1.0,
+    this.fadeOutDuration = const Duration(milliseconds: 300),
+    this.fadeOutCurve = Curves.easeOut,
+    this.fadeInDuration = const Duration(milliseconds: 700),
+    this.fadeInCurve = Curves.easeIn,
     this.width,
     this.height,
     this.fit,
-    this.alignment,
-    this.repeat: ImageRepeat.noRepeat,
-  })
-      : placeholder = placeholderScale != null
-            ? new ExactAssetImage(placeholder,
-                bundle: bundle, scale: placeholderScale)
-            : new AssetImage(placeholder, bundle: bundle),
-        image = new NetworkImage(image, scale: imageScale),
-        super(key: key);
+    this.alignment = Alignment.center,
+    this.repeat = ImageRepeat.noRepeat,
+    this.matchTextDirection = false,
+  }) : assert(placeholder != null),
+       assert(image != null),
+       placeholder = placeholderScale != null
+         ? ExactAssetImage(placeholder, bundle: bundle, scale: placeholderScale)
+         : AssetImage(placeholder, bundle: bundle),
+       assert(imageScale != null),
+       assert(fadeOutDuration != null),
+       assert(fadeOutCurve != null),
+       assert(fadeInDuration != null),
+       assert(fadeInCurve != null),
+       assert(alignment != null),
+       assert(repeat != null),
+       assert(matchTextDirection != null),
+       image = NetworkImage(image, scale: imageScale),
+       super(key: key);
 
   /// Image displayed while the target [image] is loading.
   final ImageProvider placeholder;
@@ -207,17 +241,52 @@ class FadeInImage extends StatefulWidget {
 
   /// How to align the image within its bounds.
   ///
-  /// An alignment of (0.0, 0.0) aligns the image to the top-left corner of its
-  /// layout bounds.  An alignment of (1.0, 0.5) aligns the image to the middle
-  /// of the right edge of its layout bounds.
-  final Alignment alignment;
+  /// The alignment aligns the given position in the image to the given position
+  /// in the layout bounds. For example, an [Alignment] alignment of (-1.0,
+  /// -1.0) aligns the image to the top-left corner of its layout bounds, while an
+  /// [Alignment] alignment of (1.0, 1.0) aligns the bottom right of the
+  /// image with the bottom right corner of its layout bounds. Similarly, an
+  /// alignment of (0.0, 1.0) aligns the bottom middle of the image with the
+  /// middle of the bottom edge of its layout bounds.
+  ///
+  /// If the [alignment] is [TextDirection]-dependent (i.e. if it is a
+  /// [AlignmentDirectional]), then an ambient [Directionality] widget
+  /// must be in scope.
+  ///
+  /// Defaults to [Alignment.center].
+  ///
+  /// See also:
+  ///
+  ///  * [Alignment], a class with convenient constants typically used to
+  ///    specify an [AlignmentGeometry].
+  ///  * [AlignmentDirectional], like [Alignment] for specifying alignments
+  ///    relative to text direction.
+  final AlignmentGeometry alignment;
 
   /// How to paint any portions of the layout bounds not covered by the image.
   final ImageRepeat repeat;
 
+  /// Whether to paint the image in the direction of the [TextDirection].
+  ///
+  /// If this is true, then in [TextDirection.ltr] contexts, the image will be
+  /// drawn with its origin in the top left (the "normal" painting direction for
+  /// images); and in [TextDirection.rtl] contexts, the image will be drawn with
+  /// a scaling factor of -1 in the horizontal direction so that the origin is
+  /// in the top right.
+  ///
+  /// This is occasionally used with images in right-to-left environments, for
+  /// images that were designed for left-to-right locales. Be careful, when
+  /// using this, to not flip images with integral shadows, text, or other
+  /// effects that will look incorrect when flipped.
+  ///
+  /// If this is true, there must be an ambient [Directionality] widget in
+  /// scope.
+  final bool matchTextDirection;
+
   @override
-  State<StatefulWidget> createState() => new _FadeInImageState();
+  State<StatefulWidget> createState() => _FadeInImageState();
 }
+
 
 /// The phases a [FadeInImage] goes through.
 @visibleForTesting
@@ -242,7 +311,7 @@ enum FadeInImagePhase {
   completed,
 }
 
-typedef void _ImageProviderResolverListener();
+typedef _ImageProviderResolverListener = void Function();
 
 class _ImageProviderResolver {
   _ImageProviderResolver({
@@ -260,10 +329,10 @@ class _ImageProviderResolver {
 
   void resolve(ImageProvider provider) {
     final ImageStream oldImageStream = _imageStream;
-    _imageStream = provider.resolve(createLocalImageConfiguration(state.context,
-        size: widget.width != null && widget.height != null
-            ? new Size(widget.width, widget.height)
-            : null));
+    _imageStream = provider.resolve(createLocalImageConfiguration(
+      state.context,
+      size: widget.width != null && widget.height != null ? Size(widget.width, widget.height) : null
+    ));
     assert(_imageStream != null);
 
     if (_imageStream.key != oldImageStream?.key) {
@@ -282,7 +351,7 @@ class _ImageProviderResolver {
   }
 }
 
-class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
+class _FadeInImageState extends State<FadeInImage> with TickerProviderStateMixin {
   _ImageProviderResolver _imageResolver;
   _ImageProviderResolver _placeholderResolver;
 
@@ -290,21 +359,17 @@ class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
   Animation<double> _animation;
 
   FadeInImagePhase _phase = FadeInImagePhase.start;
-
   FadeInImagePhase get phase => _phase;
 
   @override
   void initState() {
-    _imageResolver =
-        new _ImageProviderResolver(state: this, listener: _updatePhase);
-    _placeholderResolver = new _ImageProviderResolver(
-        state: this,
-        listener: () {
-          setState(() {
-            // Trigger rebuild to display the placeholder image
-          });
-        });
-    _controller = new AnimationController(
+    _imageResolver = _ImageProviderResolver(state: this, listener: _updatePhase);
+    _placeholderResolver = _ImageProviderResolver(state: this, listener: () {
+      setState(() {
+        // Trigger rebuild to display the placeholder image
+      });
+    });
+    _controller = AnimationController(
       value: 1.0,
       vsync: this,
     );
@@ -328,8 +393,8 @@ class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
   @override
   void didUpdateWidget(FadeInImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.image != oldWidget.image ||
-        widget.placeholder != widget.placeholder) _resolveImage();
+    if (widget.image != oldWidget.image || widget.placeholder != oldWidget.placeholder)
+      _resolveImage();
   }
 
   @override
@@ -342,9 +407,11 @@ class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
     _imageResolver.resolve(widget.image);
 
     // No need to resolve the placeholder if we are past the placeholder stage.
-    if (_isShowingPlaceholder) _placeholderResolver.resolve(widget.placeholder);
+    if (_isShowingPlaceholder)
+      _placeholderResolver.resolve(widget.placeholder);
 
-    if (_phase == FadeInImagePhase.start) _updatePhase();
+    if (_phase == FadeInImagePhase.start)
+      _updatePhase();
   }
 
   void _updatePhase() {
@@ -360,7 +427,7 @@ class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
           if (_imageResolver._imageInfo != null) {
             // Received image data. Begin placeholder fade-out.
             _controller.duration = widget.fadeOutDuration;
-            _animation = new CurvedAnimation(
+            _animation = CurvedAnimation(
               parent: _controller,
               curve: widget.fadeOutCurve,
             );
@@ -372,7 +439,7 @@ class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
           if (_controller.status == AnimationStatus.dismissed) {
             // Done fading out placeholder. Begin target image fade-in.
             _controller.duration = widget.fadeInDuration;
-            _animation = new CurvedAnimation(
+            _animation = CurvedAnimation(
               parent: _controller,
               curve: widget.fadeInCurve,
             );
@@ -419,35 +486,34 @@ class _FadeInImageState extends TickerProviderStateMixin<FadeInImage> {
 
   ImageInfo get _imageInfo {
     return _isShowingPlaceholder
-        ? _placeholderResolver._imageInfo
-        : _imageResolver._imageInfo;
+      ? _placeholderResolver._imageInfo
+      : _imageResolver._imageInfo;
   }
 
   @override
   Widget build(BuildContext context) {
     assert(_phase != FadeInImagePhase.start);
     final ImageInfo imageInfo = _imageInfo;
-    return new RawImage(
+    return RawImage(
       image: imageInfo?.image,
       width: widget.width,
       height: widget.height,
       scale: imageInfo?.scale ?? 1.0,
-      color: new Color.fromRGBO(255, 255, 255, _animation?.value ?? 1.0),
+      color: Color.fromRGBO(255, 255, 255, _animation?.value ?? 1.0),
       colorBlendMode: BlendMode.modulate,
       fit: widget.fit,
       alignment: widget.alignment,
       repeat: widget.repeat,
+      matchTextDirection: widget.matchTextDirection,
     );
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(new EnumProperty<FadeInImagePhase>('phase', _phase));
-    description.add(new DiagnosticsProperty<ImageInfo>('pixels', _imageInfo));
-    description.add(new DiagnosticsProperty<ImageStream>(
-        'image stream', _imageResolver._imageStream));
-    description.add(new DiagnosticsProperty<ImageStream>(
-        'placeholder stream', _placeholderResolver._imageStream));
+    description.add(EnumProperty<FadeInImagePhase>('phase', _phase));
+    description.add(DiagnosticsProperty<ImageInfo>('pixels', _imageInfo));
+    description.add(DiagnosticsProperty<ImageStream>('image stream', _imageResolver._imageStream));
+    description.add(DiagnosticsProperty<ImageStream>('placeholder stream', _placeholderResolver._imageStream));
   }
 }

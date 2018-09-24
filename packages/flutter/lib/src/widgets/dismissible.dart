@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
-
 import 'automatic_keep_alive.dart';
 import 'basic.dart';
 import 'debug.dart';
@@ -12,8 +10,7 @@ import 'gesture_detector.dart';
 import 'ticker_provider.dart';
 import 'transitions.dart';
 
-const Duration _kDismissDuration = const Duration(milliseconds: 200);
-const Curve _kResizeTimeCurve = const Interval(0.4, 1.0, curve: Curves.ease);
+const Curve _kResizeTimeCurve = Interval(0.4, 1.0, curve: Curves.ease);
 const double _kMinFlingVelocity = 700.0;
 const double _kMinFlingVelocityDelta = 400.0;
 const double _kFlingVelocityScale = 1.0 / 300.0;
@@ -23,7 +20,7 @@ const double _kDismissThreshold = 0.4;
 /// the given `direction`.
 ///
 /// Used by [Dismissible.onDismissed].
-typedef void DismissDirectionCallback(DismissDirection direction);
+typedef DismissDirectionCallback = void Function(DismissDirection direction);
 
 /// The direction in which a [Dismissible] can be dismissed.
 enum DismissDirection {
@@ -80,11 +77,14 @@ class Dismissible extends StatefulWidget {
     this.secondaryBackground,
     this.onResize,
     this.onDismissed,
-    this.direction: DismissDirection.horizontal,
-    this.resizeDuration: const Duration(milliseconds: 300),
-    this.dismissThresholds: const <DismissDirection, double>{},
-  })
-      : super(key: key);
+    this.direction = DismissDirection.horizontal,
+    this.resizeDuration = const Duration(milliseconds: 300),
+    this.dismissThresholds = const <DismissDirection, double>{},
+    this.movementDuration = const Duration(milliseconds: 200),
+    this.crossAxisEndOffset = 0.0,
+  }) : assert(key != null),
+       assert(secondaryBackground != null ? background != null : true),
+       super(key: key);
 
   /// The widget below this widget in the tree.
   ///
@@ -113,7 +113,7 @@ class Dismissible extends StatefulWidget {
   /// The amount of time the widget will spend contracting before [onDismissed] is called.
   ///
   /// If null, the widget will not contract and [onDismissed] will be called
-  /// immediately after the the widget is dismissed.
+  /// immediately after the widget is dismissed.
   final Duration resizeDuration;
 
   /// The offset threshold the item has to be dragged in order to be considered
@@ -133,13 +133,26 @@ class Dismissible extends StatefulWidget {
   /// [direction] property.
   final Map<DismissDirection, double> dismissThresholds;
 
+  /// Defines the duration for card to dismiss or to come back to original position if not dismissed.
+  final Duration movementDuration;
+
+  /// Defines the end offset across the main axis after the card is dismissed.
+  ///
+  /// If non-zero value is given then widget moves in cross direction depending on whether
+  /// it is positive or negative.
+  final double crossAxisEndOffset;
+
   @override
-  _DismissibleState createState() => new _DismissibleState();
+  _DismissibleState createState() => _DismissibleState();
 }
 
 class _DismissibleClipper extends CustomClipper<Rect> {
-  _DismissibleClipper({@required this.axis, @required this.moveAnimation})
-      : super(reclip: moveAnimation);
+  _DismissibleClipper({
+    @required this.axis,
+    @required this.moveAnimation
+  }) : assert(axis != null),
+       assert(moveAnimation != null),
+       super(reclip: moveAnimation);
 
   final Axis axis;
   final Animation<Offset> moveAnimation;
@@ -151,15 +164,13 @@ class _DismissibleClipper extends CustomClipper<Rect> {
       case Axis.horizontal:
         final double offset = moveAnimation.value.dx * size.width;
         if (offset < 0)
-          return new Rect.fromLTRB(
-              size.width + offset, 0.0, size.width, size.height);
-        return new Rect.fromLTRB(0.0, 0.0, offset, size.height);
+          return Rect.fromLTRB(size.width + offset, 0.0, size.width, size.height);
+        return Rect.fromLTRB(0.0, 0.0, offset, size.height);
       case Axis.vertical:
         final double offset = moveAnimation.value.dy * size.height;
         if (offset < 0)
-          return new Rect.fromLTRB(
-              0.0, size.height + offset, size.width, size.height);
-        return new Rect.fromLTRB(0.0, 0.0, size.width, offset);
+          return Rect.fromLTRB(0.0, size.height + offset, size.width, size.height);
+        return Rect.fromLTRB(0.0, 0.0, size.width, offset);
     }
     return null;
   }
@@ -169,54 +180,20 @@ class _DismissibleClipper extends CustomClipper<Rect> {
 
   @override
   bool shouldReclip(_DismissibleClipper oldClipper) {
-    return oldClipper.axis != axis ||
-        oldClipper.moveAnimation.value != moveAnimation.value;
+    return oldClipper.axis != axis
+        || oldClipper.moveAnimation.value != moveAnimation.value;
   }
 }
 
 enum _FlingGestureKind { none, forward, reverse }
 
-class _DismissibleState extends TickerProviderStateMixin<Dismissible>
-    implements AutomaticKeepAliveClientMixin<Dismissible> {
-  KeepAliveHandle _keepAliveHandle;
-
-  void _ensureKeepAlive() {
-    assert(_keepAliveHandle == null);
-    _keepAliveHandle = new KeepAliveHandle();
-    new KeepAliveNotification(_keepAliveHandle).dispatch(context);
-  }
-
-  void _releaseKeepAlive() {
-    _keepAliveHandle.release();
-    _keepAliveHandle = null;
-  }
-
-  /// Ensures that any [AutomaticKeepAlive] ancestors are in a good state, by
-  /// firing a [KeepAliveNotification] or triggering the [KeepAliveHandle] as
-  /// appropriate.
-  @protected
-  void updateKeepAlive() {
-    if (wantKeepAlive) {
-      if (_keepAliveHandle == null) _ensureKeepAlive();
-    } else {
-      if (_keepAliveHandle != null) _releaseKeepAlive();
-    }
-  }
-
-  @override
-  void deactivate() {
-    if (_keepAliveHandle != null) _releaseKeepAlive();
-    super.deactivate();
-  }
-
+class _DismissibleState extends State<Dismissible> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin { // ignore: MIXIN_INFERENCE_INCONSISTENT_MATCHING_CLASSES
   @override
   void initState() {
     super.initState();
-    _moveController =
-        new AnimationController(duration: _kDismissDuration, vsync: this)
-          ..addStatusListener(_handleDismissStatusChanged);
+    _moveController = AnimationController(duration: widget.movementDuration, vsync: this)
+      ..addStatusListener(_handleDismissStatusChanged);
     _updateMoveAnimation();
-    if (wantKeepAlive) _ensureKeepAlive();
   }
 
   AnimationController _moveController;
@@ -230,9 +207,7 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
   Size _sizePriorToCollapse;
 
   @override
-  bool get wantKeepAlive =>
-      _moveController?.isAnimating == true ||
-      _resizeController?.isAnimating == true;
+  bool get wantKeepAlive => _moveController?.isAnimating == true || _resizeController?.isAnimating == true;
 
   @override
   void dispose() {
@@ -242,23 +217,20 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
   }
 
   bool get _directionIsXAxis {
-    return widget.direction == DismissDirection.horizontal ||
-        widget.direction == DismissDirection.endToStart ||
-        widget.direction == DismissDirection.startToEnd;
+    return widget.direction == DismissDirection.horizontal
+        || widget.direction == DismissDirection.endToStart
+        || widget.direction == DismissDirection.startToEnd;
   }
 
   DismissDirection _extentToDirection(double extent) {
-    if (extent == 0.0) return null;
+    if (extent == 0.0)
+      return null;
     if (_directionIsXAxis) {
       switch (Directionality.of(context)) {
         case TextDirection.rtl:
-          return extent < 0
-              ? DismissDirection.startToEnd
-              : DismissDirection.endToStart;
+          return extent < 0 ? DismissDirection.startToEnd : DismissDirection.endToStart;
         case TextDirection.ltr:
-          return extent > 0
-              ? DismissDirection.startToEnd
-              : DismissDirection.endToStart;
+          return extent > 0 ? DismissDirection.startToEnd : DismissDirection.endToStart;
       }
       assert(false);
       return null;
@@ -280,8 +252,7 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
   void _handleDragStart(DragStartDetails details) {
     _dragUnderway = true;
     if (_moveController.isAnimating) {
-      _dragExtent =
-          _moveController.value * _overallDragAxisExtent * _dragExtent.sign;
+      _dragExtent = _moveController.value * _overallDragAxisExtent * _dragExtent.sign;
       _moveController.stop();
     } else {
       _dragExtent = 0.0;
@@ -293,7 +264,8 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    if (!_isActive || _moveController.isAnimating) return;
+    if (!_isActive || _moveController.isAnimating)
+      return;
 
     final double delta = details.primaryDelta;
     final double oldDragExtent = _dragExtent;
@@ -304,20 +276,24 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
         break;
 
       case DismissDirection.up:
-        if (_dragExtent + delta < 0) _dragExtent += delta;
+        if (_dragExtent + delta < 0)
+          _dragExtent += delta;
         break;
 
       case DismissDirection.down:
-        if (_dragExtent + delta > 0) _dragExtent += delta;
+        if (_dragExtent + delta > 0)
+          _dragExtent += delta;
         break;
 
       case DismissDirection.endToStart:
         switch (Directionality.of(context)) {
           case TextDirection.rtl:
-            if (_dragExtent + delta > 0) _dragExtent += delta;
+            if (_dragExtent + delta > 0)
+              _dragExtent += delta;
             break;
           case TextDirection.ltr:
-            if (_dragExtent + delta < 0) _dragExtent += delta;
+            if (_dragExtent + delta < 0)
+              _dragExtent += delta;
             break;
         }
         break;
@@ -325,10 +301,12 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
       case DismissDirection.startToEnd:
         switch (Directionality.of(context)) {
           case TextDirection.rtl:
-            if (_dragExtent + delta < 0) _dragExtent += delta;
+            if (_dragExtent + delta < 0)
+              _dragExtent += delta;
             break;
           case TextDirection.ltr:
-            if (_dragExtent + delta > 0) _dragExtent += delta;
+            if (_dragExtent + delta > 0)
+              _dragExtent += delta;
             break;
         }
         break;
@@ -345,11 +323,12 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
 
   void _updateMoveAnimation() {
     final double end = _dragExtent.sign;
-    _moveAnimation = new Tween<Offset>(
+    _moveAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: _directionIsXAxis ? new Offset(end, 0.0) : new Offset(0.0, end),
-    )
-        .animate(_moveController);
+      end: _directionIsXAxis
+          ? Offset(end, widget.crossAxisEndOffset)
+          : Offset(widget.crossAxisEndOffset, end),
+    ).animate(_moveController);
   }
 
   _FlingGestureKind _describeFlingGesture(Velocity velocity) {
@@ -367,58 +346,51 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
     DismissDirection flingDirection;
     // Verify that the fling is in the generally right direction and fast enough.
     if (_directionIsXAxis) {
-      if (vx.abs() - vy.abs() < _kMinFlingVelocityDelta ||
-          vx.abs() < _kMinFlingVelocity) return _FlingGestureKind.none;
+      if (vx.abs() - vy.abs() < _kMinFlingVelocityDelta || vx.abs() < _kMinFlingVelocity)
+        return _FlingGestureKind.none;
       assert(vx != 0.0);
       flingDirection = _extentToDirection(vx);
     } else {
-      if (vy.abs() - vx.abs() < _kMinFlingVelocityDelta ||
-          vy.abs() < _kMinFlingVelocity) return _FlingGestureKind.none;
+      if (vy.abs() - vx.abs() < _kMinFlingVelocityDelta || vy.abs() < _kMinFlingVelocity)
+        return _FlingGestureKind.none;
       assert(vy != 0.0);
       flingDirection = _extentToDirection(vy);
     }
     assert(_dismissDirection != null);
-    if (flingDirection == _dismissDirection) return _FlingGestureKind.forward;
+    if (flingDirection == _dismissDirection)
+      return _FlingGestureKind.forward;
     return _FlingGestureKind.reverse;
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    if (!_isActive || _moveController.isAnimating) return;
+    if (!_isActive || _moveController.isAnimating)
+      return;
     _dragUnderway = false;
     if (_moveController.isCompleted) {
       _startResizeAnimation();
       return;
     }
-    final double flingVelocity = _directionIsXAxis
-        ? details.velocity.pixelsPerSecond.dx
-        : details.velocity.pixelsPerSecond.dy;
+    final double flingVelocity = _directionIsXAxis ? details.velocity.pixelsPerSecond.dx : details.velocity.pixelsPerSecond.dy;
     switch (_describeFlingGesture(details.velocity)) {
       case _FlingGestureKind.forward:
         assert(_dragExtent != 0.0);
         assert(!_moveController.isDismissed);
-        if ((widget.dismissThresholds[_dismissDirection] ??
-                _kDismissThreshold) >=
-            1.0) {
+        if ((widget.dismissThresholds[_dismissDirection] ?? _kDismissThreshold) >= 1.0) {
           _moveController.reverse();
           break;
         }
         _dragExtent = flingVelocity.sign;
-        _moveController.fling(
-            velocity: flingVelocity.abs() * _kFlingVelocityScale);
+        _moveController.fling(velocity: flingVelocity.abs() * _kFlingVelocityScale);
         break;
       case _FlingGestureKind.reverse:
         assert(_dragExtent != 0.0);
         assert(!_moveController.isDismissed);
         _dragExtent = flingVelocity.sign;
-        _moveController.fling(
-            velocity: -flingVelocity.abs() * _kFlingVelocityScale);
+        _moveController.fling(velocity: -flingVelocity.abs() * _kFlingVelocityScale);
         break;
       case _FlingGestureKind.none:
-        if (!_moveController.isDismissed) {
-          // we already know it's not completed, we check that above
-          if (_moveController.value >
-              (widget.dismissThresholds[_dismissDirection] ??
-                  _kDismissThreshold)) {
+        if (!_moveController.isDismissed) { // we already know it's not completed, we check that above
+          if (_moveController.value > (widget.dismissThresholds[_dismissDirection] ?? _kDismissThreshold)) {
             _moveController.forward();
           } else {
             _moveController.reverse();
@@ -446,16 +418,19 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
         widget.onDismissed(direction);
       }
     } else {
-      _resizeController =
-          new AnimationController(duration: widget.resizeDuration, vsync: this)
-            ..addListener(_handleResizeProgressChanged)
-            ..addStatusListener((AnimationStatus status) => updateKeepAlive());
+      _resizeController = AnimationController(duration: widget.resizeDuration, vsync: this)
+        ..addListener(_handleResizeProgressChanged)
+        ..addStatusListener((AnimationStatus status) => updateKeepAlive());
       _resizeController.forward();
       setState(() {
         _sizePriorToCollapse = context.size;
-        _resizeAnimation = new Tween<double>(begin: 1.0, end: 0.0).animate(
-            new CurvedAnimation(
-                parent: _resizeController, curve: _kResizeTimeCurve));
+        _resizeAnimation = Tween<double>(
+          begin: 1.0,
+          end: 0.0
+        ).animate(CurvedAnimation(
+          parent: _resizeController,
+          curve: _kResizeTimeCurve
+        ));
       });
     }
   }
@@ -468,21 +443,21 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
         widget.onDismissed(direction);
       }
     } else {
-      if (widget.onResize != null) widget.onResize();
+      if (widget.onResize != null)
+        widget.onResize();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (wantKeepAlive && _keepAliveHandle == null) _ensureKeepAlive();
+    super.build(context); // See AutomaticKeepAliveClientMixin.
 
     assert(!_directionIsXAxis || debugCheckHasDirectionality(context));
 
     Widget background = widget.background;
     if (widget.secondaryBackground != null) {
       final DismissDirection direction = _dismissDirection;
-      if (direction == DismissDirection.endToStart ||
-          direction == DismissDirection.up)
+      if (direction == DismissDirection.endToStart || direction == DismissDirection.up)
         background = widget.secondaryBackground;
     }
 
@@ -491,52 +466,61 @@ class _DismissibleState extends TickerProviderStateMixin<Dismissible>
       assert(() {
         if (_resizeAnimation.status != AnimationStatus.forward) {
           assert(_resizeAnimation.status == AnimationStatus.completed);
-          throw new FlutterError(
-              'A dismissed Dismissible widget is still part of the tree.\n'
-              'Make sure to implement the onDismissed handler and to immediately remove the Dismissible\n'
-              'widget from the application once that handler has fired.');
+          throw FlutterError(
+            'A dismissed Dismissible widget is still part of the tree.\n'
+            'Make sure to implement the onDismissed handler and to immediately remove the Dismissible\n'
+            'widget from the application once that handler has fired.'
+          );
         }
         return true;
       }());
 
-      return new SizeTransition(
-          sizeFactor: _resizeAnimation,
-          axis: _directionIsXAxis ? Axis.vertical : Axis.horizontal,
-          child: new SizedBox(
-              width: _sizePriorToCollapse.width,
-              height: _sizePriorToCollapse.height,
-              child: background));
+      return SizeTransition(
+        sizeFactor: _resizeAnimation,
+        axis: _directionIsXAxis ? Axis.vertical : Axis.horizontal,
+        child: SizedBox(
+          width: _sizePriorToCollapse.width,
+          height: _sizePriorToCollapse.height,
+          child: background
+        )
+      );
     }
 
-    Widget content =
-        new SlideTransition(position: _moveAnimation, child: widget.child);
+    Widget content = SlideTransition(
+      position: _moveAnimation,
+      child: widget.child
+    );
 
     if (background != null) {
       final List<Widget> children = <Widget>[];
 
       if (!_moveAnimation.isDismissed) {
-        children.add(new Positioned.fill(
-            child: new ClipRect(
-                clipper: new _DismissibleClipper(
-                  axis: _directionIsXAxis ? Axis.horizontal : Axis.vertical,
-                  moveAnimation: _moveAnimation,
-                ),
-                child: background)));
+        children.add(Positioned.fill(
+          child: ClipRect(
+            clipper: _DismissibleClipper(
+              axis: _directionIsXAxis ? Axis.horizontal : Axis.vertical,
+              moveAnimation: _moveAnimation,
+            ),
+            child: background
+          )
+        ));
       }
 
       children.add(content);
-      content = new Stack(children: children);
+      content = Stack(children: children);
     }
 
     // We are not resizing but we may be being dragging in widget.direction.
-    return new GestureDetector(
-        onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
-        onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
-        onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
-        onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
-        onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
-        onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
-        behavior: HitTestBehavior.opaque,
-        child: content);
+    return GestureDetector(
+      onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
+      onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
+      onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
+      onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
+      onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
+      onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
+      behavior: HitTestBehavior.opaque,
+      child: content
+    );
   }
 }
+

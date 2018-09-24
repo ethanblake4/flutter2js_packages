@@ -4,8 +4,10 @@
 
 import 'dart:async';
 
-import 'package:flutter2js/flutter_internals.dart' as flutter2js;
 import 'package:flutter/foundation.dart';
+import 'package:flutter2js/flutter_internals.dart' as flutter2js;
+
+import 'system_channels.dart';
 
 /// Data stored on the system clipboard.
 ///
@@ -14,7 +16,7 @@ import 'package:flutter/foundation.dart';
 @immutable
 class ClipboardData {
   /// Creates data for the system clipboard.
-  const ClipboardData({this.text});
+  const ClipboardData({ this.text });
 
   /// Plain text variant of this clipboard data.
   final String text;
@@ -32,8 +34,8 @@ class Clipboard {
   static const String kTextPlain = 'text/plain';
 
   /// Stores the given clipboard data on the clipboard.
-  static Future<Null> setData(ClipboardData data) {
-    return flutter2js.PlatformPlugin.current.clipboardSetData(data);
+  static Future<Null> setData(ClipboardData data) async {
+    await flutter2js.PlatformPlugin.current.clipboardSetData(data);
   }
 
   /// Retrieves data from the clipboard that matches the given format.
@@ -43,7 +45,7 @@ class Clipboard {
   ///
   /// Returns a future which completes to null if the data could not be
   /// obtained, and to a [ClipboardData] object if it could.
-  static Future<ClipboardData> getData(String format) {
-    return flutter2js.PlatformPlugin.current.clipboardGetData(format);
+  static Future<ClipboardData> getData(String format) async {
+    return await flutter2js.PlatformPlugin.current.clipboardGetData(format);
   }
 }

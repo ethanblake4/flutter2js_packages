@@ -12,7 +12,6 @@
 ///    bidirectional text algorithm.
 class Unicode {
   Unicode._();
-
   /// U+202A LEFT-TO-RIGHT EMBEDDING
   ///
   /// Treat the following text as embedded left-to-right.

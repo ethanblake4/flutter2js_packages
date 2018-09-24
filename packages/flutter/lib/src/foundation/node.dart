@@ -4,6 +4,10 @@
 
 import 'package:meta/meta.dart';
 
+// This file gets mutated by //dev/devicelab/bin/tasks/flutter_test_performance.dart
+// during device lab performance tests. When editing this file, check to make sure
+// that it didn't break that test.
+
 /// An abstract node in a tree.
 ///
 /// AbstractNode has as notion of depth, attachment, and parent, but does not
@@ -60,7 +64,7 @@ class AbstractNode {
   ///
   /// Override this method in subclasses with child nodes to call [redepthChild]
   /// for each child. Do not call this method directly.
-  void redepthChildren() {}
+  void redepthChildren() { }
 
   /// The owner for this node (null if unattached).
   ///
@@ -118,12 +122,14 @@ class AbstractNode {
     assert(child._parent == null);
     assert(() {
       AbstractNode node = this;
-      while (node.parent != null) node = node.parent;
+      while (node.parent != null)
+        node = node.parent;
       assert(node != child); // indicates we are about to create a cycle
       return true;
     }());
     child._parent = this;
-    if (attached) child.attach(_owner);
+    if (attached)
+      child.attach(_owner);
     redepthChild(child);
   }
 
@@ -137,6 +143,7 @@ class AbstractNode {
     assert(child._parent == this);
     assert(child.attached == attached);
     child._parent = null;
-    if (attached) child.detach();
+    if (attached)
+      child.detach();
   }
 }

@@ -10,6 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'basic.dart';
+import 'debug.dart';
 import 'framework.dart';
 import 'ticker_provider.dart';
 
@@ -59,11 +60,13 @@ class OverlayEntry {
   /// call [remove] on the overlay entry itself.
   OverlayEntry({
     @required this.builder,
-    bool opaque: false,
-    bool maintainState: false,
-  })
-      : _opaque = opaque,
-        _maintainState = maintainState;
+    bool opaque = false,
+    bool maintainState = false,
+  }) : assert(builder != null),
+       assert(opaque != null),
+       assert(maintainState != null),
+       _opaque = opaque,
+       _maintainState = maintainState;
 
   /// This entry will include the widget built by this builder in the overlay at
   /// the entry's position.
@@ -79,9 +82,9 @@ class OverlayEntry {
   /// set.
   bool get opaque => _opaque;
   bool _opaque;
-
   set opaque(bool value) {
-    if (_opaque == value) return;
+    if (_opaque == value)
+      return;
     _opaque = value;
     assert(_overlay != null);
     _overlay._didChangeEntryOpacity();
@@ -103,18 +106,17 @@ class OverlayEntry {
   /// from subsequent routes will be handled properly when they complete.
   bool get maintainState => _maintainState;
   bool _maintainState;
-
   set maintainState(bool value) {
     assert(_maintainState != null);
-    if (_maintainState == value) return;
+    if (_maintainState == value)
+      return;
     _maintainState = value;
     assert(_overlay != null);
     _overlay._didChangeEntryOpacity();
   }
 
   OverlayState _overlay;
-  final GlobalKey<_OverlayEntryState> _key =
-      new GlobalKey<_OverlayEntryState>();
+  final GlobalKey<_OverlayEntryState> _key = GlobalKey<_OverlayEntryState>();
 
   /// Remove this entry from the overlay.
   ///
@@ -131,8 +133,7 @@ class OverlayEntry {
     assert(_overlay != null);
     final OverlayState overlay = _overlay;
     _overlay = null;
-    if (SchedulerBinding.instance.schedulerPhase ==
-        SchedulerPhase.persistentCallbacks) {
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
       SchedulerBinding.instance.addPostFrameCallback((Duration duration) {
         overlay._remove(this);
       });
@@ -149,17 +150,18 @@ class OverlayEntry {
   }
 
   @override
-  String toString() => '${describeIdentity(
-          this)}(opaque: $opaque; maintainState: $maintainState)';
+  String toString() => '${describeIdentity(this)}(opaque: $opaque; maintainState: $maintainState)';
 }
 
 class _OverlayEntry extends StatefulWidget {
-  _OverlayEntry(this.entry) : super(key: entry._key);
+  _OverlayEntry(this.entry)
+    : assert(entry != null),
+      super(key: entry._key);
 
   final OverlayEntry entry;
 
   @override
-  _OverlayEntryState createState() => new _OverlayEntryState();
+  _OverlayEntryState createState() => _OverlayEntryState();
 }
 
 class _OverlayEntryState extends State<_OverlayEntry> {
@@ -169,9 +171,7 @@ class _OverlayEntryState extends State<_OverlayEntry> {
   }
 
   void _markNeedsBuild() {
-    setState(() {
-      /* the state that changed is in the builder */
-    });
+    setState(() { /* the state that changed is in the builder */ });
   }
 }
 
@@ -200,8 +200,11 @@ class Overlay extends StatefulWidget {
   ///
   /// Rather than creating an overlay, consider using the overlay that is
   /// created by the [WidgetsApp] or the [MaterialApp] for the application.
-  const Overlay({Key key, this.initialEntries: const <OverlayEntry>[]})
-      : super(key: key);
+  const Overlay({
+    Key key,
+    this.initialEntries = const <OverlayEntry>[]
+  }) : assert(initialEntries != null),
+       super(key: key);
 
   /// The entries to include in the overlay initially.
   ///
@@ -231,21 +234,21 @@ class Overlay extends StatefulWidget {
   /// ```dart
   /// OverlayState overlay = Overlay.of(context);
   /// ```
-  static OverlayState of(BuildContext context, {Widget debugRequiredFor}) {
-    final OverlayState result =
-        context.ancestorStateOfType(const TypeMatcher<OverlayState>());
+  static OverlayState of(BuildContext context, { Widget debugRequiredFor }) {
+    final OverlayState result = context.ancestorStateOfType(const TypeMatcher<OverlayState>());
     assert(() {
       if (debugRequiredFor != null && result == null) {
         final String additional = context.widget != debugRequiredFor
-            ? '\nThe context from which that widget was searching for an overlay was:\n  $context'
-            : '';
-        throw new FlutterError('No Overlay widget found.\n'
-            '${debugRequiredFor
-            .runtimeType} widgets require an Overlay widget ancestor for correct operation.\n'
-            'The most common way to add an Overlay to an application is to include a MaterialApp or Navigator widget in the runApp() call.\n'
-            'The specific widget that failed to find an overlay was:\n'
-            '  $debugRequiredFor'
-            '$additional');
+          ? '\nThe context from which that widget was searching for an overlay was:\n  $context'
+          : '';
+        throw FlutterError(
+          'No Overlay widget found.\n'
+          '${debugRequiredFor.runtimeType} widgets require an Overlay widget ancestor for correct operation.\n'
+          'The most common way to add an Overlay to an application is to include a MaterialApp or Navigator widget in the runApp() call.\n'
+          'The specific widget that failed to find an overlay was:\n'
+          '  $debugRequiredFor'
+          '$additional'
+        );
       }
       return true;
     }());
@@ -253,14 +256,14 @@ class Overlay extends StatefulWidget {
   }
 
   @override
-  OverlayState createState() => new OverlayState();
+  OverlayState createState() => OverlayState();
 }
 
 /// The current state of an [Overlay].
 ///
 /// Used to insert [OverlayEntry]s into the overlay using the [insert] and
 /// [insertAll] functions.
-class OverlayState extends TickerProviderStateMixin<Overlay> {
+class OverlayState extends State<Overlay> with TickerProviderStateMixin {
   final List<OverlayEntry> _entries = <OverlayEntry>[];
 
   @override
@@ -273,14 +276,12 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
   ///
   /// If [above] is non-null, the entry is inserted just above [above].
   /// Otherwise, the entry is inserted on top.
-  void insert(OverlayEntry entry, {OverlayEntry above}) {
+  void insert(OverlayEntry entry, { OverlayEntry above }) {
     assert(entry._overlay == null);
-    assert(
-        above == null || (above._overlay == this && _entries.contains(above)));
+    assert(above == null || (above._overlay == this && _entries.contains(above)));
     entry._overlay = this;
     setState(() {
-      final int index =
-          above == null ? _entries.length : _entries.indexOf(above) + 1;
+      final int index = above == null ? _entries.length : _entries.indexOf(above) + 1;
       _entries.insert(index, entry);
     });
   }
@@ -289,17 +290,16 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
   ///
   /// If [above] is non-null, the entries are inserted just above [above].
   /// Otherwise, the entries are inserted on top.
-  void insertAll(Iterable<OverlayEntry> entries, {OverlayEntry above}) {
-    assert(
-        above == null || (above._overlay == this && _entries.contains(above)));
-    if (entries.isEmpty) return;
+  void insertAll(Iterable<OverlayEntry> entries, { OverlayEntry above }) {
+    assert(above == null || (above._overlay == this && _entries.contains(above)));
+    if (entries.isEmpty)
+      return;
     for (OverlayEntry entry in entries) {
       assert(entry._overlay == null);
       entry._overlay = this;
     }
     setState(() {
-      final int index =
-          above == null ? _entries.length : _entries.indexOf(above) + 1;
+      final int index = above == null ? _entries.length : _entries.indexOf(above) + 1;
       _entries.insertAll(index, entries);
     });
   }
@@ -307,9 +307,7 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
   void _remove(OverlayEntry entry) {
     if (mounted) {
       _entries.remove(entry);
-      setState(() {
-        /* entry was removed */
-      });
+      setState(() { /* entry was removed */ });
     }
   }
 
@@ -329,7 +327,8 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
           result = true;
           break;
         }
-        if (candidate.opaque) break;
+        if (candidate.opaque)
+          break;
       }
       return true;
     }());
@@ -354,15 +353,15 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
     for (int i = _entries.length - 1; i >= 0; i -= 1) {
       final OverlayEntry entry = _entries[i];
       if (onstage) {
-        onstageChildren.add(new _OverlayEntry(entry));
-        if (entry.opaque) onstage = false;
+        onstageChildren.add(_OverlayEntry(entry));
+        if (entry.opaque)
+          onstage = false;
       } else if (entry.maintainState) {
-        offstageChildren.add(
-            new TickerMode(enabled: false, child: new _OverlayEntry(entry)));
+        offstageChildren.add(TickerMode(enabled: false, child: _OverlayEntry(entry)));
       }
     }
-    return new _Theatre(
-      onstage: new Stack(
+    return _Theatre(
+      onstage: Stack(
         fit: StackFit.expand,
         children: onstageChildren.reversed.toList(growable: false),
       ),
@@ -371,12 +370,11 @@ class OverlayState extends TickerProviderStateMixin<Overlay> {
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder description) {
-    super.debugFillProperties(description);
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
     // TODO(jacobr): use IterableProperty instead as that would
     // provide a slightly more consistent string summary of the List.
-    description
-        .add(new DiagnosticsProperty<List<OverlayEntry>>('entries', _entries));
+    properties.add(DiagnosticsProperty<List<OverlayEntry>>('entries', _entries));
   }
 }
 
@@ -392,22 +390,24 @@ class _Theatre extends RenderObjectWidget {
   _Theatre({
     this.onstage,
     @required this.offstage,
-  });
+  }) : assert(offstage != null),
+       assert(!offstage.any((Widget child) => child == null));
 
   final Stack onstage;
 
   final List<Widget> offstage;
 
   @override
-  _TheatreElement createElement() => new _TheatreElement(this);
+  _TheatreElement createElement() => _TheatreElement(this);
 
   @override
-  _RenderTheatre createRenderObject(BuildContext context) =>
-      new _RenderTheatre();
+  _RenderTheatre createRenderObject(BuildContext context) => _RenderTheatre();
 }
 
 class _TheatreElement extends RenderObjectElement {
-  _TheatreElement(_Theatre widget) : super(widget);
+  _TheatreElement(_Theatre widget)
+    : assert(!debugChildrenHaveDuplicateKeys(widget, widget.offstage)),
+      super(widget);
 
   @override
   _Theatre get widget => super.widget;
@@ -416,10 +416,10 @@ class _TheatreElement extends RenderObjectElement {
   _RenderTheatre get renderObject => super.renderObject;
 
   Element _onstage;
-  static final Object _onstageSlot = new Object();
+  static final Object _onstageSlot = Object();
 
   List<Element> _offstage;
-  final Set<Element> _forgottenOffstageChildren = new HashSet<Element>();
+  final Set<Element> _forgottenOffstageChildren = HashSet<Element>();
 
   @override
   void insertChildRenderObject(RenderBox child, dynamic slot) {
@@ -461,15 +461,18 @@ class _TheatreElement extends RenderObjectElement {
 
   @override
   void visitChildren(ElementVisitor visitor) {
-    if (_onstage != null) visitor(_onstage);
+    if (_onstage != null)
+      visitor(_onstage);
     for (Element child in _offstage) {
-      if (!_forgottenOffstageChildren.contains(child)) visitor(child);
+      if (!_forgottenOffstageChildren.contains(child))
+        visitor(child);
     }
   }
 
   @override
   void debugVisitOnstageChildren(ElementVisitor visitor) {
-    if (_onstage != null) visitor(_onstage);
+    if (_onstage != null)
+      visitor(_onstage);
   }
 
   @override
@@ -488,7 +491,7 @@ class _TheatreElement extends RenderObjectElement {
   void mount(Element parent, dynamic newSlot) {
     super.mount(parent, newSlot);
     _onstage = updateChild(_onstage, widget.onstage, _onstageSlot);
-    _offstage = new List<Element>(widget.offstage.length);
+    _offstage = List<Element>(widget.offstage.length);
     Element previousChild;
     for (int i = 0; i < _offstage.length; i += 1) {
       final Element newChild = inflateWidget(widget.offstage[i], previousChild);
@@ -502,8 +505,7 @@ class _TheatreElement extends RenderObjectElement {
     super.update(newWidget);
     assert(widget == newWidget);
     _onstage = updateChild(_onstage, widget.onstage, _onstageSlot);
-    _offstage = updateChildren(_offstage, widget.offstage,
-        forgottenChildren: _forgottenOffstageChildren);
+    _offstage = updateChildren(_offstage, widget.offstage, forgottenChildren: _forgottenOffstageChildren);
     _forgottenOffstageChildren.clear();
   }
 }
@@ -516,37 +518,14 @@ class _TheatreElement extends RenderObjectElement {
 // This class uses [StackParentData] objects for its parent data so that the
 // children of its primary subtree's stack can be moved to this object's list
 // of zombie children without changing their parent data objects.
-class _RenderTheatre extends RenderBoxWithChildMixin<RenderBox>
-    with RenderProxyBoxMixin, ContainerRenderObjectMixin<RenderBox, StackParentData> {
-
-  /// IMPORTANT: Flutter2js-only
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-    RenderBox child = this.firstChild;
-    while (child != null) {
-      child.attach(owner);
-      final StackParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
-
-  /// IMPORTANT: Flutter2js-only
-  @override
-  void detach() {
-    super.detach();
-    RenderBox child = this.firstChild;
-    while (child != null) {
-      child.detach();
-      final StackParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-  }
+class _RenderTheatre extends RenderBox
+  with RenderObjectWithChildMixin<RenderStack>, RenderProxyBoxMixin<RenderStack>,
+       ContainerRenderObjectMixin<RenderBox, StackParentData> {
 
   @override
   void setupParentData(RenderObject child) {
     if (child.parentData is! StackParentData)
-      child.parentData = new StackParentData();
+      child.parentData = StackParentData();
   }
 
   // Because both RenderObjectWithChildMixin and ContainerRenderObjectMixin
@@ -567,13 +546,15 @@ class _RenderTheatre extends RenderBoxWithChildMixin<RenderBox>
 
   @override
   void redepthChildren() {
-    if (child != null) redepthChild(child);
+    if (child != null)
+      redepthChild(child);
     super.redepthChildren();
   }
 
   @override
   void visitChildren(RenderObjectVisitor visitor) {
-    if (child != null) visitor(child);
+    if (child != null)
+      visitor(child);
     super.visitChildren(visitor);
   }
 
@@ -581,7 +562,8 @@ class _RenderTheatre extends RenderBoxWithChildMixin<RenderBox>
   List<DiagnosticsNode> debugDescribeChildren() {
     final List<DiagnosticsNode> children = <DiagnosticsNode>[];
 
-    if (child != null) children.add(child.toDiagnosticsNode(name: 'onstage'));
+    if (child != null)
+      children.add(child.toDiagnosticsNode(name: 'onstage'));
 
     if (firstChild != null) {
       RenderBox child = firstChild;
@@ -594,24 +576,26 @@ class _RenderTheatre extends RenderBoxWithChildMixin<RenderBox>
             style: DiagnosticsTreeStyle.offstage,
           ),
         );
-        if (child == lastChild) break;
+        if (child == lastChild)
+          break;
         final StackParentData childParentData = child.parentData;
         child = childParentData.nextSibling;
         count += 1;
       }
     } else {
       children.add(
-        new DiagnosticsNode.message(
+        DiagnosticsNode.message(
           'no offstage children',
           style: DiagnosticsTreeStyle.offstage,
         ),
       );
     }
     return children;
-  }
+   }
 
   @override
   void visitChildrenForSemantics(RenderObjectVisitor visitor) {
-    if (child != null) visitor(child);
+    if (child != null)
+      visitor(child);
   }
 }
