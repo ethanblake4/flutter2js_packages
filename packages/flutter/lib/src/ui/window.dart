@@ -319,7 +319,6 @@ class Locale {
 /// There is a single Window instance in the system, which you can
 /// obtain from the [window] property.
 abstract class Window {
-  Window._();
 
   /// The number of device pixels for each logical pixel. This number might not
   /// be a power of two. Indeed, it might not even be an integer. For example,
