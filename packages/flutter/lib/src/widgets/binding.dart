@@ -940,6 +940,8 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
   factory WidgetsFlutterBinding() =>
       flutter2js.PlatformPlugin.current.newWidgetsFlutterBinding();
 
+  WidgetsFlutterBinding.constructor() : super();
+
   /// Returns an instance of the [WidgetsBinding], creating and
   /// initializing it if necessary. If one is created, it will be a
   /// [WidgetsFlutterBinding]. If one was previously initialized, then
