@@ -115,7 +115,7 @@ enum AnimationBehavior {
 /// (This assumes that the controllers are created in [State.initState] and
 /// disposed in [State.dispose].)
 class AnimationController extends Animation<double>
-  with AnimationEagerListenerMixin, AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
+  with MxListenerMixin, AnimationEagerListenerMixin, AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
 
   /// Creates an animation controller.
   ///

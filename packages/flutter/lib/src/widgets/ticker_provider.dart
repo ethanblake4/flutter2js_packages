@@ -74,10 +74,9 @@ class TickerMode extends InheritedWidget {
 /// [AnimationController] objects over the lifetime of the [State], use a full
 /// [TickerProviderStateMixin] instead.
 @optionalTypeArgs
-abstract class SingleTickerProviderStateMixin<T extends StatefulWidget> extends State<T> implements TickerProvider {
+mixin SingleTickerProviderStateMixin<T extends StatefulWidget> on State<T> implements TickerProvider {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory SingleTickerProviderStateMixin._() => null;
 
   Ticker _ticker;
 
@@ -156,10 +155,9 @@ abstract class SingleTickerProviderStateMixin<T extends StatefulWidget> extends 
 /// [AnimationController]) for the lifetime of your [State], then using a
 /// [SingleTickerProviderStateMixin] is more efficient. This is the common case.
 @optionalTypeArgs
-abstract class TickerProviderStateMixin<T extends StatefulWidget> extends State<T> implements TickerProvider {
+mixin TickerProviderStateMixin<T extends StatefulWidget> on State<T> implements TickerProvider {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory TickerProviderStateMixin._() => null;
 
   Set<Ticker> _tickers;
 

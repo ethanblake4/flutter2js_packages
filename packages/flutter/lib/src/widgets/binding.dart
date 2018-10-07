@@ -240,7 +240,7 @@ abstract class WidgetsBindingObserver {
 }
 
 /// The glue between the widgets layer and the Flutter engine.
-abstract class WidgetsBinding extends BindingBase with SchedulerBinding, GestureBinding, RendererBinding {
+abstract class WidgetsBinding extends BindingBase with ServicesBinding, SchedulerBinding, GestureBinding, SemanticsBinding, RendererBinding {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   factory WidgetsBinding._() => null;

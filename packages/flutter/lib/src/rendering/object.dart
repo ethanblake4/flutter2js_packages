@@ -2785,10 +2785,9 @@ abstract class ContainerParentDataMixin<ChildType extends RenderObject> extends 
 ///
 /// Provides a child model for a render object subclass that has a doubly-linked
 /// list of children.
-abstract class ContainerRenderObjectMixin<ChildType extends RenderObject, ParentDataType extends ContainerParentDataMixin<ChildType>> extends RenderObject {
+mixin ContainerRenderObjectMixin<ChildType extends RenderObject, ParentDataType extends ContainerParentDataMixin<ChildType>> on RenderObject {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory ContainerRenderObjectMixin._() => null;
 
   bool _debugUltimatePreviousSiblingOf(ChildType child, { ChildType equals }) {
     ParentDataType childParentData = child.parentData;

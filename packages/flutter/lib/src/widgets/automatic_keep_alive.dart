@@ -341,10 +341,9 @@ class KeepAliveHandle extends ChangeNotifier {
 ///  * [AutomaticKeepAlive], which listens to messages from this mixin.
 ///  * [KeepAliveNotification], the notifications sent by this mixin.
 @optionalTypeArgs
-abstract class AutomaticKeepAliveClientMixin<T extends StatefulWidget> extends State<T> {
+mixin AutomaticKeepAliveClientMixin<T extends StatefulWidget> on State<T> {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory AutomaticKeepAliveClientMixin._() => null;
 
   KeepAliveHandle _keepAliveHandle;
 

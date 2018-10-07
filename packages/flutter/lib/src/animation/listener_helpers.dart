@@ -8,19 +8,20 @@ import 'package:flutter/foundation.dart';
 
 import 'animation.dart';
 
-abstract class _ListenerMixin {
+mixin MxListenerMixin {
 
   void didRegisterListener();
   void didUnregisterListener();
 }
 
 /// A mixin that helps listen to another object only when this object has registered listeners.
-mixin AnimationLazyListenerMixin {
+mixin AnimationLazyListenerMixin on MxListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
 
   int _listenerCounter = 0;
 
+  @override
   void didRegisterListener() {
     assert(_listenerCounter >= 0);
     if (_listenerCounter == 0)
@@ -28,6 +29,7 @@ mixin AnimationLazyListenerMixin {
     _listenerCounter += 1;
   }
 
+  @override
   void didUnregisterListener() {
     assert(_listenerCounter >= 1);
     _listenerCounter -= 1;
@@ -49,12 +51,14 @@ mixin AnimationLazyListenerMixin {
 
 /// A mixin that replaces the didRegisterListener/didUnregisterListener contract
 /// with a dispose contract.
-mixin AnimationEagerListenerMixin {
+mixin AnimationEagerListenerMixin on MxListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
 
+  @override
   void didRegisterListener() { }
 
+  @override
   void didUnregisterListener() { }
 
   /// Release the resources used by this object. The object is no longer usable
@@ -65,7 +69,7 @@ mixin AnimationEagerListenerMixin {
 
 /// A mixin that implements the [addListener]/[removeListener] protocol and notifies
 /// all the registered listeners when [notifyListeners] is called.
-mixin AnimationLocalListenersMixin on Object implements _ListenerMixin {
+mixin AnimationLocalListenersMixin on MxListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
 
@@ -116,7 +120,7 @@ mixin AnimationLocalListenersMixin on Object implements _ListenerMixin {
 /// A mixin that implements the addStatusListener/removeStatusListener protocol
 /// and notifies all the registered listeners when notifyStatusListeners is
 /// called.
-mixin AnimationLocalStatusListenersMixin on Object implements _ListenerMixin {
+mixin AnimationLocalStatusListenersMixin on MxListenerMixin {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
   final ObserverList<AnimationStatusListener> _statusListeners = ObserverList<AnimationStatusListener>();

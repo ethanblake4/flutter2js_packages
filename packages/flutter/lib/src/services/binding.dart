@@ -16,11 +16,9 @@ import 'platform_messages.dart';
 /// the licenses found in the `LICENSE` file stored at the root of the asset
 /// bundle, and implements the `ext.flutter.evict` service extension (see
 /// [evict]).
-abstract class ServicesBinding extends BindingBase {
+mixin ServicesBinding on BindingBase {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory ServicesBinding._() => null;
-
   @override
   void initInstances() {
     super.initInstances();
