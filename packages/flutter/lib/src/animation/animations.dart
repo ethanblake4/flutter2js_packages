@@ -366,10 +366,10 @@ class CurvedAnimation extends Animation<double> with AnimationWithParentMixin<do
   /// The curve direction is only reset when we hit the beginning or the end of
   /// the timeline to avoid discontinuities in the value of any variables this
   /// animation is used to animate.
-  AnimationStatus _curveDirection;
+  //AnimationStatus _curveDirection;
 
   void _updateCurveDirection(AnimationStatus status) {
-    switch (status) {
+    /* flutter2js switch (status) {
       case AnimationStatus.dismissed:
       case AnimationStatus.completed:
         _curveDirection = null;
@@ -380,11 +380,11 @@ class CurvedAnimation extends Animation<double> with AnimationWithParentMixin<do
       case AnimationStatus.reverse:
         _curveDirection ??= AnimationStatus.reverse;
         break;
-    }
+    } */
   }
 
   bool get _useForwardCurve {
-    return reverseCurve == null || (_curveDirection ?? parent.status) != AnimationStatus.reverse;
+    return reverseCurve == null; /* flutter2js || (_curveDirection ?? parent.status) != AnimationStatus.reverse; */
   }
 
   @override
