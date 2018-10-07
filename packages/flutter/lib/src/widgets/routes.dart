@@ -484,7 +484,10 @@ mixin LocalHistoryRoute<T> on Route<T> {
         changedInternalState();
       return false;
     }
-    return super.didPop(result);
+    // flutter2js only, fix weird error (should be return super.didPop)
+    didComplete(result);
+    return true;
+
   }
 
   @override
