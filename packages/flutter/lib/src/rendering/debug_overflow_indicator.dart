@@ -86,10 +86,9 @@ class _OverflowRegionData {
 ///
 ///   * The code for [RenderUnconstrainedBox] and [RenderFlex] for examples of
 ///     classes that use this indicator mixin.
-abstract class DebugOverflowIndicatorMixin extends RenderObject {
+mixin DebugOverflowIndicatorMixin on RenderObject {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory DebugOverflowIndicatorMixin._() => null;
 
   static const Color _black = Color(0xBF000000);
   static const Color _yellow = Color(0xBFFFFF00);

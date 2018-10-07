@@ -251,10 +251,9 @@ abstract class _SliverPersistentHeaderRenderObjectWidget extends RenderObjectWid
   }
 }
 
-abstract class _RenderSliverPersistentHeaderForWidgetsMixin extends RenderSliverPersistentHeader {
+mixin _RenderSliverPersistentHeaderForWidgetsMixin on RenderSliverPersistentHeader {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory _RenderSliverPersistentHeaderForWidgetsMixin._() => null;
 
   _SliverPersistentHeaderElement _element;
 

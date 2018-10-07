@@ -312,7 +312,7 @@ class LocalHistoryEntry {
 /// is removed from the list and its [LocalHistoryEntry.onRemove] is called.
 ///
 /// This class is typically used as a mixin.
-abstract class LocalHistoryRoute<T> extends Route<T> {
+mixin LocalHistoryRoute<T> on Route<T> {
   List<LocalHistoryEntry> _localHistory;
 
   /// Adds a local history entry to this route.

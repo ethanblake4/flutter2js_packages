@@ -240,10 +240,10 @@ abstract class WidgetsBindingObserver {
 }
 
 /// The glue between the widgets layer and the Flutter engine.
-abstract class WidgetsBinding extends BindingBase with ServicesBinding, SchedulerBinding, GestureBinding, SemanticsBinding, RendererBinding {
+mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding,
+    HitTestable, HitTestDispatcher, HitTestTarget, GestureBinding, SemanticsBinding, RendererBinding {
   // This class is intended to be used as a mixin, and should not be
   // extended directly.
-  factory WidgetsBinding._() => null;
 
   @override
   void initInstances() {
@@ -935,7 +935,8 @@ class RenderObjectToWidgetElement<T extends RenderObject> extends RootRenderObje
 
 /// A concrete binding for applications based on the Widgets framework.
 /// This is the glue that binds the framework to the Flutter engine.
-class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBinding, SchedulerBinding, PaintingBinding, SemanticsBinding, RendererBinding, WidgetsBinding {
+class WidgetsFlutterBinding extends BindingBase with HitTestable, HitTestDispatcher, HitTestTarget,
+    GestureBinding, ServicesBinding, SchedulerBinding, PaintingBinding, SemanticsBinding, RendererBinding, WidgetsBinding {
 
   factory WidgetsFlutterBinding() =>
       flutter2js.PlatformPlugin.current.newWidgetsFlutterBinding();
