@@ -35,10 +35,10 @@ typedef RecognizerCallback<T> = T Function();
 ///  * [GestureDetector], the widget that is used to detect gestures.
 ///  * [debugPrintRecognizerCallbacksTrace], a flag that can be set to help
 ///    debug issues with gesture recognizers.
-abstract class GestureRecognizer extends  with DiagnosticableTreeMixin {
+abstract class GestureRecognizer extends GestureArenaMember with DiagnosticableTreeMixin {
   /// Initializes the gesture recognizer.
   ///
-  /// The argument is optional and is only used for debug GestureArenaMemberpurposes (e.g. in the
+  /// The argument is optional and is only used for debug purposes (e.g. in the
   /// [toString] serialization).
   GestureRecognizer({ this.debugOwner });
 
