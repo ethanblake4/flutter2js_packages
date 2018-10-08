@@ -63,34 +63,34 @@ class _RenderCupertinoSliverRefresh extends RenderSliver
   }) : assert(refreshIndicatorExtent != null),
        assert(refreshIndicatorExtent >= 0.0),
        assert(hasLayoutExtent != null),
-       _refreshIndicatorExtent = refreshIndicatorExtent,
-       _hasLayoutExtent = hasLayoutExtent {
+       m_refreshIndicatorExtent = refreshIndicatorExtent,
+       m_hasLayoutExtent = hasLayoutExtent {
     this.child = child;
   }
 
   // The amount of layout space the indicator should occupy in the sliver in a
   // resting state when in the refreshing mode.
-  double get refreshIndicatorLayoutExtent => _refreshIndicatorExtent;
-  double _refreshIndicatorExtent;
+  double get refreshIndicatorLayoutExtent => m_refreshIndicatorExtent;
+  double m_refreshIndicatorExtent;
   set refreshIndicatorLayoutExtent(double value) {
     assert(value != null);
     assert(value >= 0.0);
-    if (value == _refreshIndicatorExtent)
+    if (value == m_refreshIndicatorExtent)
       return;
-    _refreshIndicatorExtent = value;
+    m_refreshIndicatorExtent = value;
     markNeedsLayout();
   }
 
   // The child box will be laid out and painted in the available space either
   // way but this determines whether to also occupy any layoutExtent space or
   // not.
-  bool get hasLayoutExtent => _hasLayoutExtent;
-  bool _hasLayoutExtent;
+  bool get hasLayoutExtent => m_hasLayoutExtent;
+  bool m_hasLayoutExtent;
   set hasLayoutExtent(bool value) {
     assert(value != null);
-    if (value == _hasLayoutExtent)
+    if (value == m_hasLayoutExtent)
       return;
-    _hasLayoutExtent = value;
+    m_hasLayoutExtent = value;
     markNeedsLayout();
   }
 
@@ -108,7 +108,7 @@ class _RenderCupertinoSliverRefresh extends RenderSliver
 
     // The new layout extent this sliver should now have.
     final double layoutExtent =
-        (_hasLayoutExtent ? 1.0 : 0.0) * _refreshIndicatorExtent;
+        (m_hasLayoutExtent ? 1.0 : 0.0) * m_refreshIndicatorExtent;
     // If the new layoutExtent instructive changed, the SliverGeometry's
     // layoutExtent will take that value (on the next performLayout run). Shift
     // the scroll offset first so it doesn't make the scroll position suddenly jump.

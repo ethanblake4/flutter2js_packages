@@ -530,17 +530,17 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
     super.initState();
     // Initially display the pre-selected date.
     final int monthPage = _monthDelta(widget.firstDate, widget.selectedDate);
-    _dayPickerController = PageController(initialPage: monthPage);
+    m_dayPickerController = PageController(initialPage: monthPage);
     _handleMonthPageChanged(monthPage);
     _updateCurrentDate();
 
     // Setup the fade animation for chevrons
-    _chevronOpacityController = AnimationController(
+    m_chevronOpacityController = AnimationController(
       duration: const Duration(milliseconds: 250), vsync: this
     );
-    _chevronOpacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+    m_chevronOpacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
-        parent: _chevronOpacityController,
+        parent: m_chevronOpacityController,
         curve: Curves.easeInOut,
       )
     );
@@ -551,7 +551,7 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
     super.didUpdateWidget(oldWidget);
     if (widget.selectedDate != oldWidget.selectedDate) {
       final int monthPage = _monthDelta(widget.firstDate, widget.selectedDate);
-      _dayPickerController = PageController(initialPage: monthPage);
+      m_dayPickerController = PageController(initialPage: monthPage);
       _handleMonthPageChanged(monthPage);
     }
   }
@@ -566,20 +566,20 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
     textDirection = Directionality.of(context);
   }
 
-  DateTime _todayDate;
-  DateTime _currentDisplayedMonthDate;
-  Timer _timer;
-  PageController _dayPickerController;
-  AnimationController _chevronOpacityController;
-  Animation<double> _chevronOpacityAnimation;
+  DateTime m_todayDate;
+  DateTime m_currentDisplayedMonthDate;
+  Timer m_timer;
+  PageController m_dayPickerController;
+  AnimationController m_chevronOpacityController;
+  Animation<double> m_chevronOpacityAnimation;
 
   void _updateCurrentDate() {
-    _todayDate = DateTime.now();
-    final DateTime tomorrow = DateTime(_todayDate.year, _todayDate.month, _todayDate.day + 1);
-    Duration timeUntilTomorrow = tomorrow.difference(_todayDate);
+    m_todayDate = DateTime.now();
+    final DateTime tomorrow = DateTime(m_todayDate.year, m_todayDate.month, m_todayDate.day + 1);
+    Duration timeUntilTomorrow = tomorrow.difference(m_todayDate);
     timeUntilTomorrow += const Duration(seconds: 1); // so we don't miss it by rounding
-    _timer?.cancel();
-    _timer = Timer(timeUntilTomorrow, () {
+    m_timer?.cancel();
+    m_timer = Timer(timeUntilTomorrow, () {
       setState(() {
         _updateCurrentDate();
       });
@@ -600,7 +600,7 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
     return DayPicker(
       key: ValueKey<DateTime>(month),
       selectedDate: widget.selectedDate,
-      currentDate: _todayDate,
+      currentDate: m_todayDate,
       onChanged: widget.onChanged,
       firstDate: widget.firstDate,
       lastDate: widget.lastDate,
@@ -610,39 +610,39 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
   }
 
   void _handleNextMonth() {
-    if (!_isDisplayingLastMonth) {
-      SemanticsService.announce(localizations.formatMonthYear(_nextMonthDate), textDirection);
-      _dayPickerController.nextPage(duration: _kMonthScrollDuration, curve: Curves.ease);
+    if (!m_isDisplayingLastMonth) {
+      SemanticsService.announce(localizations.formatMonthYear(m_nextMonthDate), textDirection);
+      m_dayPickerController.nextPage(duration: _kMonthScrollDuration, curve: Curves.ease);
     }
   }
 
   void _handlePreviousMonth() {
-    if (!_isDisplayingFirstMonth) {
-      SemanticsService.announce(localizations.formatMonthYear(_previousMonthDate), textDirection);
-      _dayPickerController.previousPage(duration: _kMonthScrollDuration, curve: Curves.ease);
+    if (!m_isDisplayingFirstMonth) {
+      SemanticsService.announce(localizations.formatMonthYear(m_previousMonthDate), textDirection);
+      m_dayPickerController.previousPage(duration: _kMonthScrollDuration, curve: Curves.ease);
     }
   }
 
   /// True if the earliest allowable month is displayed.
-  bool get _isDisplayingFirstMonth {
-    return !_currentDisplayedMonthDate.isAfter(
+  bool get m_isDisplayingFirstMonth {
+    return !m_currentDisplayedMonthDate.isAfter(
         DateTime(widget.firstDate.year, widget.firstDate.month));
   }
 
   /// True if the latest allowable month is displayed.
-  bool get _isDisplayingLastMonth {
-    return !_currentDisplayedMonthDate.isBefore(
+  bool get m_isDisplayingLastMonth {
+    return !m_currentDisplayedMonthDate.isBefore(
         DateTime(widget.lastDate.year, widget.lastDate.month));
   }
 
-  DateTime _previousMonthDate;
-  DateTime _nextMonthDate;
+  DateTime m_previousMonthDate;
+  DateTime m_nextMonthDate;
 
   void _handleMonthPageChanged(int monthPage) {
     setState(() {
-      _previousMonthDate = _addMonthsToMonthDate(widget.firstDate, monthPage - 1);
-      _currentDisplayedMonthDate = _addMonthsToMonthDate(widget.firstDate, monthPage);
-      _nextMonthDate = _addMonthsToMonthDate(widget.firstDate, monthPage + 1);
+      m_previousMonthDate = _addMonthsToMonthDate(widget.firstDate, monthPage - 1);
+      m_currentDisplayedMonthDate = _addMonthsToMonthDate(widget.firstDate, monthPage);
+      m_nextMonthDate = _addMonthsToMonthDate(widget.firstDate, monthPage + 1);
     });
   }
 
@@ -657,17 +657,17 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
             sortKey: _MonthPickerSortKey.calendar,
             child: NotificationListener<ScrollStartNotification>(
               onNotification: (_) {
-                _chevronOpacityController.forward();
+                m_chevronOpacityController.forward();
                 return false;
               },
               child: NotificationListener<ScrollEndNotification>(
                 onNotification: (_) {
-                  _chevronOpacityController.reverse();
+                  m_chevronOpacityController.reverse();
                   return false;
                 },
                 child: PageView.builder(
                   key: ValueKey<DateTime>(widget.selectedDate),
-                  controller: _dayPickerController,
+                  controller: m_dayPickerController,
                   scrollDirection: Axis.horizontal,
                   itemCount: _monthDelta(widget.firstDate, widget.lastDate) + 1,
                   itemBuilder: _buildItems,
@@ -682,11 +682,11 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
             child: Semantics(
               sortKey: _MonthPickerSortKey.previousMonth,
               child: FadeTransition(
-                opacity: _chevronOpacityAnimation,
+                opacity: m_chevronOpacityAnimation,
                 child: IconButton(
                   icon: const Icon(Icons.chevron_left),
-                  tooltip: _isDisplayingFirstMonth ? null : '${localizations.previousMonthTooltip} ${localizations.formatMonthYear(_previousMonthDate)}',
-                  onPressed: _isDisplayingFirstMonth ? null : _handlePreviousMonth,
+                  tooltip: m_isDisplayingFirstMonth ? null : '${localizations.previousMonthTooltip} ${localizations.formatMonthYear(m_previousMonthDate)}',
+                  onPressed: m_isDisplayingFirstMonth ? null : _handlePreviousMonth,
                 ),
               ),
             ),
@@ -697,11 +697,11 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
             child: Semantics(
               sortKey: _MonthPickerSortKey.nextMonth,
               child: FadeTransition(
-                opacity: _chevronOpacityAnimation,
+                opacity: m_chevronOpacityAnimation,
                 child: IconButton(
                   icon: const Icon(Icons.chevron_right),
-                  tooltip: _isDisplayingLastMonth ? null : '${localizations.nextMonthTooltip} ${localizations.formatMonthYear(_nextMonthDate)}',
-                  onPressed: _isDisplayingLastMonth ? null : _handleNextMonth,
+                  tooltip: m_isDisplayingLastMonth ? null : '${localizations.nextMonthTooltip} ${localizations.formatMonthYear(m_nextMonthDate)}',
+                  onPressed: m_isDisplayingLastMonth ? null : _handleNextMonth,
                 ),
               ),
             ),
@@ -713,8 +713,8 @@ class _MonthPickerState extends State<MonthPicker> with SingleTickerProviderStat
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _dayPickerController?.dispose();
+    m_timer?.cancel();
+    m_dayPickerController?.dispose();
     super.dispose();
   }
 }

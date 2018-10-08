@@ -125,12 +125,12 @@ class _CupertinoButtonState extends State<CupertinoButton> with SingleTickerProv
   // Eyeballed values. Feel free to tweak.
   static const Duration kFadeOutDuration = Duration(milliseconds: 10);
   static const Duration kFadeInDuration = Duration(milliseconds: 100);
-  Tween<double> _opacityTween;
+  Tween<double> m_opacityTween;
 
-  AnimationController _animationController;
+  AnimationController m_animationController;
 
   void _setTween() {
-    _opacityTween = Tween<double>(
+    m_opacityTween = Tween<double>(
       begin: 1.0,
       end: widget.pressedOpacity ?? 1.0,
     );
@@ -139,7 +139,7 @@ class _CupertinoButtonState extends State<CupertinoButton> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    m_animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       value: 0.0,
       vsync: this,
@@ -149,8 +149,8 @@ class _CupertinoButtonState extends State<CupertinoButton> with SingleTickerProv
 
   @override
   void dispose() {
-    _animationController.dispose();
-    _animationController = null;
+    m_animationController.dispose();
+    m_animationController = null;
     super.dispose();
   }
 
@@ -184,12 +184,12 @@ class _CupertinoButtonState extends State<CupertinoButton> with SingleTickerProv
   }
 
   void _animate() {
-    if (_animationController.isAnimating)
+    if (m_animationController.isAnimating)
       return;
     final bool wasHeldDown = _buttonHeldDown;
     final Future<Null> ticker = _buttonHeldDown
-        ? _animationController.animateTo(1.0, duration: kFadeOutDuration)
-        : _animationController.animateTo(0.0, duration: kFadeInDuration);
+        ? m_animationController.animateTo(1.0, duration: kFadeOutDuration)
+        : m_animationController.animateTo(0.0, duration: kFadeInDuration);
     ticker.then((Null value) {
       if (mounted && wasHeldDown != _buttonHeldDown)
         _animate();
@@ -217,8 +217,8 @@ class _CupertinoButtonState extends State<CupertinoButton> with SingleTickerProv
               minHeight: widget.minSize,
             ),
           child: FadeTransition(
-            opacity: _opacityTween.animate(CurvedAnimation(
-              parent: _animationController,
+            opacity: m_opacityTween.animate(CurvedAnimation(
+              parent: m_animationController,
               curve: Curves.decelerate,
             )),
             child: DecoratedBox(

@@ -4462,7 +4462,7 @@ class RenderFollowerLayer extends RenderProxyBox {
 
   @override
   void detach() {
-    _layer = null;
+    m_rolayer = null;
     super.detach();
   }
 
@@ -4470,7 +4470,7 @@ class RenderFollowerLayer extends RenderProxyBox {
   bool get alwaysNeedsCompositing => true;
 
   /// The layer we created when we were last painted.
-  FollowerLayer _layer;
+  FollowerLayer m_layer;
 
   /// Return the transform that was used in the last composition phase, if any.
   ///
@@ -4479,7 +4479,7 @@ class RenderFollowerLayer extends RenderProxyBox {
   /// [FollowerLayer.getLastTransform]), this returns the identity matrix (see
   /// [new Matrix4.identity].
   Matrix4 getCurrentTransform() {
-    return _layer?.getLastTransform() ?? Matrix4.identity();
+    return m_layer?.getLastTransform() ?? Matrix4.identity();
   }
 
   @override
@@ -4506,14 +4506,14 @@ class RenderFollowerLayer extends RenderProxyBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     assert(showWhenUnlinked != null);
-    _layer = FollowerLayer(
+    m_layer = FollowerLayer(
       link: link,
       showWhenUnlinked: showWhenUnlinked,
       linkedOffset: this.offset,
       unlinkedOffset: offset,
     );
     context.pushLayer(
-      _layer,
+      m_rolayer,
       super.paint,
       Offset.zero,
       childPaintBounds: Rect.fromLTRB(

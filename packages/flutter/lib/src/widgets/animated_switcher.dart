@@ -230,9 +230,9 @@ class AnimatedSwitcher extends StatefulWidget {
 }
 
 class _AnimatedSwitcherState extends State<AnimatedSwitcher> with TickerProviderStateMixin {
-  final Set<_AnimatedSwitcherChildEntry> _previousChildren = Set<_AnimatedSwitcherChildEntry>();
-  _AnimatedSwitcherChildEntry _currentChild;
-  List<Widget> _previousChildWidgetCache = const <Widget>[];
+  final Set<_AnimatedSwitcherChildEntry> m_previousChildren = Set<_AnimatedSwitcherChildEntry>();
+  _AnimatedSwitcherChildEntry m_currentChild;
+  List<Widget> m_previousChildWidgetCache = const <Widget>[];
   int serialNumber = 0;
 
   @override
@@ -269,28 +269,28 @@ class _AnimatedSwitcherState extends State<AnimatedSwitcher> with TickerProvider
   }
 
   void _removeExpiredChild(_AnimatedSwitcherChildEntry child) {
-    assert(_previousChildren.contains(child));
-    _previousChildren.remove(child);
+    assert(m_previousChildren.contains(child));
+    m_previousChildren.remove(child);
     _markChildWidgetCacheAsDirty();
   }
 
   void _retireCurrentChild() {
-    assert(!_previousChildren.contains(_currentChild));
-    _currentChild.controller.reverse();
-    _previousChildren.add(_currentChild);
+    assert(!m_previousChildren.contains(m_currentChild));
+    m_currentChild.controller.reverse();
+    m_previousChildren.add(m_currentChild);
     _markChildWidgetCacheAsDirty();
   }
 
   void _markChildWidgetCacheAsDirty() {
-    _previousChildWidgetCache = null;
+    m_previousChildWidgetCache = null;
   }
 
   void _addEntry({@required bool animate}) {
     if (widget.child == null) {
-      if (animate && _currentChild != null) {
+      if (animate && m_currentChild != null) {
         _retireCurrentChild();
       }
-      _currentChild = null;
+      m_currentChild = null;
       return;
     }
     final AnimationController controller = AnimationController(
@@ -298,13 +298,13 @@ class _AnimatedSwitcherState extends State<AnimatedSwitcher> with TickerProvider
       vsync: this,
     );
     if (animate) {
-      if (_currentChild != null) {
+      if (m_currentChild != null) {
         _retireCurrentChild();
       }
       controller.forward();
     } else {
-      assert(_currentChild == null);
-      assert(_previousChildren.isEmpty);
+      assert(m_currentChild == null);
+      assert(m_previousChildren.isEmpty);
       controller.value = 1.0;
     }
     final Animation<double> animation = CurvedAnimation(
@@ -312,15 +312,15 @@ class _AnimatedSwitcherState extends State<AnimatedSwitcher> with TickerProvider
       curve: widget.switchInCurve,
       reverseCurve: widget.switchOutCurve,
     );
-    _currentChild = _newEntry(controller: controller, animation: animation);
+    m_currentChild = _newEntry(controller: controller, animation: animation);
   }
 
   @override
   void dispose() {
-    if (_currentChild != null) {
-      _currentChild.controller.dispose();
+    if (m_currentChild != null) {
+      m_currentChild.controller.dispose();
     }
-    for (_AnimatedSwitcherChildEntry child in _previousChildren) {
+    for (_AnimatedSwitcherChildEntry child in m_previousChildren) {
       child.controller.dispose();
     }
     super.dispose();
@@ -339,44 +339,44 @@ class _AnimatedSwitcherState extends State<AnimatedSwitcher> with TickerProvider
 
     // If the transition builder changed, then update all of the previous transitions
     if (widget.transitionBuilder != oldWidget.transitionBuilder) {
-      _previousChildren.forEach(updateTransition);
-      if (_currentChild != null) {
-        updateTransition(_currentChild);
+      m_previousChildren.forEach(updateTransition);
+      if (m_currentChild != null) {
+        updateTransition(m_currentChild);
       }
       _markChildWidgetCacheAsDirty();
     }
 
     final bool hasNewChild = widget.child != null;
-    final bool hasOldChild = _currentChild != null;
+    final bool hasOldChild = m_currentChild != null;
     if (hasNewChild != hasOldChild ||
-        hasNewChild && !Widget.canUpdate(widget.child, _currentChild.widgetChild)) {
+        hasNewChild && !Widget.canUpdate(widget.child, m_currentChild.widgetChild)) {
       _addEntry(animate: true);
     } else {
       // Make sure we update the child widget and transition in _currentChild
       // even if we're not going to start a new animation, but keep the key from
       // the previous transition so that we update the transition instead of
       // replacing it.
-      if (_currentChild != null) {
-        _currentChild.widgetChild = widget.child;
-        updateTransition(_currentChild);
+      if (m_currentChild != null) {
+        m_currentChild.widgetChild = widget.child;
+        updateTransition(m_currentChild);
         _markChildWidgetCacheAsDirty();
       }
     }
   }
 
   void _rebuildChildWidgetCacheIfNeeded() {
-    _previousChildWidgetCache ??= List<Widget>.unmodifiable(
-      _previousChildren.map<Widget>((_AnimatedSwitcherChildEntry child) {
+    m_previousChildWidgetCache ??= List<Widget>.unmodifiable(
+      m_previousChildren.map<Widget>((_AnimatedSwitcherChildEntry child) {
         return child.transition;
       }),
     );
-    assert(_previousChildren.length == _previousChildWidgetCache.length);
-    assert(_previousChildren.isEmpty || _previousChildren.last.transition == _previousChildWidgetCache.last);
+    assert(m_previousChildren.length == m_previousChildWidgetCache.length);
+    assert(m_previousChildren.isEmpty || m_previousChildren.last.transition == m_previousChildWidgetCache.last);
   }
 
   @override
   Widget build(BuildContext context) {
     _rebuildChildWidgetCacheIfNeeded();
-    return widget.layoutBuilder(_currentChild?.transition, _previousChildWidgetCache);
+    return widget.layoutBuilder(m_currentChild?.transition, m_previousChildWidgetCache);
   }
 }

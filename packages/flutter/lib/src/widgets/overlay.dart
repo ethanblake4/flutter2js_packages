@@ -264,7 +264,7 @@ class Overlay extends StatefulWidget {
 /// Used to insert [OverlayEntry]s into the overlay using the [insert] and
 /// [insertAll] functions.
 class OverlayState extends State<Overlay> with TickerProviderStateMixin {
-  final List<OverlayEntry> _entries = <OverlayEntry>[];
+  final List<OverlayEntry> m_entries = <OverlayEntry>[];
 
   @override
   void initState() {
@@ -278,11 +278,11 @@ class OverlayState extends State<Overlay> with TickerProviderStateMixin {
   /// Otherwise, the entry is inserted on top.
   void insert(OverlayEntry entry, { OverlayEntry above }) {
     assert(entry._overlay == null);
-    assert(above == null || (above._overlay == this && _entries.contains(above)));
+    assert(above == null || (above._overlay == this && m_entries.contains(above)));
     entry._overlay = this;
     setState(() {
-      final int index = above == null ? _entries.length : _entries.indexOf(above) + 1;
-      _entries.insert(index, entry);
+      final int index = above == null ? m_entries.length : m_entries.indexOf(above) + 1;
+      m_entries.insert(index, entry);
     });
   }
 
@@ -291,7 +291,7 @@ class OverlayState extends State<Overlay> with TickerProviderStateMixin {
   /// If [above] is non-null, the entries are inserted just above [above].
   /// Otherwise, the entries are inserted on top.
   void insertAll(Iterable<OverlayEntry> entries, { OverlayEntry above }) {
-    assert(above == null || (above._overlay == this && _entries.contains(above)));
+    assert(above == null || (above._overlay == this && m_entries.contains(above)));
     if (entries.isEmpty)
       return;
     for (OverlayEntry entry in entries) {
@@ -299,14 +299,14 @@ class OverlayState extends State<Overlay> with TickerProviderStateMixin {
       entry._overlay = this;
     }
     setState(() {
-      final int index = above == null ? _entries.length : _entries.indexOf(above) + 1;
-      _entries.insertAll(index, entries);
+      final int index = above == null ? m_entries.length : m_entries.indexOf(above) + 1;
+      m_entries.insertAll(index, entries);
     });
   }
 
   void _remove(OverlayEntry entry) {
     if (mounted) {
-      _entries.remove(entry);
+      m_entries.remove(entry);
       setState(() { /* entry was removed */ });
     }
   }
@@ -319,10 +319,10 @@ class OverlayState extends State<Overlay> with TickerProviderStateMixin {
   /// only in checked mode.
   bool debugIsVisible(OverlayEntry entry) {
     bool result = false;
-    assert(_entries.contains(entry));
+    assert(m_entries.contains(entry));
     assert(() {
-      for (int i = _entries.length - 1; i > 0; i -= 1) {
-        final OverlayEntry candidate = _entries[i];
+      for (int i = m_entries.length - 1; i > 0; i -= 1) {
+        final OverlayEntry candidate = m_entries[i];
         if (candidate == entry) {
           result = true;
           break;
@@ -350,8 +350,8 @@ class OverlayState extends State<Overlay> with TickerProviderStateMixin {
     final List<Widget> onstageChildren = <Widget>[];
     final List<Widget> offstageChildren = <Widget>[];
     bool onstage = true;
-    for (int i = _entries.length - 1; i >= 0; i -= 1) {
-      final OverlayEntry entry = _entries[i];
+    for (int i = m_entries.length - 1; i >= 0; i -= 1) {
+      final OverlayEntry entry = m_entries[i];
       if (onstage) {
         onstageChildren.add(_OverlayEntry(entry));
         if (entry.opaque)
@@ -374,7 +374,7 @@ class OverlayState extends State<Overlay> with TickerProviderStateMixin {
     super.debugFillProperties(properties);
     // TODO(jacobr): use IterableProperty instead as that would
     // provide a slightly more consistent string summary of the List.
-    properties.add(DiagnosticsProperty<List<OverlayEntry>>('entries', _entries));
+    properties.add(DiagnosticsProperty<List<OverlayEntry>>('entries', m_entries));
   }
 }
 

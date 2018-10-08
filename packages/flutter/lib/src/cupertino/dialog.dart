@@ -1259,43 +1259,43 @@ class _RenderCupertinoDialogActions extends RenderBox
     List<RenderBox> children,
     @required double dialogWidth,
     double dividerThickness = 0.0,
-  }) : _dialogWidth = dialogWidth,
-       _dividerThickness = dividerThickness {
+  }) : m_dialogWidth = dialogWidth,
+       m_dividerThickness = dividerThickness {
     addAll(children);
   }
 
-  double get dialogWidth => _dialogWidth;
-  double _dialogWidth;
+  double get dialogWidth => m_dialogWidth;
+  double m_dialogWidth;
   set dialogWidth(double newWidth) {
-    if (newWidth != _dialogWidth) {
-      _dialogWidth = newWidth;
+    if (newWidth != m_dialogWidth) {
+      m_dialogWidth = newWidth;
       markNeedsLayout();
     }
   }
 
   // The thickness of the divider between buttons.
-  double get dividerThickness => _dividerThickness;
-  double _dividerThickness;
+  double get dividerThickness => m_dividerThickness;
+  double m_dividerThickness;
   set dividerThickness(double newValue) {
-    if (newValue != _dividerThickness) {
-      _dividerThickness = newValue;
+    if (newValue != m_dividerThickness) {
+      m_dividerThickness = newValue;
       markNeedsLayout();
     }
   }
 
-  final Paint _buttonBackgroundPaint = Paint()
+  final Paint m_buttonBackgroundPaint = Paint()
     ..color = _kDialogColor
     ..style = PaintingStyle.fill;
 
-  final Paint _pressedButtonBackgroundPaint = Paint()
+  final Paint m_pressedButtonBackgroundPaint = Paint()
     ..color = _kDialogPressedColor
     ..style = PaintingStyle.fill;
 
-  final Paint _dividerPaint = Paint()
+  final Paint m_dividerPaint = Paint()
     ..color = _kButtonDividerColor
     ..style = PaintingStyle.fill;
 
-  Iterable<RenderBox> get _pressedButtons sync* {
+  Iterable<RenderBox> get m_pressedButtons sync* {
     RenderBox currentChild = firstChild;
     while (currentChild != null) {
       assert(currentChild.parentData is _ActionButtonParentData);
@@ -1307,7 +1307,7 @@ class _RenderCupertinoDialogActions extends RenderBox
     }
   }
 
-  bool get _isButtonPressed {
+  bool get m_isButtonPressed {
     RenderBox currentChild = firstChild;
     while (currentChild != null) {
       assert(currentChild.parentData is _ActionButtonParentData);
@@ -1552,7 +1552,7 @@ class _RenderCupertinoDialogActions extends RenderBox
     // The vertical divider sits between the left button and right button (if
     // the dialog has 2 buttons).  The vertical divider is hidden if either the
     // left or right button is pressed.
-    final Rect verticalDivider = childCount == 2 && !_isButtonPressed
+    final Rect verticalDivider = childCount == 2 && !m_isButtonPressed
       ? Rect.fromLTWH(
           offset.dx + firstChild.size.width,
           offset.dy,
@@ -1564,7 +1564,7 @@ class _RenderCupertinoDialogActions extends RenderBox
         )
       : Rect.zero;
 
-    final List<Rect> pressedButtonRects = _pressedButtons.map((RenderBox pressedButton) {
+    final List<Rect> pressedButtonRects = m_pressedButtons.map((RenderBox pressedButton) {
       final MultiChildLayoutParentData buttonParentData = pressedButton.parentData;
 
       return Rect.fromLTWH(
@@ -1587,7 +1587,7 @@ class _RenderCupertinoDialogActions extends RenderBox
 
     canvas.drawPath(
       backgroundFillPath,
-      _buttonBackgroundPaint,
+      m_buttonBackgroundPaint,
     );
 
     // Create the pressed buttons background path and paint it.
@@ -1598,7 +1598,7 @@ class _RenderCupertinoDialogActions extends RenderBox
 
     canvas.drawPath(
       pressedBackgroundFillPath,
-      _pressedButtonBackgroundPaint,
+      m_pressedButtonBackgroundPaint,
     );
 
     // Create the dividers path and paint it.
@@ -1607,7 +1607,7 @@ class _RenderCupertinoDialogActions extends RenderBox
 
     canvas.drawPath(
       dividersPath,
-      _dividerPaint,
+      m_dividerPaint,
     );
   }
 
@@ -1677,9 +1677,9 @@ class _RenderCupertinoDialogActions extends RenderBox
       child = childAfter(child);
     }
 
-    canvas.drawPath(backgroundFillPath, _buttonBackgroundPaint);
-    canvas.drawPath(pressedBackgroundFillPath, _pressedButtonBackgroundPaint);
-    canvas.drawPath(dividersPath, _dividerPaint);
+    canvas.drawPath(backgroundFillPath, m_buttonBackgroundPaint);
+    canvas.drawPath(pressedBackgroundFillPath, m_pressedButtonBackgroundPaint);
+    canvas.drawPath(dividersPath, m_dividerPaint);
   }
 
   void _drawButtons(PaintingContext context, Offset offset) {

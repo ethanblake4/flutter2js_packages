@@ -286,12 +286,12 @@ class DefaultTabController extends StatefulWidget {
 }
 
 class _DefaultTabControllerState extends State<DefaultTabController> with SingleTickerProviderStateMixin {
-  TabController _controller;
+  TabController m_controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = TabController(
+    m_controller = TabController(
       vsync: this,
       length: widget.length,
       initialIndex: widget.initialIndex,
@@ -300,14 +300,14 @@ class _DefaultTabControllerState extends State<DefaultTabController> with Single
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return _TabControllerScope(
-      controller: _controller,
+      controller: m_controller,
       enabled: TickerMode.of(context),
       child: widget.child,
     );

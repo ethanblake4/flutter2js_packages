@@ -255,21 +255,21 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
   /// To control what kind of [ScrollPosition] is created for a [Scrollable],
   /// provide it with custom [ScrollController] that creates the appropriate
   /// [ScrollPosition] in its [ScrollController.createScrollPosition] method.
-  ScrollPosition get position => _position;
-  ScrollPosition _position;
+  ScrollPosition get position => m_position;
+  ScrollPosition m_position;
 
   @override
   AxisDirection get axisDirection => widget.axisDirection;
 
-  ScrollBehavior _configuration;
-  ScrollPhysics _physics;
+  ScrollBehavior m_configuration;
+  ScrollPhysics m_physics;
 
   // Only call this from places that will definitely trigger a rebuild.
   void _updatePosition() {
-    _configuration = ScrollConfiguration.of(context);
-    _physics = _configuration.getScrollPhysics(context);
+    m_configuration = ScrollConfiguration.of(context);
+    m_physics = m_configuration.getScrollPhysics(context);
     if (widget.physics != null)
-      _physics = widget.physics.applyTo(_physics);
+      m_physics = widget.physics.applyTo(m_physics);
     final ScrollController controller = widget.controller;
     final ScrollPosition oldPosition = position;
     if (oldPosition != null) {
@@ -280,8 +280,8 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
       scheduleMicrotask(oldPosition.dispose);
     }
 
-    _position = controller?.createScrollPosition(_physics, this, oldPosition)
-      ?? ScrollPositionWithSingleContext(physics: _physics, context: this, oldPosition: oldPosition);
+    m_position = controller?.createScrollPosition(m_physics, this, oldPosition)
+      ?? ScrollPositionWithSingleContext(physics: m_physics, context: this, oldPosition: oldPosition);
     assert(position != null);
     controller?.attach(position);
   }
@@ -333,34 +333,34 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
   @override
   @protected
   void setSemanticsActions(Set<SemanticsAction> actions) {
-    if (_gestureDetectorKey.currentState != null)
-      _gestureDetectorKey.currentState.replaceSemanticsActions(actions);
+    if (m_gestureDetectorKey.currentState != null)
+      m_gestureDetectorKey.currentState.replaceSemanticsActions(actions);
   }
 
 
   // GESTURE RECOGNITION AND POINTER IGNORING
 
-  final GlobalKey<RawGestureDetectorState> _gestureDetectorKey = GlobalKey<RawGestureDetectorState>();
-  final GlobalKey _ignorePointerKey = GlobalKey();
+  final GlobalKey<RawGestureDetectorState> m_gestureDetectorKey = GlobalKey<RawGestureDetectorState>();
+  final GlobalKey m_ignorePointerKey = GlobalKey();
 
   // This field is set during layout, and then reused until the next time it is set.
-  Map<Type, GestureRecognizerFactory> _gestureRecognizers = const <Type, GestureRecognizerFactory>{};
-  bool _shouldIgnorePointer = false;
+  Map<Type, GestureRecognizerFactory> m_gestureRecognizers = const <Type, GestureRecognizerFactory>{};
+  bool m_shouldIgnorePointer = false;
 
-  bool _lastCanDrag;
-  Axis _lastAxisDirection;
+  bool m_lastCanDrag;
+  Axis m_lastAxisDirection;
 
   @override
   @protected
   void setCanDrag(bool canDrag) {
-    if (canDrag == _lastCanDrag && (!canDrag || widget.axis == _lastAxisDirection))
+    if (canDrag == m_lastCanDrag && (!canDrag || widget.axis == m_lastAxisDirection))
       return;
     if (!canDrag) {
-      _gestureRecognizers = const <Type, GestureRecognizerFactory>{};
+      m_gestureRecognizers = const <Type, GestureRecognizerFactory>{};
     } else {
       switch (widget.axis) {
         case Axis.vertical:
-          _gestureRecognizers = <Type, GestureRecognizerFactory>{
+          m_gestureRecognizers = <Type, GestureRecognizerFactory>{
             VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<VerticalDragGestureRecognizer>(
               () => VerticalDragGestureRecognizer(),
               (VerticalDragGestureRecognizer instance) {
@@ -370,15 +370,15 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
                   ..onUpdate = _handleDragUpdate
                   ..onEnd = _handleDragEnd
                   ..onCancel = _handleDragCancel
-                  ..minFlingDistance = _physics?.minFlingDistance
-                  ..minFlingVelocity = _physics?.minFlingVelocity
-                  ..maxFlingVelocity = _physics?.maxFlingVelocity;
+                  ..minFlingDistance = m_physics?.minFlingDistance
+                  ..minFlingVelocity = m_physics?.minFlingVelocity
+                  ..maxFlingVelocity = m_physics?.maxFlingVelocity;
               },
             ),
           };
           break;
         case Axis.horizontal:
-          _gestureRecognizers = <Type, GestureRecognizerFactory>{
+          m_gestureRecognizers = <Type, GestureRecognizerFactory>{
             HorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
               () => HorizontalDragGestureRecognizer(),
               (HorizontalDragGestureRecognizer instance) {
@@ -388,19 +388,19 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
                   ..onUpdate = _handleDragUpdate
                   ..onEnd = _handleDragEnd
                   ..onCancel = _handleDragCancel
-                  ..minFlingDistance = _physics?.minFlingDistance
-                  ..minFlingVelocity = _physics?.minFlingVelocity
-                  ..maxFlingVelocity = _physics?.maxFlingVelocity;
+                  ..minFlingDistance = m_physics?.minFlingDistance
+                  ..minFlingVelocity = m_physics?.minFlingVelocity
+                  ..maxFlingVelocity = m_physics?.maxFlingVelocity;
               },
             ),
           };
           break;
       }
     }
-    _lastCanDrag = canDrag;
-    _lastAxisDirection = widget.axis;
-    if (_gestureDetectorKey.currentState != null)
-      _gestureDetectorKey.currentState.replaceGestureRecognizers(_gestureRecognizers);
+    m_lastCanDrag = canDrag;
+    m_lastAxisDirection = widget.axis;
+    if (m_gestureDetectorKey.currentState != null)
+      m_gestureDetectorKey.currentState.replaceGestureRecognizers(m_gestureRecognizers);
   }
 
   @override
@@ -409,71 +409,71 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
   @override
   @protected
   void setIgnorePointer(bool value) {
-    if (_shouldIgnorePointer == value)
+    if (m_shouldIgnorePointer == value)
       return;
-    _shouldIgnorePointer = value;
-    if (_ignorePointerKey.currentContext != null) {
-      final RenderIgnorePointer renderBox = _ignorePointerKey.currentContext.findRenderObject();
-      renderBox.ignoring = _shouldIgnorePointer;
+    m_shouldIgnorePointer = value;
+    if (m_ignorePointerKey.currentContext != null) {
+      final RenderIgnorePointer renderBox = m_ignorePointerKey.currentContext.findRenderObject();
+      renderBox.ignoring = m_shouldIgnorePointer;
     }
   }
 
   @override
-  BuildContext get notificationContext => _gestureDetectorKey.currentContext;
+  BuildContext get notificationContext => m_gestureDetectorKey.currentContext;
 
   @override
   BuildContext get storageContext => context;
 
   // TOUCH HANDLERS
 
-  Drag _drag;
-  ScrollHoldController _hold;
+  Drag m_drag;
+  ScrollHoldController m_hold;
 
   void _handleDragDown(DragDownDetails details) {
-    assert(_drag == null);
-    assert(_hold == null);
-    _hold = position.hold(_disposeHold);
+    assert(m_drag == null);
+    assert(m_hold == null);
+    m_hold = position.hold(_disposeHold);
   }
 
   void _handleDragStart(DragStartDetails details) {
     // It's possible for _hold to become null between _handleDragDown and
     // _handleDragStart, for example if some user code calls jumpTo or otherwise
     // triggers a new activity to begin.
-    assert(_drag == null);
-    _drag = position.drag(details, _disposeDrag);
-    assert(_drag != null);
-    assert(_hold == null);
+    assert(m_drag == null);
+    m_drag = position.drag(details, _disposeDrag);
+    assert(m_drag != null);
+    assert(m_hold == null);
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
     // _drag might be null if the drag activity ended and called _disposeDrag.
-    assert(_hold == null || _drag == null);
-    _drag?.update(details);
+    assert(m_hold == null || m_drag == null);
+    m_drag?.update(details);
   }
 
   void _handleDragEnd(DragEndDetails details) {
     // _drag might be null if the drag activity ended and called _disposeDrag.
-    assert(_hold == null || _drag == null);
-    _drag?.end(details);
-    assert(_drag == null);
+    assert(m_hold == null || m_drag == null);
+    m_drag?.end(details);
+    assert(m_drag == null);
   }
 
   void _handleDragCancel() {
     // _hold might be null if the drag started.
     // _drag might be null if the drag activity ended and called _disposeDrag.
-    assert(_hold == null || _drag == null);
-    _hold?.cancel();
-    _drag?.cancel();
-    assert(_hold == null);
-    assert(_drag == null);
+    assert(m_hold == null || m_drag == null);
+    m_hold?.cancel();
+    m_drag?.cancel();
+    assert(m_hold == null);
+    assert(m_drag == null);
   }
 
   void _disposeHold() {
-    _hold = null;
+    m_hold = null;
   }
 
   void _disposeDrag() {
-    _drag = null;
+    m_drag = null;
   }
 
 
@@ -484,15 +484,15 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
     assert(position != null);
     // TODO(ianh): Having all these global keys is sad.
     Widget result = RawGestureDetector(
-      key: _gestureDetectorKey,
-      gestures: _gestureRecognizers,
+      key: m_gestureDetectorKey,
+      gestures: m_gestureRecognizers,
       behavior: HitTestBehavior.opaque,
       excludeFromSemantics: widget.excludeFromSemantics,
       child: Semantics(
         explicitChildNodes: !widget.excludeFromSemantics,
         child: IgnorePointer(
-          key: _ignorePointerKey,
-          ignoring: _shouldIgnorePointer,
+          key: m_ignorePointerKey,
+          ignoring: m_shouldIgnorePointer,
           ignoringSemantics: false,
           child: _ScrollableScope(
             scrollable: this,
@@ -512,7 +512,7 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin
       );
     }
 
-    return _configuration.buildViewportChrome(context, result, widget.axisDirection);
+    return m_configuration.buildViewportChrome(context, result, widget.axisDirection);
   }
 
   @override

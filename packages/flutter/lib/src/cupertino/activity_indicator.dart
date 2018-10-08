@@ -42,18 +42,18 @@ class CupertinoActivityIndicator extends StatefulWidget {
 
 
 class _CupertinoActivityIndicatorState extends State<CupertinoActivityIndicator> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  AnimationController m_controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    m_controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     );
 
     if (widget.animating)
-      _controller.repeat();
+      m_controller.repeat();
   }
 
   @override
@@ -61,15 +61,15 @@ class _CupertinoActivityIndicatorState extends State<CupertinoActivityIndicator>
     super.didUpdateWidget(oldWidget);
     if (widget.animating != oldWidget.animating) {
       if (widget.animating)
-        _controller.repeat();
+        m_controller.repeat();
       else
-        _controller.stop();
+        m_controller.stop();
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -80,7 +80,7 @@ class _CupertinoActivityIndicatorState extends State<CupertinoActivityIndicator>
       width: widget.radius * 2,
       child: CustomPaint(
         painter: _CupertinoActivityIndicatorPainter(
-          position: _controller,
+          position: m_controller,
           radius: widget.radius,
         ),
       ),

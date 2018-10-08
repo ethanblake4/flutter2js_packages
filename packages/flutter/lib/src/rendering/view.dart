@@ -57,13 +57,13 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
     RenderBox child,
     @required ViewConfiguration configuration,
   }) : assert(configuration != null),
-       _configuration = configuration {
+       m_configuration = configuration {
     this.child = child;
   }
 
   /// The current layout size of the view.
-  Size get size => _size;
-  Size _size = Size.zero;
+  Size get size => m_size;
+  Size m_size = Size.zero;
 
   /// IMPORTANT: Flutter2js-only
   @override
@@ -80,8 +80,8 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
   }
 
   /// The constraints used for the root layout.
-  ViewConfiguration get configuration => _configuration;
-  ViewConfiguration _configuration;
+  ViewConfiguration get configuration => m_configuration;
+  ViewConfiguration m_configuration;
   /// The configuration is initially set by the `configuration` argument
   /// passed to the constructor.
   ///
@@ -90,9 +90,9 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
     assert(value != null);
     if (configuration == value)
       return;
-    _configuration = value;
+    m_configuration = value;
     replaceRootLayer(_updateMatricesAndCreateNewRootLayer());
-    assert(_rootTransform != null);
+    assert(m_rootTransform != null);
     markNeedsLayout();
   }
 
@@ -124,20 +124,20 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
   /// constructor.
   void scheduleInitialFrame() {
     assert(owner != null);
-    assert(_rootTransform == null);
+    assert(m_rootTransform == null);
     scheduleInitialLayout();
     scheduleInitialPaint(_updateMatricesAndCreateNewRootLayer());
-    assert(_rootTransform != null);
+    assert(m_rootTransform != null);
     owner.requestVisualUpdate();
   }
 
-  Matrix4 _rootTransform;
+  Matrix4 m_rootTransform;
 
   Layer _updateMatricesAndCreateNewRootLayer() {
-    _rootTransform = configuration.toMatrix();
-    final ContainerLayer rootLayer = TransformLayer(transform: _rootTransform);
+    m_rootTransform = configuration.toMatrix();
+    final ContainerLayer rootLayer = TransformLayer(transform: m_rootTransform);
     rootLayer.attach(this);
-    assert(_rootTransform != null);
+    assert(m_rootTransform != null);
     return rootLayer;
   }
 
@@ -153,12 +153,12 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
 
   @override
   void performLayout() {
-    assert(_rootTransform != null);
-    _size = configuration.size;
-    assert(_size.isFinite);
+    assert(m_rootTransform != null);
+    m_size = configuration.size;
+    assert(m_size.isFinite);
 
     if (child != null)
-      child.layout(BoxConstraints.tight(_size));
+      child.layout(BoxConstraints.tight(m_size));
   }
 
   @override
@@ -194,8 +194,8 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
 
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
-    assert(_rootTransform != null);
-    transform.multiply(_rootTransform);
+    assert(m_rootTransform != null);
+    transform.multiply(m_rootTransform);
     super.applyPaintTransform(child, transform);
   }
 
@@ -256,8 +256,8 @@ class RenderView extends RenderObject with RenderObjectWithChildMixin<RenderBox>
 
   @override
   Rect get semanticBounds {
-    assert(_rootTransform != null);
-    return MatrixUtils.transformRect(_rootTransform, Offset.zero & size);
+    assert(m_rootTransform != null);
+    return MatrixUtils.transformRect(m_rootTransform, Offset.zero & size);
   }
 
   @override

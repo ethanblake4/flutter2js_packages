@@ -266,10 +266,10 @@ class OutlineButton extends StatefulWidget {
 }
 
 class _OutlineButtonState extends State<OutlineButton> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _fillAnimation;
-  Animation<double> _elevationAnimation;
-  bool _pressed = false;
+  AnimationController m_controller;
+  Animation<double> m_fillAnimation;
+  Animation<double> m_elevationAnimation;
+  bool m_pressed = false;
 
   @override
   void initState() {
@@ -282,18 +282,18 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
     // button's fill is translucent, because the shadow fills the interior
     // of the button.
 
-    _controller = AnimationController(
+    m_controller = AnimationController(
       duration: _kPressDuration,
       vsync: this
     );
-    _fillAnimation = CurvedAnimation(
-      parent: _controller,
+    m_fillAnimation = CurvedAnimation(
+      parent: m_controller,
       curve: const Interval(0.0, 0.5,
         curve: Curves.fastOutSlowIn,
       ),
     );
-    _elevationAnimation = CurvedAnimation(
-      parent: _controller,
+    m_elevationAnimation = CurvedAnimation(
+      parent: m_controller,
       curve: const Interval(0.5, 0.5),
       reverseCurve: const Interval(1.0, 1.0),
     );
@@ -301,7 +301,7 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -342,7 +342,7 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
       begin: color.withAlpha(0x00),
       end: color.withAlpha(0xFF),
     );
-    return colorTween.evaluate(_fillAnimation);
+    return colorTween.evaluate(m_fillAnimation);
   }
 
   // TODO(hmuller): this method is the same as FlatButton
@@ -368,7 +368,7 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
       return widget.borderSide;
 
     final Color color = widget.enabled
-      ? (_pressed
+      ? (m_pressed
          ? widget.highlightedBorderColor ?? theme.primaryColor
          : (widget.borderSide?.color ??
             (themeIsDark ? Colors.grey[600] : Colors.grey[200])))
@@ -385,7 +385,7 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
     return Tween<double>(
       begin: 0.0,
       end: widget.highlightElevation ?? 2.0,
-    ).evaluate(_elevationAnimation);
+    ).evaluate(m_elevationAnimation);
   }
 
   @override
@@ -396,7 +396,7 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
     final Color splashColor = _getSplashColor(theme, buttonTheme);
 
     return AnimatedBuilder(
-      animation: _controller,
+      animation: m_controller,
       builder: (BuildContext context, Widget child) {
         return RaisedButton(
           textColor: textColor,
@@ -411,11 +411,11 @@ class _OutlineButtonState extends State<OutlineButton> with SingleTickerProvider
           highlightElevation: _getHighlightElevation(),
           onHighlightChanged: (bool value) {
             setState(() {
-              _pressed = value;
+              m_pressed = value;
               if (value)
-                _controller.forward();
+                m_controller.forward();
               else
-                _controller.reverse();
+                m_controller.reverse();
             });
           },
           padding: widget.padding,

@@ -1233,8 +1233,8 @@ class _RawChipState extends State<RawChip> with TickerProviderStateMixin<RawChip
         && (widget.onPressed != null || widget.onSelected != null);
   }
 
-  bool _isTapping = false;
-  bool get isTapping => !canTap ? false : _isTapping;
+  bool m_isTapping = false;
+  bool get isTapping => !canTap ? false : m_isTapping;
 
   @override
   void initState() {
@@ -1315,7 +1315,7 @@ class _RawChipState extends State<RawChip> with TickerProviderStateMixin<RawChip
       return;
     }
     setState(() {
-      _isTapping = true;
+      m_isTapping = true;
     });
   }
 
@@ -1324,7 +1324,7 @@ class _RawChipState extends State<RawChip> with TickerProviderStateMixin<RawChip
       return;
     }
     setState(() {
-      _isTapping = false;
+      m_isTapping = false;
     });
   }
 
@@ -1333,7 +1333,7 @@ class _RawChipState extends State<RawChip> with TickerProviderStateMixin<RawChip
       return;
     }
     setState(() {
-      _isTapping = false;
+      m_isTapping = false;
     });
     // Only one of these can be set, so only one will be called.
     widget.onSelected?.call(!widget.selected);

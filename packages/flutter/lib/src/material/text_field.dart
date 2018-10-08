@@ -364,16 +364,16 @@ class TextField extends StatefulWidget {
 }
 
 class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixin {
-  final GlobalKey<EditableTextState> _editableTextKey = GlobalKey<EditableTextState>();
+  final GlobalKey<EditableTextState> m_editableTextKey = GlobalKey<EditableTextState>();
 
-  Set<InteractiveInkFeature> _splashes;
-  InteractiveInkFeature _currentSplash;
+  Set<InteractiveInkFeature> m_splashes;
+  InteractiveInkFeature m_currentSplash;
 
-  TextEditingController _controller;
-  TextEditingController get _effectiveController => widget.controller ?? _controller;
+  TextEditingController m_controller;
+  TextEditingController get m_effectiveController => widget.controller ?? m_controller;
 
-  FocusNode _focusNode;
-  FocusNode get _effectiveFocusNode => widget.focusNode ?? (_focusNode ??= FocusNode());
+  FocusNode m_focusNode;
+  FocusNode get m_effectiveFocusNode => widget.focusNode ?? (m_focusNode ??= FocusNode());
 
   bool get needsCounter => widget.maxLength != null
     && widget.decoration != null
@@ -390,11 +390,11 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
     if (!needsCounter)
       return effectiveDecoration;
 
-    final int currentLength = _effectiveController.value.text.runes.length;
+    final int currentLength = m_effectiveController.value.text.runes.length;
     final String counterText = '$currentLength/${widget.maxLength}';
     final int remaining = (widget.maxLength - currentLength).clamp(0, widget.maxLength);
     final String semanticCounterText = localizations.remainingTextFieldCharacterCount(remaining);
-    if (_effectiveController.value.text.runes.length > widget.maxLength) {
+    if (m_effectiveController.value.text.runes.length > widget.maxLength) {
       final ThemeData themeData = Theme.of(context);
       return effectiveDecoration.copyWith(
         errorText: effectiveDecoration.errorText ?? '',
@@ -414,31 +414,31 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
   void initState() {
     super.initState();
     if (widget.controller == null)
-      _controller = TextEditingController();
+      m_controller = TextEditingController();
   }
 
   @override
   void didUpdateWidget(TextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller == null && oldWidget.controller != null)
-      _controller = TextEditingController.fromValue(oldWidget.controller.value);
+      m_controller = TextEditingController.fromValue(oldWidget.controller.value);
     else if (widget.controller != null && oldWidget.controller == null)
-      _controller = null;
+      m_controller = null;
     final bool isEnabled = widget.enabled ?? widget.decoration?.enabled ?? true;
     final bool wasEnabled = oldWidget.enabled ?? oldWidget.decoration?.enabled ?? true;
     if (wasEnabled && !isEnabled) {
-      _effectiveFocusNode.unfocus();
+      m_effectiveFocusNode.unfocus();
     }
   }
 
   @override
   void dispose() {
-    _focusNode?.dispose();
+    m_focusNode?.dispose();
     super.dispose();
   }
 
   void _requestKeyboard() {
-    _editableTextKey.currentState?.requestKeyboard();
+    m_editableTextKey.currentState?.requestKeyboard();
   }
 
   void _handleSelectionChanged(TextSelection selection, SelectionChangedCause cause) {
@@ -448,18 +448,18 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
 
   InteractiveInkFeature _createInkFeature(TapDownDetails details) {
     final MaterialInkController inkController = Material.of(context);
-    final BuildContext editableContext = _editableTextKey.currentContext;
+    final BuildContext editableContext = m_editableTextKey.currentContext;
     final RenderBox referenceBox = InputDecorator.containerOf(editableContext) ?? editableContext.findRenderObject();
     final Offset position = referenceBox.globalToLocal(details.globalPosition);
     final Color color = Theme.of(context).splashColor;
 
     InteractiveInkFeature splash;
     void handleRemoved() {
-      if (_splashes != null) {
-        assert(_splashes.contains(splash));
-        _splashes.remove(splash);
-        if (_currentSplash == splash)
-          _currentSplash = null;
+      if (m_splashes != null) {
+        assert(m_splashes.contains(splash));
+        m_splashes.remove(splash);
+        if (m_currentSplash == splash)
+          m_currentSplash = null;
         updateKeepAlive();
       } // else we're probably in deactivate()
     }
@@ -479,7 +479,7 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
     return splash;
   }
 
-  RenderEditable get _renderEditable => _editableTextKey.currentState.renderEditable;
+  RenderEditable get _renderEditable => m_editableTextKey.currentState.renderEditable;
 
   void _handleTapDown(TapDownDetails details) {
     _renderEditable.handleTapDown(details);
@@ -502,37 +502,37 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
   }
 
   void _startSplash(TapDownDetails details) {
-    if (_effectiveFocusNode.hasFocus)
+    if (m_effectiveFocusNode.hasFocus)
       return;
     final InteractiveInkFeature splash = _createInkFeature(details);
-    _splashes ??= HashSet<InteractiveInkFeature>();
-    _splashes.add(splash);
-    _currentSplash = splash;
+    m_splashes ??= HashSet<InteractiveInkFeature>();
+    m_splashes.add(splash);
+    m_currentSplash = splash;
     updateKeepAlive();
   }
 
   void _confirmCurrentSplash() {
-    _currentSplash?.confirm();
-    _currentSplash = null;
+    m_currentSplash?.confirm();
+    m_currentSplash = null;
   }
 
   void _cancelCurrentSplash() {
-    _currentSplash?.cancel();
+    m_currentSplash?.cancel();
   }
 
   @override
-  bool get wantKeepAlive => _splashes != null && _splashes.isNotEmpty;
+  bool get wantKeepAlive => m_splashes != null && m_splashes.isNotEmpty;
 
   @override
   void deactivate() {
-    if (_splashes != null) {
-      final Set<InteractiveInkFeature> splashes = _splashes;
-      _splashes = null;
+    if (m_splashes != null) {
+      final Set<InteractiveInkFeature> splashes = m_splashes;
+      m_splashes = null;
       for (InteractiveInkFeature splash in splashes)
         splash.dispose();
-      _currentSplash = null;
+      m_currentSplash = null;
     }
-    assert(_currentSplash == null);
+    assert(m_currentSplash == null);
     super.deactivate();
   }
 
@@ -546,15 +546,15 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
     final ThemeData themeData = Theme.of(context);
     final TextStyle style = widget.style ?? themeData.textTheme.subhead;
     final Brightness keyboardAppearance = widget.keyboardAppearance ?? themeData.primaryColorBrightness;
-    final TextEditingController controller = _effectiveController;
-    final FocusNode focusNode = _effectiveFocusNode;
+    final TextEditingController controller = m_effectiveController;
+    final FocusNode focusNode = m_effectiveFocusNode;
     final List<TextInputFormatter> formatters = widget.inputFormatters ?? <TextInputFormatter>[];
     if (widget.maxLength != null && widget.maxLengthEnforced)
       formatters.add(LengthLimitingTextInputFormatter(widget.maxLength));
 
     Widget child = RepaintBoundary(
       child: EditableText(
-        key: _editableTextKey,
+        key: m_editableTextKey,
         controller: controller,
         focusNode: focusNode,
         keyboardType: widget.keyboardType,
@@ -603,8 +603,8 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
 
     return Semantics(
       onTap: () {
-        if (!_effectiveController.selection.isValid)
-          _effectiveController.selection = TextSelection.collapsed(offset: _effectiveController.text.length);
+        if (!m_effectiveController.selection.isValid)
+          m_effectiveController.selection = TextSelection.collapsed(offset: m_effectiveController.text.length);
         _requestKeyboard();
       },
       child: IgnorePointer(

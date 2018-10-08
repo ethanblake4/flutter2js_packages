@@ -27,60 +27,60 @@ class RenderRotatedBox extends RenderBox with RenderObjectWithChildMixin<RenderB
     @required int quarterTurns,
     RenderBox child
   }) : assert(quarterTurns != null),
-       _quarterTurns = quarterTurns {
+       m_quarterTurns = quarterTurns {
     this.child = child;
   }
 
   /// The number of clockwise quarter turns the child should be rotated.
-  int get quarterTurns => _quarterTurns;
-  int _quarterTurns;
+  int get quarterTurns => m_quarterTurns;
+  int m_quarterTurns;
   set quarterTurns(int value) {
     assert(value != null);
-    if (_quarterTurns == value)
+    if (m_quarterTurns == value)
       return;
-    _quarterTurns = value;
+    m_quarterTurns = value;
     markNeedsLayout();
   }
 
-  bool get _isVertical => quarterTurns % 2 == 1;
+  bool get m_isVertical => quarterTurns % 2 == 1;
 
   @override
   double computeMinIntrinsicWidth(double height) {
     if (child == null)
       return 0.0;
-    return _isVertical ? child.getMinIntrinsicHeight(height) : child.getMinIntrinsicWidth(height);
+    return m_isVertical ? child.getMinIntrinsicHeight(height) : child.getMinIntrinsicWidth(height);
   }
 
   @override
   double computeMaxIntrinsicWidth(double height) {
     if (child == null)
       return 0.0;
-    return _isVertical ? child.getMaxIntrinsicHeight(height) : child.getMaxIntrinsicWidth(height);
+    return m_isVertical ? child.getMaxIntrinsicHeight(height) : child.getMaxIntrinsicWidth(height);
   }
 
   @override
   double computeMinIntrinsicHeight(double width) {
     if (child == null)
       return 0.0;
-    return _isVertical ? child.getMinIntrinsicWidth(width) : child.getMinIntrinsicHeight(width);
+    return m_isVertical ? child.getMinIntrinsicWidth(width) : child.getMinIntrinsicHeight(width);
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
     if (child == null)
       return 0.0;
-    return _isVertical ? child.getMaxIntrinsicWidth(width) : child.getMaxIntrinsicHeight(width);
+    return m_isVertical ? child.getMaxIntrinsicWidth(width) : child.getMaxIntrinsicHeight(width);
   }
 
-  Matrix4 _paintTransform;
+  Matrix4 m_paintTransform;
 
   @override
   void performLayout() {
-    _paintTransform = null;
+    m_paintTransform = null;
     if (child != null) {
-      child.layout(_isVertical ? constraints.flipped : constraints, parentUsesSize: true);
-      size = _isVertical ? Size(child.size.height, child.size.width) : child.size;
-      _paintTransform = Matrix4.identity()
+      child.layout(m_isVertical ? constraints.flipped : constraints, parentUsesSize: true);
+      size = m_isVertical ? Size(child.size.height, child.size.width) : child.size;
+      m_paintTransform = Matrix4.identity()
         ..translate(size.width / 2.0, size.height / 2.0)
         ..rotateZ(_kQuarterTurnsInRadians * (quarterTurns % 4))
         ..translate(-child.size.width / 2.0, -child.size.height / 2.0);
@@ -91,10 +91,10 @@ class RenderRotatedBox extends RenderBox with RenderObjectWithChildMixin<RenderB
 
   @override
   bool hitTestChildren(HitTestResult result, { Offset position }) {
-    assert(_paintTransform != null || debugNeedsLayout || child == null);
-    if (child == null || _paintTransform == null)
+    assert(m_paintTransform != null || debugNeedsLayout || child == null);
+    if (child == null || m_paintTransform == null)
       return false;
-    final Matrix4 inverse = Matrix4.inverted(_paintTransform);
+    final Matrix4 inverse = Matrix4.inverted(m_paintTransform);
     return child.hitTest(result, position: MatrixUtils.transformPoint(inverse, position));
   }
 
@@ -105,13 +105,13 @@ class RenderRotatedBox extends RenderBox with RenderObjectWithChildMixin<RenderB
   @override
   void paint(PaintingContext context, Offset offset) {
     if (child != null)
-      context.pushTransform(needsCompositing, offset, _paintTransform, _paintChild);
+      context.pushTransform(needsCompositing, offset, m_paintTransform, _paintChild);
   }
 
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
-    if (_paintTransform != null)
-      transform.multiply(_paintTransform);
+    if (m_paintTransform != null)
+      transform.multiply(m_paintTransform);
     super.applyPaintTransform(child, transform);
   }
 }

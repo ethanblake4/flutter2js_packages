@@ -260,17 +260,17 @@ typedef TweenVisitor<T> = Tween<T> Function(Tween<T> tween, T targetValue, Tween
 abstract class ImplicitlyAnimatedWidgetState<T extends ImplicitlyAnimatedWidget> extends State<T> with SingleTickerProviderStateMixin {
   /// The animation controller driving this widget's implicit animations.
   @protected
-  AnimationController get controller => _controller;
-  AnimationController _controller;
+  AnimationController get controller => m_controller;
+  AnimationController m_controller;
 
   /// The animation driving this widget's implicit animations.
-  Animation<double> get animation => _animation;
-  Animation<double> _animation;
+  Animation<double> get animation => m_animation;
+  Animation<double> m_animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    m_controller = AnimationController(
       duration: widget.duration,
       debugLabel: '${widget.toStringShort()}',
       vsync: this,
@@ -285,13 +285,13 @@ abstract class ImplicitlyAnimatedWidgetState<T extends ImplicitlyAnimatedWidget>
     super.didUpdateWidget(oldWidget);
     if (widget.curve != oldWidget.curve)
       _updateCurve();
-    _controller.duration = widget.duration;
+    m_controller.duration = widget.duration;
     if (_constructTweens()) {
       forEachTween((Tween<dynamic> tween, dynamic targetValue, TweenConstructor<dynamic> constructor) {
         _updateTween(tween, targetValue);
         return tween;
       });
-      _controller
+      m_controller
         ..value = 0.0
         ..forward();
       didUpdateTweens();
@@ -300,14 +300,14 @@ abstract class ImplicitlyAnimatedWidgetState<T extends ImplicitlyAnimatedWidget>
 
   void _updateCurve() {
     if (widget.curve != null)
-      _animation = CurvedAnimation(parent: _controller, curve: widget.curve);
+      m_animation = CurvedAnimation(parent: m_controller, curve: widget.curve);
     else
-      _animation = _controller;
+      m_animation = m_controller;
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -319,7 +319,7 @@ abstract class ImplicitlyAnimatedWidgetState<T extends ImplicitlyAnimatedWidget>
     if (tween == null)
       return;
     tween
-      ..begin = tween.evaluate(_animation)
+      ..begin = tween.evaluate(m_animation)
       ..end = targetValue;
   }
 

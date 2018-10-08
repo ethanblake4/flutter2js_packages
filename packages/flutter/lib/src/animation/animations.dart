@@ -169,65 +169,65 @@ class ProxyAnimation extends Animation<double>
   /// If the animation argument is omitted, the proxy animation will have the
   /// status [AnimationStatus.dismissed] and a value of 0.0.
   ProxyAnimation([Animation<double> animation]) {
-    _parent = animation;
-    if (_parent == null) {
-      _status = AnimationStatus.dismissed;
-      _value = 0.0;
+    mparent = animation;
+    if (mparent == null) {
+      mstatus = AnimationStatus.dismissed;
+      mvalue = 0.0;
     }
   }
 
-  AnimationStatus _status;
-  double _value;
+  AnimationStatus mstatus;
+  double mvalue;
 
   /// The animation whose value this animation will proxy.
   ///
   /// This value is mutable. When mutated, the listeners on the proxy animation
   /// will be transparently updated to be listening to the new parent animation.
-  Animation<double> get parent => _parent;
-  Animation<double> _parent;
+  Animation<double> get parent => mparent;
+  Animation<double> mparent;
   set parent(Animation<double> value) {
-    if (value == _parent)
+    if (value == mparent)
       return;
-    if (_parent != null) {
-      _status = _parent.status;
-      _value = _parent.value;
+    if (mparent != null) {
+      mstatus = mparent.status;
+      mvalue = mparent.value;
       if (isListening)
         didStopListening();
     }
-    _parent = value;
-    if (_parent != null) {
+    mparent = value;
+    if (mparent != null) {
       if (isListening)
         didStartListening();
-      if (_value != _parent.value)
+      if (mvalue != mparent.value)
         notifyListeners();
-      if (_status != _parent.status)
-        notifyStatusListeners(_parent.status);
-      _status = null;
-      _value = null;
+      if (mstatus != mparent.status)
+        notifyStatusListeners(mparent.status);
+      mstatus = null;
+      mvalue = null;
     }
   }
 
   @override
   void didStartListening() {
-    if (_parent != null) {
-      _parent.addListener(notifyListeners);
-      _parent.addStatusListener(notifyStatusListeners);
+    if (mparent != null) {
+      mparent.addListener(notifyListeners);
+      mparent.addStatusListener(notifyStatusListeners);
     }
   }
 
   @override
   void didStopListening() {
-    if (_parent != null) {
-      _parent.removeListener(notifyListeners);
-      _parent.removeStatusListener(notifyStatusListeners);
+    if (mparent != null) {
+      mparent.removeListener(notifyListeners);
+      mparent.removeStatusListener(notifyStatusListeners);
     }
   }
 
   @override
-  AnimationStatus get status => _parent != null ? _parent.status : _status;
+  AnimationStatus get status => mparent != null ? mparent.status : mstatus;
 
   @override
-  double get value => _parent != null ? _parent.value : _value;
+  double get value => mparent != null ? mparent.value : mvalue;
 
   @override
   String toString() {
@@ -383,13 +383,13 @@ class CurvedAnimation extends Animation<double> with AnimationWithParentMixin<do
     } */
   }
 
-  bool get _useForwardCurve {
+  bool get museForwardCurve {
     return reverseCurve == null; /* flutter2js || (_curveDirection ?? parent.status) != AnimationStatus.reverse; */
   }
 
   @override
   double get value {
-    final Curve activeCurve = _useForwardCurve ? curve : reverseCurve;
+    final Curve activeCurve = museForwardCurve ? curve : reverseCurve;
 
     final double t = parent.value;
     if (activeCurve == null)
@@ -417,7 +417,7 @@ class CurvedAnimation extends Animation<double> with AnimationWithParentMixin<do
   String toString() {
     if (reverseCurve == null)
       return '$parent\u27A9$curve';
-    if (_useForwardCurve)
+    if (museForwardCurve)
       return '$parent\u27A9$curve\u2092\u2099/$reverseCurve';
     return '$parent\u27A9$curve/$reverseCurve\u2092\u2099';
   }
@@ -442,100 +442,100 @@ class TrainHoppingAnimation extends Animation<double>
   ///
   /// The current train argument must not be null but the next train argument
   /// can be null.
-  TrainHoppingAnimation(this._currentTrain, this._nextTrain, { this.onSwitchedTrain })
-    : assert(_currentTrain != null) {
-    if (_nextTrain != null) {
-      if (_currentTrain.value > _nextTrain.value) {
-        _mode = _TrainHoppingMode.maximize;
+  TrainHoppingAnimation(this.m_currentTrain, this.m_nextTrain, { this.onSwitchedTrain })
+    : assert(m_currentTrain != null) {
+    if (m_nextTrain != null) {
+      if (m_currentTrain.value > m_nextTrain.value) {
+        m_mode = _TrainHoppingMode.maximize;
       } else {
-        _mode = _TrainHoppingMode.minimize;
-        if (_currentTrain.value == _nextTrain.value) {
-          _currentTrain = _nextTrain;
-          _nextTrain = null;
+        m_mode = _TrainHoppingMode.minimize;
+        if (m_currentTrain.value == m_nextTrain.value) {
+          m_currentTrain = m_nextTrain;
+          m_nextTrain = null;
         }
       }
     }
-    _currentTrain.addStatusListener(_statusChangeHandler);
-    _currentTrain.addListener(_valueChangeHandler);
-    _nextTrain?.addListener(_valueChangeHandler);
-    assert(_mode != null);
+    m_currentTrain.addStatusListener(_statusChangeHandler);
+    m_currentTrain.addListener(_valueChangeHandler);
+    m_nextTrain?.addListener(_valueChangeHandler);
+    assert(m_mode != null);
   }
 
   /// The animation that is current driving this animation.
-  Animation<double> get currentTrain => _currentTrain;
-  Animation<double> _currentTrain;
-  Animation<double> _nextTrain;
-  _TrainHoppingMode _mode;
+  Animation<double> get currentTrain => m_currentTrain;
+  Animation<double> m_currentTrain;
+  Animation<double> m_nextTrain;
+  _TrainHoppingMode m_mode;
 
   /// Called when this animation switches to be driven by a different animation.
   VoidCallback onSwitchedTrain;
 
-  AnimationStatus _lastStatus;
+  AnimationStatus m_lastStatus;
   void _statusChangeHandler(AnimationStatus status) {
-    assert(_currentTrain != null);
-    if (status != _lastStatus) {
+    assert(m_currentTrain != null);
+    if (status != m_lastStatus) {
       notifyListeners();
-      _lastStatus = status;
+      m_lastStatus = status;
     }
-    assert(_lastStatus != null);
+    assert(m_lastStatus != null);
   }
 
   @override
-  AnimationStatus get status => _currentTrain.status;
+  AnimationStatus get status => m_currentTrain.status;
 
-  double _lastValue;
+  double m_lastValue;
   void _valueChangeHandler() {
-    assert(_currentTrain != null);
+    assert(m_currentTrain != null);
     bool hop = false;
-    if (_nextTrain != null) {
-      switch (_mode) {
+    if (m_nextTrain != null) {
+      switch (m_mode) {
         case _TrainHoppingMode.minimize:
-          hop = _nextTrain.value <= _currentTrain.value;
+          hop = m_nextTrain.value <= m_currentTrain.value;
           break;
         case _TrainHoppingMode.maximize:
-          hop = _nextTrain.value >= _currentTrain.value;
+          hop = m_nextTrain.value >= m_currentTrain.value;
           break;
       }
       if (hop) {
-        _currentTrain
+        m_currentTrain
           ..removeStatusListener(_statusChangeHandler)
           ..removeListener(_valueChangeHandler);
-        _currentTrain = _nextTrain;
-        _nextTrain = null;
-        _currentTrain.addStatusListener(_statusChangeHandler);
-        _statusChangeHandler(_currentTrain.status);
+        m_currentTrain = m_nextTrain;
+        m_nextTrain = null;
+        m_currentTrain.addStatusListener(_statusChangeHandler);
+        _statusChangeHandler(m_currentTrain.status);
       }
     }
     final double newValue = value;
-    if (newValue != _lastValue) {
+    if (newValue != m_lastValue) {
       notifyListeners();
-      _lastValue = newValue;
+      m_lastValue = newValue;
     }
-    assert(_lastValue != null);
+    assert(m_lastValue != null);
     if (hop && onSwitchedTrain != null)
       onSwitchedTrain();
   }
 
   @override
-  double get value => _currentTrain.value;
+  double get value => m_currentTrain.value;
 
   /// Frees all the resources used by this performance.
   /// After this is called, this object is no longer usable.
   @override
   void dispose() {
-    assert(_currentTrain != null);
-    _currentTrain.removeStatusListener(_statusChangeHandler);
-    _currentTrain.removeListener(_valueChangeHandler);
-    _currentTrain = null;
-    _nextTrain?.removeListener(_valueChangeHandler);
-    _nextTrain = null;
+    assert(m_currentTrain != null);
+    m_currentTrain.removeStatusListener(_statusChangeHandler);
+    m_currentTrain.removeListener(_valueChangeHandler);
+    m_currentTrain = null;
+    m_nextTrain?.removeListener(_valueChangeHandler);
+    m_nextTrain = null;
     super.dispose();
   }
 
   @override
   String toString() {
-    if (_nextTrain != null)
-      return '$currentTrain\u27A9$runtimeType(next: $_nextTrain)';
+    if (m_nextTrain != null)
+      return '$currentTrain\u27A9$runtimeType(next: $m_nextTrain)';
     return '$currentTrain\u27A9$runtimeType(no next)';
   }
 }
@@ -599,10 +599,10 @@ abstract class CompoundAnimation<T> extends Animation<T>
     return '$runtimeType($first, $next)';
   }
 
-  AnimationStatus _lastStatus;
+  AnimationStatus m_lastStatus;
   void _maybeNotifyStatusListeners(AnimationStatus _) {
-    if (status != _lastStatus) {
-      _lastStatus = status;
+    if (status != m_lastStatus) {
+      m_lastStatus = status;
       notifyStatusListeners(status);
     }
   }

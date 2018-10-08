@@ -164,10 +164,10 @@ abstract class RenderViewportBase<ParentDataClass extends ContainerParentDataMix
        assert(crossAxisDirection != null),
        assert(offset != null),
        assert(axisDirectionToAxis(axisDirection) != axisDirectionToAxis(crossAxisDirection)),
-       _axisDirection = axisDirection,
-       _crossAxisDirection = crossAxisDirection,
-       _offset = offset,
-       _cacheExtent = cacheExtent ?? RenderAbstractViewport.defaultCacheExtent;
+       m_axisDirection = axisDirection,
+       m_crossAxisDirection = crossAxisDirection,
+       m_offset = offset,
+       m_cacheExtent = cacheExtent ?? RenderAbstractViewport.defaultCacheExtent;
 
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
@@ -188,13 +188,13 @@ abstract class RenderViewportBase<ParentDataClass extends ContainerParentDataMix
   /// For example, if the [axisDirection] is [AxisDirection.down], a scroll
   /// offset of zero is at the top of the viewport and increases towards the
   /// bottom of the viewport.
-  AxisDirection get axisDirection => _axisDirection;
-  AxisDirection _axisDirection;
+  AxisDirection get axisDirection => m_axisDirection;
+  AxisDirection m_axisDirection;
   set axisDirection(AxisDirection value) {
     assert(value != null);
-    if (value == _axisDirection)
+    if (value == m_axisDirection)
       return;
-    _axisDirection = value;
+    m_axisDirection = value;
     markNeedsLayout();
   }
 
@@ -204,13 +204,13 @@ abstract class RenderViewportBase<ParentDataClass extends ContainerParentDataMix
   /// is typically [AxisDirection.left] if the ambient [TextDirection] is
   /// [TextDirection.rtl] and [AxisDirection.right] if the ambient
   /// [TextDirection] is [TextDirection.ltr].
-  AxisDirection get crossAxisDirection => _crossAxisDirection;
-  AxisDirection _crossAxisDirection;
+  AxisDirection get crossAxisDirection => m_crossAxisDirection;
+  AxisDirection m_crossAxisDirection;
   set crossAxisDirection(AxisDirection value) {
     assert(value != null);
-    if (value == _crossAxisDirection)
+    if (value == m_crossAxisDirection)
       return;
-    _crossAxisDirection = value;
+    m_crossAxisDirection = value;
     markNeedsLayout();
   }
 
@@ -226,17 +226,17 @@ abstract class RenderViewportBase<ParentDataClass extends ContainerParentDataMix
   /// viewport uses to select which part of its content to display. As the user
   /// scrolls the viewport, this value changes, which changes the content that
   /// is displayed.
-  ViewportOffset get offset => _offset;
-  ViewportOffset _offset;
+  ViewportOffset get offset => m_offset;
+  ViewportOffset m_offset;
   set offset(ViewportOffset value) {
     assert(value != null);
-    if (value == _offset)
+    if (value == m_offset)
       return;
     if (attached)
-      _offset.removeListener(markNeedsLayout);
-    _offset = value;
+      m_offset.removeListener(markNeedsLayout);
+    m_offset = value;
     if (attached)
-      _offset.addListener(markNeedsLayout);
+      m_offset.addListener(markNeedsLayout);
     // We need to go through layout even if the new offset has the same pixels
     // value as the old offset so that we will apply our viewport and content
     // dimensions.
@@ -261,26 +261,26 @@ abstract class RenderViewportBase<ParentDataClass extends ContainerParentDataMix
   /// viewport to an invisible item in the cache area, the framework will bring
   /// that item into view with an (implicit) scroll action.
   /// {@endtemplate}
-  double get cacheExtent => _cacheExtent;
-  double _cacheExtent;
+  double get cacheExtent => m_cacheExtent;
+  double m_cacheExtent;
   set cacheExtent(double value) {
     value = value ?? RenderAbstractViewport.defaultCacheExtent;
     assert(value != null);
-    if (value == _cacheExtent)
+    if (value == m_cacheExtent)
       return;
-    _cacheExtent = value;
+    m_cacheExtent = value;
     markNeedsLayout();
   }
 
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    _offset.addListener(markNeedsLayout);
+    m_offset.addListener(markNeedsLayout);
   }
 
   @override
   void detach() {
-    _offset.removeListener(markNeedsLayout);
+    m_offset.removeListener(markNeedsLayout);
     super.detach();
   }
 

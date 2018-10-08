@@ -42,12 +42,12 @@ abstract class Layer extends AbstractNode with DiagnosticableTreeMixin {
   ContainerLayer get parent => super.parent;
 
   /// This layer's next sibling in the parent layer's child list.
-  Layer get nextSibling => _nextSibling;
-  Layer _nextSibling;
+  Layer get nextSibling => m_nextSibling;
+  Layer m_nextSibling;
 
   /// This layer's previous sibling in the parent layer's child list.
-  Layer get previousSibling => _previousSibling;
-  Layer _previousSibling;
+  Layer get previousSibling => m_previousSibling;
+  Layer m_previousSibling;
 
   /// Removes this layer from its parent layer's child list.
   ///
@@ -62,15 +62,15 @@ abstract class Layer extends AbstractNode with DiagnosticableTreeMixin {
     assert(parent != null);
     assert(attached == parent.attached);
     assert(newLayer.parent == null);
-    assert(newLayer._nextSibling == null);
-    assert(newLayer._previousSibling == null);
+    assert(newLayer.m_nextSibling == null);
+    assert(newLayer.m_previousSibling == null);
     assert(!newLayer.attached);
-    newLayer._nextSibling = nextSibling;
-    if (_nextSibling != null)
-      _nextSibling._previousSibling = newLayer;
-    newLayer._previousSibling = previousSibling;
-    if (_previousSibling != null)
-      _previousSibling._nextSibling = newLayer;
+    newLayer.m_nextSibling = nextSibling;
+    if (m_nextSibling != null)
+      m_nextSibling.m_previousSibling = newLayer;
+    newLayer.m_previousSibling = previousSibling;
+    if (m_previousSibling != null)
+      m_previousSibling.m_nextSibling = newLayer;
     assert(() {
       Layer node = this;
       while (node.parent != null)
@@ -84,8 +84,8 @@ abstract class Layer extends AbstractNode with DiagnosticableTreeMixin {
       parent._firstChild = newLayer;
     if (parent.lastChild == this)
       parent._lastChild = newLayer;
-    _nextSibling = null;
-    _previousSibling = null;
+    m_nextSibling = null;
+    m_previousSibling = null;
     parent.dropChild(this);
     assert(!attached);
   }
@@ -342,9 +342,9 @@ class ContainerLayer extends Layer {
 
   bool _debugUltimateNextSiblingOf(Layer child, { Layer equals }) {
     assert(child.attached == attached);
-    while (child._nextSibling != null) {
-      assert(child._nextSibling != child);
-      child = child._nextSibling;
+    while (child.m_nextSibling != null) {
+      assert(child.m_nextSibling != child);
+      child = child.m_nextSibling;
       assert(child.attached == attached);
     }
     return child == equals;
@@ -400,9 +400,9 @@ class ContainerLayer extends Layer {
       return true;
     }());
     adoptChild(child);
-    child._previousSibling = lastChild;
+    child.m_previousSibling = lastChild;
     if (lastChild != null)
-      lastChild._nextSibling = child;
+      lastChild.m_nextSibling = child;
     _lastChild = child;
     _firstChild ??= child;
     assert(child.attached == attached);
@@ -414,25 +414,25 @@ class ContainerLayer extends Layer {
     assert(child.attached == attached);
     assert(_debugUltimatePreviousSiblingOf(child, equals: firstChild));
     assert(_debugUltimateNextSiblingOf(child, equals: lastChild));
-    if (child._previousSibling == null) {
+    if (child.m_previousSibling == null) {
       assert(_firstChild == child);
-      _firstChild = child._nextSibling;
+      _firstChild = child.m_nextSibling;
     } else {
-      child._previousSibling._nextSibling = child.nextSibling;
+      child.m_previousSibling.m_nextSibling = child.nextSibling;
     }
-    if (child._nextSibling == null) {
+    if (child.m_nextSibling == null) {
       assert(lastChild == child);
       _lastChild = child.previousSibling;
     } else {
-      child.nextSibling._previousSibling = child.previousSibling;
+      child.nextSibling.m_previousSibling = child.previousSibling;
     }
     assert((firstChild == null) == (lastChild == null));
     assert(firstChild == null || firstChild.attached == attached);
     assert(lastChild == null || lastChild.attached == attached);
     assert(firstChild == null || _debugUltimateNextSiblingOf(firstChild, equals: lastChild));
     assert(lastChild == null || _debugUltimatePreviousSiblingOf(lastChild, equals: firstChild));
-    child._previousSibling = null;
-    child._nextSibling = null;
+    child.m_previousSibling = null;
+    child.m_nextSibling = null;
     dropChild(child);
     assert(!child.attached);
   }
@@ -442,8 +442,8 @@ class ContainerLayer extends Layer {
     Layer child = firstChild;
     while (child != null) {
       final Layer next = child.nextSibling;
-      child._previousSibling = null;
-      child._nextSibling = null;
+      child.m_previousSibling = null;
+      child.m_nextSibling = null;
       assert(child.attached == attached);
       dropChild(child);
       child = next;

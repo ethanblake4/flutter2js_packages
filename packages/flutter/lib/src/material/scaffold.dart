@@ -458,27 +458,27 @@ class _FloatingActionButtonTransition extends StatefulWidget {
 class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTransition> with TickerProviderStateMixin {
   // The animations applied to the Floating Action Button when it is entering or exiting.
   // Controls the previous widget.child as it exits
-  AnimationController _previousController;
-  Animation<double> _previousScaleAnimation;
-  Animation<double> _previousRotationAnimation;
+  AnimationController m_previousController;
+  Animation<double> m_previousScaleAnimation;
+  Animation<double> m_previousRotationAnimation;
   // Controls the current child widget.child as it exits
-  AnimationController _currentController;
+  AnimationController m_currentController;
   // The animations to run, considering the widget's fabMoveAnimation and the current/previous entrance/exit animations.
-  Animation<double> _currentScaleAnimation;
-  Animation<double> _extendedCurrentScaleAnimation;
-  Animation<double> _currentRotationAnimation;
-  Widget _previousChild;
+  Animation<double> m_currentScaleAnimation;
+  Animation<double> m_extendedCurrentScaleAnimation;
+  Animation<double> m_currentRotationAnimation;
+  Widget m_previousChild;
 
   @override
   void initState() {
     super.initState();
 
-    _previousController = AnimationController(
+    m_previousController = AnimationController(
       duration: kFloatingActionButtonSegue,
       vsync: this,
     )..addStatusListener(_handlePreviousAnimationStatusChanged);
 
-    _currentController = AnimationController(
+    m_currentController = AnimationController(
       duration: kFloatingActionButtonSegue,
       vsync: this,
     );
@@ -488,7 +488,7 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
     if (widget.child != null) {
       // If we start out with a child, have the child appear fully visible instead
       // of animating in.
-      _currentController.value = 1.0;
+      m_currentController.value = 1.0;
     }
     else {
       // If we start without a child we update the geometry object with a
@@ -499,8 +499,8 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
 
   @override
   void dispose() {
-    _previousController.dispose();
-    _currentController.dispose();
+    m_previousController.dispose();
+    m_currentController.dispose();
     super.dispose();
   }
 
@@ -515,23 +515,23 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
       // Get the right scale and rotation animations to use for this widget.
       _updateAnimations();
     }
-    if (_previousController.status == AnimationStatus.dismissed) {
-      final double currentValue = _currentController.value;
+    if (m_previousController.status == AnimationStatus.dismissed) {
+      final double currentValue = m_currentController.value;
       if (currentValue == 0.0 || oldWidget.child == null) {
         // The current child hasn't started its entrance animation yet. We can
         // just skip directly to the new child's entrance.
-        _previousChild = null;
+        m_previousChild = null;
         if (widget.child != null)
-          _currentController.forward();
+          m_currentController.forward();
       } else {
         // Otherwise, we need to copy the state from the current controller to
         // the previous controller and run an exit animation for the previous
         // widget before running the entrance animation for the new child.
-        _previousChild = oldWidget.child;
-        _previousController
+        m_previousChild = oldWidget.child;
+        m_previousController
           ..value = currentValue
           ..reverse();
-        _currentController.value = 0.0;
+        m_currentController.value = 0.0;
       }
     }
   }
@@ -539,18 +539,18 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
   void _updateAnimations() {
     // Get the animations for exit and entrance.
     final CurvedAnimation previousExitScaleAnimation = CurvedAnimation(
-      parent: _previousController,
+      parent: m_previousController,
       curve: Curves.easeIn,
     );
     final Animation<double> previousExitRotationAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(
       CurvedAnimation(
-        parent: _previousController,
+        parent: m_previousController,
         curve: Curves.easeIn,
       ),
     );
 
     final CurvedAnimation currentEntranceScaleAnimation = CurvedAnimation(
-      parent: _currentController,
+      parent: m_currentController,
       curve: Curves.easeIn,
     );
     final Animation<double> currentEntranceRotationAnimation = Tween<double>(
@@ -558,7 +558,7 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
       end: 1.0,
     ).animate(
       CurvedAnimation(
-        parent: _currentController,
+        parent: m_currentController,
         curve: Curves.easeIn
       ),
     );
@@ -568,26 +568,26 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
     final Animation<double> moveRotationAnimation = widget.fabMotionAnimator.getRotationAnimation(parent: widget.fabMoveAnimation);
 
     // Aggregate the animations.
-    _previousScaleAnimation = AnimationMin<double>(moveScaleAnimation, previousExitScaleAnimation);
-    _currentScaleAnimation = AnimationMin<double>(moveScaleAnimation, currentEntranceScaleAnimation);
-    _extendedCurrentScaleAnimation = CurvedAnimation(
-      parent: _currentScaleAnimation,
+    m_previousScaleAnimation = AnimationMin<double>(moveScaleAnimation, previousExitScaleAnimation);
+    m_currentScaleAnimation = AnimationMin<double>(moveScaleAnimation, currentEntranceScaleAnimation);
+    m_extendedCurrentScaleAnimation = CurvedAnimation(
+      parent: m_currentScaleAnimation,
       curve: const Interval(0.0, 0.1),
     );
 
-    _previousRotationAnimation = TrainHoppingAnimation(previousExitRotationAnimation, moveRotationAnimation);
-    _currentRotationAnimation = TrainHoppingAnimation(currentEntranceRotationAnimation, moveRotationAnimation);
+    m_previousRotationAnimation = TrainHoppingAnimation(previousExitRotationAnimation, moveRotationAnimation);
+    m_currentRotationAnimation = TrainHoppingAnimation(currentEntranceRotationAnimation, moveRotationAnimation);
 
-    _currentScaleAnimation.addListener(_onProgressChanged);
-    _previousScaleAnimation.addListener(_onProgressChanged);
+    m_currentScaleAnimation.addListener(_onProgressChanged);
+    m_previousScaleAnimation.addListener(_onProgressChanged);
   }
 
   void _handlePreviousAnimationStatusChanged(AnimationStatus status) {
     setState(() {
       if (status == AnimationStatus.dismissed) {
-        assert(_currentController.status == AnimationStatus.dismissed);
+        assert(m_currentController.status == AnimationStatus.dismissed);
         if (widget.child != null)
-          _currentController.forward();
+          m_currentController.forward();
       }
     });
   }
@@ -603,18 +603,18 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
   Widget build(BuildContext context) {
     final List<Widget> children = <Widget>[];
 
-    if (_previousController.status != AnimationStatus.dismissed) {
-      if (_isExtendedFloatingActionButton(_previousChild)) {
+    if (m_previousController.status != AnimationStatus.dismissed) {
+      if (_isExtendedFloatingActionButton(m_previousChild)) {
         children.add(FadeTransition(
-          opacity: _previousScaleAnimation,
-          child: _previousChild,
+          opacity: m_previousScaleAnimation,
+          child: m_previousChild,
         ));
       } else {
         children.add(ScaleTransition(
-          scale: _previousScaleAnimation,
+          scale: m_previousScaleAnimation,
           child: RotationTransition(
-            turns: _previousRotationAnimation,
-            child: _previousChild,
+            turns: m_previousRotationAnimation,
+            child: m_previousChild,
           ),
         ));
       }
@@ -622,17 +622,17 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
 
     if (_isExtendedFloatingActionButton(widget.child)) {
       children.add(ScaleTransition(
-        scale: _extendedCurrentScaleAnimation,
+        scale: m_extendedCurrentScaleAnimation,
         child: FadeTransition(
-          opacity: _currentScaleAnimation,
+          opacity: m_currentScaleAnimation,
           child: widget.child,
         ),
       ));
     } else {
       children.add(ScaleTransition(
-        scale: _currentScaleAnimation,
+        scale: m_currentScaleAnimation,
         child: RotationTransition(
-          turns: _currentRotationAnimation,
+          turns: m_currentRotationAnimation,
           child: widget.child,
         ),
       ));
@@ -645,7 +645,7 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
   }
 
   void _onProgressChanged() {
-    _updateGeometryScale(math.max(_previousScaleAnimation.value, _currentScaleAnimation.value));
+    _updateGeometryScale(math.max(m_previousScaleAnimation.value, m_currentScaleAnimation.value));
   }
 
   void _updateGeometryScale(double scale) {
@@ -1012,26 +1012,26 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
 
   // DRAWER API
 
-  final GlobalKey<DrawerControllerState> _drawerKey = GlobalKey<DrawerControllerState>();
-  final GlobalKey<DrawerControllerState> _endDrawerKey = GlobalKey<DrawerControllerState>();
+  final GlobalKey<DrawerControllerState> m_drawerKey = GlobalKey<DrawerControllerState>();
+  final GlobalKey<DrawerControllerState> m_endDrawerKey = GlobalKey<DrawerControllerState>();
 
   /// Whether this scaffold has a non-null [Scaffold.drawer].
   bool get hasDrawer => widget.drawer != null;
   /// Whether this scaffold has a non-null [Scaffold.endDrawer].
   bool get hasEndDrawer => widget.endDrawer != null;
 
-  bool _drawerOpened = false;
-  bool _endDrawerOpened = false;
+  bool m_drawerOpened = false;
+  bool m_endDrawerOpened = false;
 
   void _drawerOpenedCallback(bool isOpened) {
     setState(() {
-      _drawerOpened = isOpened;
+      m_drawerOpened = isOpened;
     });
   }
 
   void _endDrawerOpenedCallback(bool isOpened) {
     setState(() {
-      _endDrawerOpened = isOpened;
+      m_endDrawerOpened = isOpened;
     });
   }
 
@@ -1048,9 +1048,9 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
   ///
   /// See [Scaffold.of] for information about how to obtain the [ScaffoldState].
   void openDrawer() {
-    if (_endDrawerKey.currentState != null && _endDrawerOpened)
-      _endDrawerKey.currentState.close();
-    _drawerKey.currentState?.open();
+    if (m_endDrawerKey.currentState != null && m_endDrawerOpened)
+      m_endDrawerKey.currentState.close();
+    m_drawerKey.currentState?.open();
   }
 
   /// Opens the end side [Drawer] (if any).
@@ -1066,9 +1066,9 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
   ///
   /// See [Scaffold.of] for information about how to obtain the [ScaffoldState].
   void openEndDrawer() {
-    if (_drawerKey.currentState != null && _drawerOpened)
-      _drawerKey.currentState.close();
-    _endDrawerKey.currentState?.open();
+    if (m_drawerKey.currentState != null && m_drawerOpened)
+      m_drawerKey.currentState.close();
+    m_endDrawerKey.currentState?.open();
   }
 
   // SNACKBAR API
@@ -1458,7 +1458,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
       _addIfNonNull(
         children,
         DrawerController(
-          key: _endDrawerKey,
+          key: m_endDrawerKey,
           alignment: DrawerAlignment.end,
           child: widget.endDrawer,
           drawerCallback: _endDrawerOpenedCallback,
@@ -1479,7 +1479,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
       _addIfNonNull(
         children,
         DrawerController(
-          key: _drawerKey,
+          key: m_drawerKey,
           alignment: DrawerAlignment.start,
           child: widget.drawer,
           drawerCallback: _drawerOpenedCallback,
@@ -1665,7 +1665,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
       );
     }
 
-    if (_endDrawerOpened) {
+    if (m_endDrawerOpened) {
       _buildDrawer(children, textDirection);
       _buildEndDrawer(children, textDirection);
     } else {

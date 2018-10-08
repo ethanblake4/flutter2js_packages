@@ -406,20 +406,20 @@ class InkResponse extends StatefulWidget {
 }
 
 class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKeepAliveClientMixin {
-  Set<InteractiveInkFeature> _splashes;
-  InteractiveInkFeature _currentSplash;
-  InkHighlight _lastHighlight;
+  Set<InteractiveInkFeature> m_splashes;
+  InteractiveInkFeature m_currentSplash;
+  InkHighlight m_lastHighlight;
 
   @override
-  bool get wantKeepAlive => _lastHighlight != null || (_splashes != null && _splashes.isNotEmpty);
+  bool get wantKeepAlive => m_lastHighlight != null || (m_splashes != null && m_splashes.isNotEmpty);
 
   void updateHighlight(bool value) {
-    if (value == (_lastHighlight != null && _lastHighlight.active))
+    if (value == (m_lastHighlight != null && m_lastHighlight.active))
       return;
     if (value) {
-      if (_lastHighlight == null) {
+      if (m_lastHighlight == null) {
         final RenderBox referenceBox = context.findRenderObject();
-        _lastHighlight = InkHighlight(
+        m_lastHighlight = InkHighlight(
           controller: Material.of(context),
           referenceBox: referenceBox,
           color: widget.highlightColor ?? Theme.of(context).highlightColor,
@@ -432,19 +432,19 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
         );
         updateKeepAlive();
       } else {
-        _lastHighlight.activate();
+        m_lastHighlight.activate();
       }
     } else {
-      _lastHighlight.deactivate();
+      m_lastHighlight.deactivate();
     }
-    assert(value == (_lastHighlight != null && _lastHighlight.active));
+    assert(value == (m_lastHighlight != null && m_lastHighlight.active));
     if (widget.onHighlightChanged != null)
       widget.onHighlightChanged(value);
   }
 
   void _handleInkHighlightRemoval() {
-    assert(_lastHighlight != null);
-    _lastHighlight = null;
+    assert(m_lastHighlight != null);
+    m_lastHighlight = null;
     updateKeepAlive();
   }
 
@@ -459,11 +459,11 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
 
     InteractiveInkFeature splash;
     void onRemoved() {
-      if (_splashes != null) {
-        assert(_splashes.contains(splash));
-        _splashes.remove(splash);
-        if (_currentSplash == splash)
-          _currentSplash = null;
+      if (m_splashes != null) {
+        assert(m_splashes.contains(splash));
+        m_splashes.remove(splash);
+        if (m_currentSplash == splash)
+          m_currentSplash = null;
         updateKeepAlive();
       } // else we're probably in deactivate()
     }
@@ -487,9 +487,9 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
 
   void _handleTapDown(TapDownDetails details) {
     final InteractiveInkFeature splash = _createInkFeature(details);
-    _splashes ??= HashSet<InteractiveInkFeature>();
-    _splashes.add(splash);
-    _currentSplash = splash;
+    m_splashes ??= HashSet<InteractiveInkFeature>();
+    m_splashes.add(splash);
+    m_currentSplash = splash;
     if (widget.onTapDown != null) {
       widget.onTapDown(details);
     }
@@ -498,8 +498,8 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
   }
 
   void _handleTap(BuildContext context) {
-    _currentSplash?.confirm();
-    _currentSplash = null;
+    m_currentSplash?.confirm();
+    m_currentSplash = null;
     updateHighlight(false);
     if (widget.onTap != null) {
       if (widget.enableFeedback)
@@ -509,8 +509,8 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
   }
 
   void _handleTapCancel() {
-    _currentSplash?.cancel();
-    _currentSplash = null;
+    m_currentSplash?.cancel();
+    m_currentSplash = null;
     if (widget.onTapCancel != null) {
       widget.onTapCancel();
     }
@@ -518,15 +518,15 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
   }
 
   void _handleDoubleTap() {
-    _currentSplash?.confirm();
-    _currentSplash = null;
+    m_currentSplash?.confirm();
+    m_currentSplash = null;
     if (widget.onDoubleTap != null)
       widget.onDoubleTap();
   }
 
   void _handleLongPress(BuildContext context) {
-    _currentSplash?.confirm();
-    _currentSplash = null;
+    m_currentSplash?.confirm();
+    m_currentSplash = null;
     if (widget.onLongPress != null) {
       if (widget.enableFeedback)
         Feedback.forLongPress(context);
@@ -536,16 +536,16 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
 
   @override
   void deactivate() {
-    if (_splashes != null) {
-      final Set<InteractiveInkFeature> splashes = _splashes;
-      _splashes = null;
+    if (m_splashes != null) {
+      final Set<InteractiveInkFeature> splashes = m_splashes;
+      m_splashes = null;
       for (InteractiveInkFeature splash in splashes)
         splash.dispose();
-      _currentSplash = null;
+      m_currentSplash = null;
     }
-    assert(_currentSplash == null);
-    _lastHighlight?.dispose();
-    _lastHighlight = null;
+    assert(m_currentSplash == null);
+    m_lastHighlight?.dispose();
+    m_lastHighlight = null;
     super.deactivate();
   }
 
@@ -554,8 +554,8 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
     assert(widget.debugCheckContext(context));
     super.build(context); // See AutomaticKeepAliveClientMixin.
     final ThemeData themeData = Theme.of(context);
-    _lastHighlight?.color = widget.highlightColor ?? themeData.highlightColor;
-    _currentSplash?.color = widget.splashColor ?? themeData.splashColor;
+    m_lastHighlight?.color = widget.highlightColor ?? themeData.highlightColor;
+    m_currentSplash?.color = widget.splashColor ?? themeData.splashColor;
     final bool enabled = widget.onTap != null || widget.onDoubleTap != null || widget.onLongPress != null;
     return GestureDetector(
       onTapDown: enabled ? _handleTapDown : null,

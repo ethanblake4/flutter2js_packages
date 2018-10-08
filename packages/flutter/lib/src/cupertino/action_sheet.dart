@@ -1022,43 +1022,43 @@ class _RenderCupertinoAlertActions extends RenderBox
     List<RenderBox> children,
     double dividerThickness = 0.0,
     bool hasCancelButton = false,
-  }) :  _dividerThickness = dividerThickness,
-        _hasCancelButton = hasCancelButton {
+  }) :  m_dividerThickness = dividerThickness,
+        m_hasCancelButton = hasCancelButton {
     addAll(children);
   }
 
   // The thickness of the divider between buttons.
-  double get dividerThickness => _dividerThickness;
-  double _dividerThickness;
+  double get dividerThickness => m_dividerThickness;
+  double m_dividerThickness;
   set dividerThickness(double newValue) {
-    if (newValue == _dividerThickness) {
+    if (newValue == m_dividerThickness) {
       return;
     }
 
-    _dividerThickness = newValue;
+    m_dividerThickness = newValue;
     markNeedsLayout();
   }
 
-  bool _hasCancelButton;
-  bool get hasCancelButton => _hasCancelButton;
+  bool m_hasCancelButton;
+  bool get hasCancelButton => m_hasCancelButton;
   set hasCancelButton(bool newValue) {
-    if (newValue == _hasCancelButton) {
+    if (newValue == m_hasCancelButton) {
       return;
     }
 
-    _hasCancelButton = newValue;
+    m_hasCancelButton = newValue;
     markNeedsLayout();
   }
 
-  final Paint _buttonBackgroundPaint = Paint()
+  final Paint m_buttonBackgroundPaint = Paint()
     ..color = _kBackgroundColor
     ..style = PaintingStyle.fill;
 
-  final Paint _pressedButtonBackgroundPaint = Paint()
+  final Paint m_pressedButtonBackgroundPaint = Paint()
     ..color = _kPressedColor
     ..style = PaintingStyle.fill;
 
-  final Paint _dividerPaint = Paint()
+  final Paint m_dividerPaint = Paint()
     ..color = _kButtonDividerColor
     ..style = PaintingStyle.fill;
 
@@ -1214,7 +1214,7 @@ class _RenderCupertinoAlertActions extends RenderBox
         accumulatingOffset.dx,
         accumulatingOffset.dy,
         size.width,
-        _dividerThickness,
+        m_dividerThickness,
       );
 
       final Rect buttonBackgroundRect = Rect.fromLTWH(
@@ -1246,9 +1246,9 @@ class _RenderCupertinoAlertActions extends RenderBox
       child = childAfter(child);
     }
 
-    canvas.drawPath(backgroundFillPath, _buttonBackgroundPaint);
-    canvas.drawPath(pressedBackgroundFillPath, _pressedButtonBackgroundPaint);
-    canvas.drawPath(dividersPath, _dividerPaint);
+    canvas.drawPath(backgroundFillPath, m_buttonBackgroundPaint);
+    canvas.drawPath(pressedBackgroundFillPath, m_pressedButtonBackgroundPaint);
+    canvas.drawPath(dividersPath, m_dividerPaint);
   }
 
   void _drawButtons(PaintingContext context, Offset offset) {

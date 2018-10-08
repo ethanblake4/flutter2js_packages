@@ -614,7 +614,7 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox with DebugOverflow
     Axis constrainedAxis,
     RenderBox child,
   }) : assert(alignment != null),
-       _constrainedAxis = constrainedAxis,
+       m_constrainedAxis = constrainedAxis,
        super.mixin(alignment, textDirection, child);
 
   /// The axis to retain constraints on, if any.
@@ -623,18 +623,18 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox with DebugOverflow
   /// constraints. If set to [Axis.vertical], then vertical constraints will
   /// be retained, and if set to [Axis.horizontal], then horizontal constraints
   /// will be retained.
-  Axis get constrainedAxis => _constrainedAxis;
-  Axis _constrainedAxis;
+  Axis get constrainedAxis => m_constrainedAxis;
+  Axis m_constrainedAxis;
   set constrainedAxis(Axis value) {
-    if (_constrainedAxis == value)
+    if (m_constrainedAxis == value)
       return;
-    _constrainedAxis = value;
+    m_constrainedAxis = value;
     markNeedsLayout();
   }
 
-  Rect _overflowContainerRect = Rect.zero;
-  Rect _overflowChildRect = Rect.zero;
-  bool _isOverflowing = false;
+  Rect m_overflowContainerRect = Rect.zero;
+  Rect m_overflowChildRect = Rect.zero;
+  bool m_isOverflowing = false;
 
   @override
   void performLayout() {
@@ -658,14 +658,14 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox with DebugOverflow
       size = constraints.constrain(child.size);
       alignChild();
       final BoxParentData childParentData = child.parentData;
-      _overflowContainerRect = Offset.zero & size;
-      _overflowChildRect = childParentData.offset & child.size;
+      m_overflowContainerRect = Offset.zero & size;
+      m_overflowChildRect = childParentData.offset & child.size;
     } else {
       size = constraints.smallest;
-      _overflowContainerRect = Rect.zero;
-      _overflowChildRect = Rect.zero;
+      m_overflowContainerRect = Rect.zero;
+      m_overflowChildRect = Rect.zero;
     }
-    _isOverflowing = RelativeRect.fromRect(_overflowContainerRect, _overflowChildRect).hasInsets;
+    m_isOverflowing = RelativeRect.fromRect(m_overflowContainerRect, m_overflowChildRect).hasInsets;
   }
 
   @override
@@ -675,7 +675,7 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox with DebugOverflow
     if (child == null || size.isEmpty)
       return;
 
-    if (!_isOverflowing) {
+    if (!m_isOverflowing) {
       super.paint(context, offset);
       return;
     }
@@ -685,20 +685,20 @@ class RenderUnconstrainedBox extends RenderAligningShiftedBox with DebugOverflow
 
     // Display the overflow indicator.
     assert(() {
-      paintOverflowIndicator(context, offset, _overflowContainerRect, _overflowChildRect);
+      paintOverflowIndicator(context, offset, m_overflowContainerRect, m_overflowChildRect);
       return true;
     }());
   }
 
   @override
   Rect describeApproximatePaintClip(RenderObject child) {
-    return _isOverflowing ? Offset.zero & size : null;
+    return m_isOverflowing ? Offset.zero & size : null;
   }
 
   @override
   String toStringShort() {
     String header = super.toStringShort();
-    if (_isOverflowing)
+    if (m_isOverflowing)
       header += ' OVERFLOWING';
     return header;
   }

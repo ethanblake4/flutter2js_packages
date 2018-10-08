@@ -163,15 +163,15 @@ class RenderListWheelViewport
          !renderChildrenOutsideViewport || !clipToSize,
          clipToSizeAndRenderChildrenOutsideViewportConflict,
        ),
-       _offset = offset,
-       _diameterRatio = diameterRatio,
-       _perspective = perspective,
-       _offAxisFraction = offAxisFraction,
-       _useMagnifier = useMagnifier,
-       _magnification = magnification,
-       _itemExtent = itemExtent,
-       _clipToSize = clipToSize,
-       _renderChildrenOutsideViewport = renderChildrenOutsideViewport {
+       m_offset = offset,
+       m_diameterRatio = diameterRatio,
+       m_perspective = perspective,
+       m_offAxisFraction = offAxisFraction,
+       m_useMagnifier = useMagnifier,
+       m_magnification = magnification,
+       m_itemExtent = itemExtent,
+       m_clipToSize = clipToSize,
+       m_renderChildrenOutsideViewport = renderChildrenOutsideViewport {
     addAll(children);
   }
 
@@ -209,17 +209,17 @@ class RenderListWheelViewport
   /// is displayed.
   ///
   /// Must not be null.
-  ViewportOffset get offset => _offset;
-  ViewportOffset _offset;
+  ViewportOffset get offset => m_offset;
+  ViewportOffset m_offset;
   set offset(ViewportOffset value) {
     assert(value != null);
-    if (value == _offset)
+    if (value == m_offset)
       return;
     if (attached)
-      _offset.removeListener(_hasScrolled);
-    _offset = value;
+      m_offset.removeListener(_hasScrolled);
+    m_offset = value;
     if (attached)
-      _offset.addListener(_hasScrolled);
+      m_offset.addListener(_hasScrolled);
     markNeedsLayout();
   }
 
@@ -251,17 +251,17 @@ class RenderListWheelViewport
   ///
   /// Must not be null and must be positive.
   /// {@endtemplate}
-  double get diameterRatio => _diameterRatio;
-  double _diameterRatio;
+  double get diameterRatio => m_diameterRatio;
+  double m_diameterRatio;
   set diameterRatio(double value) {
     assert(value != null);
     assert(
       value > 0,
       diameterRatioZeroMessage,
     );
-    if (value == _diameterRatio)
+    if (value == m_diameterRatio)
       return;
-    _diameterRatio = value;
+    m_diameterRatio = value;
     markNeedsPaint();
     markNeedsSemanticsUpdate();
   }
@@ -280,8 +280,8 @@ class RenderListWheelViewport
   ///
   /// Must not be null and must be positive.
   /// {@endtemplate}
-  double get perspective => _perspective;
-  double _perspective;
+  double get perspective => m_perspective;
+  double m_perspective;
   set perspective(double value) {
     assert(value != null);
     assert(value > 0);
@@ -289,9 +289,9 @@ class RenderListWheelViewport
       value <= 0.01,
       perspectiveTooHighMessage,
     );
-    if (value == _perspective)
+    if (value == m_perspective)
       return;
-    _perspective = value;
+    m_perspective = value;
     markNeedsPaint();
     markNeedsSemanticsUpdate();
   }
@@ -321,26 +321,26 @@ class RenderListWheelViewport
   /// The visual effect can be unaesthetic if this value is too far from the
   /// range [-0.5, 0.5].
   /// {@endtemplate}
-  double get offAxisFraction => _offAxisFraction;
-  double _offAxisFraction = 0.0;
+  double get offAxisFraction => m_offAxisFraction;
+  double m_offAxisFraction = 0.0;
   set offAxisFraction(double value) {
     assert(value != null);
-    if (value == _offAxisFraction)
+    if (value == m_offAxisFraction)
       return;
-    _offAxisFraction = value;
+    m_offAxisFraction = value;
     markNeedsPaint();
   }
 
   /// {@template flutter.rendering.wheelList.useMagnifier}
   /// Whether to use the magnifier for the center item of the wheel.
   /// {@endtemplate}
-  bool get useMagnifier => _useMagnifier;
-  bool _useMagnifier = false;
+  bool get useMagnifier => m_useMagnifier;
+  bool m_useMagnifier = false;
   set useMagnifier(bool value) {
     assert(value != null);
-    if (value == _useMagnifier)
+    if (value == m_useMagnifier)
       return;
-    _useMagnifier = value;
+    m_useMagnifier = value;
     markNeedsPaint();
   }
   /// {@template flutter.rendering.wheelList.magnification}
@@ -353,14 +353,14 @@ class RenderListWheelViewport
   ///
   /// Must be positive.
   /// {@endtemplate}
-  double get magnification => _magnification;
-  double _magnification = 1.0;
+  double get magnification => m_magnification;
+  double m_magnification = 1.0;
   set magnification(double value) {
     assert(value != null);
     assert(value > 0);
-    if (value == _magnification)
+    if (value == m_magnification)
       return;
-    _magnification = value;
+    m_magnification = value;
     markNeedsPaint();
   }
 
@@ -370,14 +370,14 @@ class RenderListWheelViewport
   ///
   /// Must not be null and must be positive.
   /// {@endtemplate}
-  double get itemExtent => _itemExtent;
-  double _itemExtent;
+  double get itemExtent => m_itemExtent;
+  double m_itemExtent;
   set itemExtent(double value) {
     assert(value != null);
     assert(value > 0);
-    if (value == _itemExtent)
+    if (value == m_itemExtent)
       return;
-    _itemExtent = value;
+    m_itemExtent = value;
     markNeedsLayout();
   }
 
@@ -389,17 +389,17 @@ class RenderListWheelViewport
   /// If this is false and [renderChildrenOutsideViewport] is false, the
   /// first and last children may be painted partly outside of this scroll view.
   /// {@endtemplate}
-  bool get clipToSize => _clipToSize;
-  bool _clipToSize;
+  bool get clipToSize => m_clipToSize;
+  bool m_clipToSize;
   set clipToSize(bool value) {
     assert(value != null);
     assert(
       !renderChildrenOutsideViewport || !clipToSize,
       clipToSizeAndRenderChildrenOutsideViewportConflict,
     );
-    if (value == _clipToSize)
+    if (value == m_clipToSize)
       return;
-    _clipToSize = value;
+    m_clipToSize = value;
     markNeedsPaint();
     markNeedsSemanticsUpdate();
   }
@@ -414,17 +414,17 @@ class RenderListWheelViewport
   /// is also true since children outside the viewport will be clipped, and
   /// therefore cannot render children outside the viewport.
   /// {@endtemplate}
-  bool get renderChildrenOutsideViewport => _renderChildrenOutsideViewport;
-  bool _renderChildrenOutsideViewport;
+  bool get renderChildrenOutsideViewport => m_renderChildrenOutsideViewport;
+  bool m_renderChildrenOutsideViewport;
   set renderChildrenOutsideViewport(bool value) {
     assert(value != null);
     assert(
       !renderChildrenOutsideViewport || !clipToSize,
       clipToSizeAndRenderChildrenOutsideViewportConflict,
     );
-    if (value == _renderChildrenOutsideViewport)
+    if (value == m_renderChildrenOutsideViewport)
       return;
-    _renderChildrenOutsideViewport = value;
+    m_renderChildrenOutsideViewport = value;
     markNeedsLayout();
     markNeedsSemanticsUpdate();
   }
@@ -443,12 +443,12 @@ class RenderListWheelViewport
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    _offset.addListener(_hasScrolled);
+    m_offset.addListener(_hasScrolled);
   }
 
   @override
   void detach() {
-    _offset.removeListener(_hasScrolled);
+    m_offset.removeListener(_hasScrolled);
     super.detach();
   }
 
@@ -477,7 +477,7 @@ class RenderListWheelViewport
     if (childManager.childCount == null)
       return double.infinity;
 
-    return math.max(0.0, (childManager.childCount - 1) * _itemExtent);
+    return math.max(0.0, (childManager.childCount - 1) * m_itemExtent);
   }
 
   /// Scroll extent distance in the untransformed plane between the center
@@ -485,17 +485,17 @@ class RenderListWheelViewport
   ///
   /// It's also the distance in the untransformed plane that children's painting
   /// is offset by with respect to those children's [BoxParentData.offset].
-  double get _topScrollMarginExtent {
+  double get m_topScrollMarginExtent {
     assert(hasSize);
     // Consider adding alignment options other than center.
-    return -size.height / 2.0 + _itemExtent / 2.0;
+    return -size.height / 2.0 + m_itemExtent / 2.0;
   }
 
   /// Transforms a **scrollable layout coordinates**' y position to the
   /// **untransformed plane's viewport painting coordinates**' y position given
   /// the current scroll offset.
   double _getUntransformedPaintingCoordinateY(double layoutCoordinateY) {
-    return layoutCoordinateY - _topScrollMarginExtent - offset.pixels;
+    return layoutCoordinateY - m_topScrollMarginExtent - offset.pixels;
   }
 
   /// Given the _diameterRatio, return the largest absolute angle of the item
@@ -507,9 +507,9 @@ class RenderListWheelViewport
   /// When the center of children passes this angle, they are no longer painted
   /// if [renderChildrenOutsideViewport] is false.
   double get _maxVisibleRadian {
-    if (_diameterRatio < 1.0)
+    if (m_diameterRatio < 1.0)
       return math.pi / 2.0;
-    return math.asin(1.0 / _diameterRatio);
+    return math.asin(1.0 / m_diameterRatio);
   }
 
   double _getIntrinsicCrossAxis(_ChildSizingFunction childSize) {
@@ -540,14 +540,14 @@ class RenderListWheelViewport
   double computeMinIntrinsicHeight(double width) {
     if (childManager.childCount == null)
       return 0.0;
-    return childManager.childCount * _itemExtent;
+    return childManager.childCount * m_itemExtent;
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
     if (childManager.childCount == null)
       return 0.0;
-    return childManager.childCount * _itemExtent;
+    return childManager.childCount * m_itemExtent;
   }
 
   @override
@@ -607,8 +607,8 @@ class RenderListWheelViewport
   void performLayout() {
     final BoxConstraints childConstraints =
       constraints.copyWith(
-        minHeight: _itemExtent,
-        maxHeight: _itemExtent,
+        minHeight: m_itemExtent,
+        maxHeight: m_itemExtent,
         minWidth: 0.0,
       );
 
@@ -622,7 +622,7 @@ class RenderListWheelViewport
       visibleHeight *= 2;
 
     final double firstVisibleOffset =
-        offset.pixels + _itemExtent / 2 - visibleHeight / 2;
+        offset.pixels + m_itemExtent / 2 - visibleHeight / 2;
     final double lastVisibleOffset = firstVisibleOffset + visibleHeight;
 
     // The index range that we want to spawn children. We find indexes that
@@ -631,7 +631,7 @@ class RenderListWheelViewport
     int targetLastIndex = scrollOffsetToIndex(lastVisibleOffset);
     // Because we exclude lastVisibleOffset, if there's a new child starting at
     // that offset, it is removed.
-    if (targetLastIndex * _itemExtent == lastVisibleOffset)
+    if (targetLastIndex * m_itemExtent == lastVisibleOffset)
       targetLastIndex--;
 
     // Validates the target index range.
@@ -721,13 +721,13 @@ class RenderListWheelViewport
     final double highestUntransformedPaintY =
         _getUntransformedPaintingCoordinateY(0.0);
     return highestUntransformedPaintY < 0.0
-        || size.height < highestUntransformedPaintY + _maxEstimatedScrollExtent + _itemExtent;
+        || size.height < highestUntransformedPaintY + _maxEstimatedScrollExtent + m_itemExtent;
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
     if (childCount > 0) {
-      if (_clipToSize && _shouldClipAtCurrentOffset()) {
+      if (m_clipToSize && _shouldClipAtCurrentOffset()) {
         context.pushClipRect(
           needsCompositing,
           offset,
@@ -768,7 +768,7 @@ class RenderListWheelViewport
 
     // Get child's center as a fraction of the viewport's height.
     final double fractionalY =
-        (untransformedPaintingCoordinates.dy + _itemExtent / 2.0) / size.height;
+        (untransformedPaintingCoordinates.dy + m_itemExtent / 2.0) / size.height;
     final double angle = -(fractionalY - 0.5) * 2.0 * _maxVisibleRadian;
     // Don't paint the backside of the cylinder when
     // renderChildrenOutsideViewport is true. Otherwise, only children within
@@ -778,15 +778,15 @@ class RenderListWheelViewport
       return;
 
     final Matrix4 transform = MatrixUtils.createCylindricalProjectionTransform(
-      radius: size.height * _diameterRatio / 2.0,
+      radius: size.height * m_diameterRatio / 2.0,
       angle: angle,
-      perspective: _perspective,
+      perspective: m_perspective,
     );
 
     // Offset that helps painting everything in the center (e.g. angle = 0).
     final Offset offsetToCenter = Offset(
         untransformedPaintingCoordinates.dx,
-        -_topScrollMarginExtent);
+        -m_topScrollMarginExtent);
 
     if (!useMagnifier)
       _paintChildCylindrically(context, offset, child, transform, offsetToCenter);
@@ -812,12 +812,12 @@ class RenderListWheelViewport
       Offset untransformedPaintingCoordinates,
   ) {
     final double magnifierTopLinePosition =
-        size.height / 2 - _itemExtent * _magnification / 2;
+        size.height / 2 - m_itemExtent * m_magnification / 2;
     final double magnifierBottomLinePosition =
-        size.height / 2 + _itemExtent * _magnification / 2;
+        size.height / 2 + m_itemExtent * m_magnification / 2;
 
     final bool isAfterMagnifierTopLine = untransformedPaintingCoordinates.dy
-        >= magnifierTopLinePosition - _itemExtent * _magnification;
+        >= magnifierTopLinePosition - m_itemExtent * m_magnification;
     final bool isBeforeMagnifierBottomLine = untransformedPaintingCoordinates.dy
         <= magnifierBottomLinePosition;
 
@@ -827,7 +827,7 @@ class RenderListWheelViewport
           0.0,
           magnifierTopLinePosition,
           size.width,
-          _itemExtent * _magnification);
+          m_itemExtent * m_magnification);
       final Rect topHalfRect = Rect.fromLTWH(
           0.0,
           0.0,
@@ -911,9 +911,9 @@ class RenderListWheelViewport
   /// magnified area.
   Matrix4 _magnifyTransform() {
     final Matrix4 magnify = Matrix4.identity();
-    magnify.translate(size.width * (-_offAxisFraction + 0.5), size.height / 2);
-    magnify.scale(_magnification, _magnification, _magnification);
-    magnify.translate(-size.width * (-_offAxisFraction + 0.5), -size.height / 2);
+    magnify.translate(size.width * (-m_offAxisFraction + 0.5), size.height / 2);
+    magnify.scale(m_magnification, m_magnification, m_magnification);
+    magnify.translate(-size.width * (-m_offAxisFraction + 0.5), -size.height / 2);
     return magnify;
   }
 
@@ -922,10 +922,10 @@ class RenderListWheelViewport
   Matrix4 _centerOriginTransform(Matrix4 originalMatrix) {
     final Matrix4 result = Matrix4.identity();
     final Offset centerOriginTranslation = Alignment.center.alongSize(size);
-    result.translate(centerOriginTranslation.dx * (-_offAxisFraction * 2 + 1),
+    result.translate(centerOriginTranslation.dx * (-m_offAxisFraction * 2 + 1),
                      centerOriginTranslation.dy);
     result.multiply(originalMatrix);
-    result.translate(-centerOriginTranslation.dx * (-_offAxisFraction * 2 + 1),
+    result.translate(-centerOriginTranslation.dx * (-m_offAxisFraction * 2 + 1),
                      -centerOriginTranslation.dy);
     return result;
   }

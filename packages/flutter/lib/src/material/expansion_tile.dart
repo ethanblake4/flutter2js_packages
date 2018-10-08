@@ -79,64 +79,64 @@ class ExpansionTile extends StatefulWidget {
 }
 
 class _ExpansionTileState extends State<ExpansionTile> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  CurvedAnimation _easeOutAnimation;
-  CurvedAnimation _easeInAnimation;
-  ColorTween _borderColor;
-  ColorTween _headerColor;
-  ColorTween _iconColor;
-  ColorTween _backgroundColor;
-  Animation<double> _iconTurns;
+  AnimationController m_controller;
+  CurvedAnimation m_easeOutAnimation;
+  CurvedAnimation m_easeInAnimation;
+  ColorTween m_borderColor;
+  ColorTween m_headerColor;
+  ColorTween m_iconColor;
+  ColorTween m_backgroundColor;
+  Animation<double> m_iconTurns;
 
-  bool _isExpanded = false;
+  bool m_isExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: _kExpand, vsync: this);
-    _easeOutAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _easeInAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    _borderColor = ColorTween();
-    _headerColor = ColorTween();
-    _iconColor = ColorTween();
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(_easeInAnimation);
-    _backgroundColor = ColorTween();
+    m_controller = AnimationController(duration: _kExpand, vsync: this);
+    m_easeOutAnimation = CurvedAnimation(parent: m_controller, curve: Curves.easeOut);
+    m_easeInAnimation = CurvedAnimation(parent: m_controller, curve: Curves.easeIn);
+    m_borderColor = ColorTween();
+    m_headerColor = ColorTween();
+    m_iconColor = ColorTween();
+    m_iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(m_easeInAnimation);
+    m_backgroundColor = ColorTween();
 
-    _isExpanded = PageStorage.of(context)?.readState(context) ?? widget.initiallyExpanded;
-    if (_isExpanded)
-      _controller.value = 1.0;
+    m_isExpanded = PageStorage.of(context)?.readState(context) ?? widget.initiallyExpanded;
+    if (m_isExpanded)
+      m_controller.value = 1.0;
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
   void _handleTap() {
     setState(() {
-      _isExpanded = !_isExpanded;
-      if (_isExpanded)
-        _controller.forward();
+      m_isExpanded = !m_isExpanded;
+      if (m_isExpanded)
+        m_controller.forward();
       else
-        _controller.reverse().then<void>((Null value) {
+        m_controller.reverse().then<void>((Null value) {
           setState(() {
             // Rebuild without widget.children.
           });
         });
-      PageStorage.of(context)?.writeState(context, _isExpanded);
+      PageStorage.of(context)?.writeState(context, m_isExpanded);
     });
     if (widget.onExpansionChanged != null)
-      widget.onExpansionChanged(_isExpanded);
+      widget.onExpansionChanged(m_isExpanded);
   }
 
   Widget _buildChildren(BuildContext context, Widget child) {
-    final Color borderSideColor = _borderColor.evaluate(_easeOutAnimation) ?? Colors.transparent;
-    final Color titleColor = _headerColor.evaluate(_easeInAnimation);
+    final Color borderSideColor = m_borderColor.evaluate(m_easeOutAnimation) ?? Colors.transparent;
+    final Color titleColor = m_headerColor.evaluate(m_easeInAnimation);
 
     return Container(
       decoration: BoxDecoration(
-        color: _backgroundColor.evaluate(_easeOutAnimation) ?? Colors.transparent,
+        color: m_backgroundColor.evaluate(m_easeOutAnimation) ?? Colors.transparent,
         border: Border(
           top: BorderSide(color: borderSideColor),
           bottom: BorderSide(color: borderSideColor),
@@ -146,7 +146,7 @@ class _ExpansionTileState extends State<ExpansionTile> with SingleTickerProvider
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           IconTheme.merge(
-            data: IconThemeData(color: _iconColor.evaluate(_easeInAnimation)),
+            data: IconThemeData(color: m_iconColor.evaluate(m_easeInAnimation)),
             child: ListTile(
               onTap: _handleTap,
               leading: widget.leading,
@@ -155,14 +155,14 @@ class _ExpansionTileState extends State<ExpansionTile> with SingleTickerProvider
                 child: widget.title,
               ),
               trailing: widget.trailing ?? RotationTransition(
-                turns: _iconTurns,
+                turns: m_iconTurns,
                 child: const Icon(Icons.expand_more),
               ),
             ),
           ),
           ClipRect(
             child: Align(
-              heightFactor: _easeInAnimation.value,
+              heightFactor: m_easeInAnimation.value,
               child: child,
             ),
           ),
@@ -174,18 +174,18 @@ class _ExpansionTileState extends State<ExpansionTile> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    _borderColor.end = theme.dividerColor;
-    _headerColor
+    m_borderColor.end = theme.dividerColor;
+    m_headerColor
       ..begin = theme.textTheme.subhead.color
       ..end = theme.accentColor;
-    _iconColor
+    m_iconColor
       ..begin = theme.unselectedWidgetColor
       ..end = theme.accentColor;
-    _backgroundColor.end = widget.backgroundColor;
+    m_backgroundColor.end = widget.backgroundColor;
 
-    final bool closed = !_isExpanded && _controller.isDismissed;
+    final bool closed = !m_isExpanded && m_controller.isDismissed;
     return AnimatedBuilder(
-      animation: _controller.view,
+      animation: m_controller.view,
       builder: _buildChildren,
       child: closed ? null : Column(children: widget.children),
     );

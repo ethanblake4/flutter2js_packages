@@ -140,22 +140,22 @@ class _BorderContainer extends StatefulWidget {
 }
 
 class _BorderContainerState extends State<_BorderContainer> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _borderAnimation;
-  _InputBorderTween _border;
+  AnimationController m_controller;
+  Animation<double> m_borderAnimation;
+  _InputBorderTween m_border;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    m_controller = AnimationController(
       duration: _kTransitionDuration,
       vsync: this,
     );
-    _borderAnimation = CurvedAnimation(
-      parent: _controller,
+    m_borderAnimation = CurvedAnimation(
+      parent: m_controller,
       curve: _kTransitionCurve,
     );
-    _border = _InputBorderTween(
+    m_border = _InputBorderTween(
       begin: widget.border,
       end: widget.border,
     );
@@ -163,7 +163,7 @@ class _BorderContainerState extends State<_BorderContainer> with SingleTickerPro
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -171,11 +171,11 @@ class _BorderContainerState extends State<_BorderContainer> with SingleTickerPro
   void didUpdateWidget(_BorderContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.border != oldWidget.border) {
-      _border = _InputBorderTween(
+      m_border = _InputBorderTween(
         begin: oldWidget.border,
         end: widget.border,
       );
-      _controller
+      m_controller
         ..value = 0.0
         ..forward();
     }
@@ -185,9 +185,9 @@ class _BorderContainerState extends State<_BorderContainer> with SingleTickerPro
   Widget build(BuildContext context) {
     return CustomPaint(
       foregroundPainter: _InputBorderPainter(
-        repaint: Listenable.merge(<Listenable>[_borderAnimation, widget.gap]),
-        borderAnimation: _borderAnimation,
-        border: _border,
+        repaint: Listenable.merge(<Listenable>[m_borderAnimation, widget.gap]),
+        borderAnimation: m_borderAnimation,
+        border: m_border,
         gapAnimation: widget.gapAnimation,
         gap: widget.gap,
         textDirection: Directionality.of(context),

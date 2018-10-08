@@ -166,100 +166,100 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
   //
   // This value is used when the extents haven't yet been calculated from
   // the currently dragging widget, such as when it first builds.
-  static const double _defaultDropAreaExtent = 100.0;
+  static const double m_defaultDropAreaExtent = 100.0;
 
   // The additional margin to place around a computed drop area.
-  static const double _dropAreaMargin = 8.0;
+  static const double m_dropAreaMargin = 8.0;
 
   // How long an animation to reorder an element in the list takes.
-  static const Duration _reorderAnimationDuration = Duration(milliseconds: 200);
+  static const Duration m_reorderAnimationDuration = Duration(milliseconds: 200);
 
   // How long an animation to scroll to an off-screen element in the
   // list takes.
-  static const Duration _scrollAnimationDuration = Duration(milliseconds: 200);
+  static const Duration m_scrollAnimationDuration = Duration(milliseconds: 200);
 
   // Controls scrolls and measures scroll progress.
-  ScrollController _scrollController;
+  ScrollController m_scrollController;
 
   // This controls the entrance of the dragging widget into a new place.
-  AnimationController _entranceController;
+  AnimationController m_entranceController;
 
   // This controls the 'ghost' of the dragging widget, which is left behind
   // where the widget used to be.
-  AnimationController _ghostController;
+  AnimationController m_ghostController;
 
   // The member of widget.children currently being dragged.
   //
   // Null if no drag is underway.
-  Key _dragging;
+  Key m_dragging;
 
   // The last computed size of the feedback widget being dragged.
-  Size _draggingFeedbackSize;
+  Size m_draggingFeedbackSize;
 
   // The location that the dragging widget occupied before it started to drag.
-  int _dragStartIndex = 0;
+  int m_dragStartIndex = 0;
 
   // The index that the dragging widget most recently left.
   // This is used to show an animation of the widget's position.
-  int _ghostIndex = 0;
+  int m_ghostIndex = 0;
 
   // The index that the dragging widget currently occupies.
-  int _currentIndex = 0;
+  int m_currentIndex = 0;
 
   // The widget to move the dragging widget too after the current index.
-  int _nextIndex = 0;
+  int m_nextIndex = 0;
 
   // Whether or not we are currently scrolling this view to show a widget.
-  bool _scrolling = false;
+  bool m_scrolling = false;
 
-  double get _dropAreaExtent {
-    if (_draggingFeedbackSize == null) {
-      return _defaultDropAreaExtent;
+  double get m_dropAreaExtent {
+    if (m_draggingFeedbackSize == null) {
+      return m_defaultDropAreaExtent;
     }
     double dropAreaWithoutMargin;
     switch (widget.scrollDirection) {
       case Axis.horizontal:
-        dropAreaWithoutMargin = _draggingFeedbackSize.width;
+        dropAreaWithoutMargin = m_draggingFeedbackSize.width;
         break;
       case Axis.vertical:
       default:
-        dropAreaWithoutMargin = _draggingFeedbackSize.height;
+        dropAreaWithoutMargin = m_draggingFeedbackSize.height;
         break;
     }
-    return dropAreaWithoutMargin + _dropAreaMargin;
+    return dropAreaWithoutMargin + m_dropAreaMargin;
   }
 
   @override
   void initState() {
     super.initState();
-    _entranceController = AnimationController(vsync: this, duration: _reorderAnimationDuration);
-    _ghostController = AnimationController(vsync: this, duration: _reorderAnimationDuration);
-    _entranceController.addStatusListener(_onEntranceStatusChanged);
+    m_entranceController = AnimationController(vsync: this, duration: m_reorderAnimationDuration);
+    m_ghostController = AnimationController(vsync: this, duration: m_reorderAnimationDuration);
+    m_entranceController.addStatusListener(_onEntranceStatusChanged);
   }
 
   @override
   void didChangeDependencies() {
-    _scrollController = PrimaryScrollController.of(context) ?? ScrollController();
+    m_scrollController = PrimaryScrollController.of(context) ?? ScrollController();
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    _entranceController.dispose();
-    _ghostController.dispose();
+    m_entranceController.dispose();
+    m_ghostController.dispose();
     super.dispose();
   }
 
   // Animates the droppable space from _currentIndex to _nextIndex.
   void _requestAnimationToNextIndex() {
-    if (_entranceController.isCompleted) {
-      _ghostIndex = _currentIndex;
-      if (_nextIndex == _currentIndex) {
+    if (m_entranceController.isCompleted) {
+      m_ghostIndex = m_currentIndex;
+      if (m_nextIndex == m_currentIndex) {
         return;
       }
-      _currentIndex = _nextIndex;
-      _ghostController.reverse(from: 1.0);
-      _entranceController.forward(from: 0.0);
+      m_currentIndex = m_nextIndex;
+      m_ghostController.reverse(from: 1.0);
+      m_entranceController.forward(from: 0.0);
     }
   }
 
@@ -274,7 +274,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
 
   // Scrolls to a target context if that context is not on the screen.
   void _scrollTo(BuildContext context) {
-    if (_scrolling)
+    if (m_scrolling)
       return;
     final RenderObject contextObject = context.findRenderObject();
     final RenderAbstractViewport viewport = RenderAbstractViewport.of(contextObject);
@@ -282,28 +282,28 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
     // If and only if the current scroll offset falls in-between the offsets
     // necessary to reveal the selected context at the top or bottom of the
     // screen, then it is already on-screen.
-    final double margin = _dropAreaExtent;
-    final double scrollOffset = _scrollController.offset;
+    final double margin = m_dropAreaExtent;
+    final double scrollOffset = m_scrollController.offset;
     final double topOffset = max(
-      _scrollController.position.minScrollExtent,
+      m_scrollController.position.minScrollExtent,
       viewport.getOffsetToReveal(contextObject, 0.0).offset - margin,
     );
     final double bottomOffset = min(
-      _scrollController.position.maxScrollExtent,
+      m_scrollController.position.maxScrollExtent,
       viewport.getOffsetToReveal(contextObject, 1.0).offset + margin,
     );
     final bool onScreen = scrollOffset <= topOffset && scrollOffset >= bottomOffset;
 
     // If the context is off screen, then we request a scroll to make it visible.
     if (!onScreen) {
-      _scrolling = true;
-      _scrollController.position.animateTo(
+      m_scrolling = true;
+      m_scrollController.position.animateTo(
         scrollOffset < bottomOffset ? bottomOffset : topOffset,
-        duration: _scrollAnimationDuration,
+        duration: m_scrollAnimationDuration,
         curve: Curves.easeInOut,
       ).then((Null none) {
         setState(() {
-          _scrolling = false;
+          m_scrolling = false;
         });
       });
     }
@@ -333,12 +333,12 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
     // Starts dragging toWrap.
     void onDragStarted() {
       setState(() {
-        _dragging = toWrap.key;
-        _dragStartIndex = index;
-        _ghostIndex = index;
-        _currentIndex = index;
-        _entranceController.value = 1.0;
-        _draggingFeedbackSize = keyIndexGlobalKey.currentContext.size;
+        m_dragging = toWrap.key;
+        m_dragStartIndex = index;
+        m_ghostIndex = index;
+        m_currentIndex = index;
+        m_entranceController.value = 1.0;
+        m_draggingFeedbackSize = keyIndexGlobalKey.currentContext.size;
       });
     }
 
@@ -350,15 +350,15 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
         // Animates leftover space in the drop area closed.
         // TODO(djshuckerow): bring the animation in line with the Material
         // specifications.
-        _ghostController.reverse(from: 0.1);
-        _entranceController.reverse(from: 0.1);
-        _dragging = null;
+        m_ghostController.reverse(from: 0.1);
+        m_entranceController.reverse(from: 0.1);
+        m_dragging = null;
       });
     }
 
     // Drops toWrap into the last position it was hovering over.
     void onDragEnded() {
-      reorder(_dragStartIndex, _currentIndex);
+      reorder(m_dragStartIndex, m_currentIndex);
     }
 
     Widget wrapWithSemantics() {
@@ -435,7 +435,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
             child: toWrapWithSemantics,
           ),
         ),
-        child: _dragging == toWrap.key ? const SizedBox() : toWrapWithSemantics,
+        child: m_dragging == toWrap.key ? const SizedBox() : toWrapWithSemantics,
         childWhenDragging: const SizedBox(),
         dragAnchor: DragAnchor.child,
         onDragStarted: onDragStarted,
@@ -460,20 +460,20 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
       Widget spacing;
       switch (widget.scrollDirection) {
         case Axis.horizontal:
-          spacing = SizedBox(width: _dropAreaExtent);
+          spacing = SizedBox(width: m_dropAreaExtent);
           break;
         case Axis.vertical:
         default:
-          spacing = SizedBox(height: _dropAreaExtent);
+          spacing = SizedBox(height: m_dropAreaExtent);
           break;
       }
 
       // We open up a space under where the dragging widget currently is to
       // show it can be dropped.
-      if (_currentIndex == index) {
+      if (m_currentIndex == index) {
         return _buildContainerForScrollDirection(children: <Widget>[
           SizeTransition(
-            sizeFactor: _entranceController,
+            sizeFactor: m_entranceController,
             axis: widget.scrollDirection,
             child: spacing
           ),
@@ -482,10 +482,10 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
       }
       // We close up the space under where the dragging widget previously was
       // with the ghostController animation.
-      if (_ghostIndex == index) {
+      if (m_ghostIndex == index) {
         return _buildContainerForScrollDirection(children: <Widget>[
           SizeTransition(
-            sizeFactor: _ghostController,
+            sizeFactor: m_ghostController,
             axis: widget.scrollDirection,
             child: spacing,
           ),
@@ -501,12 +501,12 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
         builder: buildDragTarget,
         onWillAccept: (Key toAccept) {
           setState(() {
-            _nextIndex = index;
+            m_nextIndex = index;
             _requestAnimationToNextIndex();
           });
           _scrollTo(context);
           // If the target is not the original starting point, then we will accept the drop.
-          return _dragging == toAccept && toAccept != toWrap.key;
+          return m_dragging == toAccept && toAccept != toWrap.key;
         },
         onAccept: (Key accepted) {},
         onLeave: (Key leaving) {},
@@ -532,7 +532,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
           case Axis.horizontal:
             finalDropArea = SizedBox(
               key: endWidgetKey,
-              width: _defaultDropAreaExtent,
+              width: m_defaultDropAreaExtent,
               height: constraints.maxHeight,
             );
             break;
@@ -540,7 +540,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
           default:
             finalDropArea = SizedBox(
               key: endWidgetKey,
-              height: _defaultDropAreaExtent,
+              height: m_defaultDropAreaExtent,
               width: constraints.maxWidth,
             );
             break;
@@ -554,7 +554,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
           scrollDirection: widget.scrollDirection,
           child: _buildContainerForScrollDirection(children: wrappedChildren),
           padding: widget.padding,
-          controller: _scrollController,
+          controller: m_scrollController,
         );
     });
   }

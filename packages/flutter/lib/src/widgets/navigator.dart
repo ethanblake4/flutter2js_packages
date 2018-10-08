@@ -252,7 +252,7 @@ abstract class Route<T> {
   ///
   /// If this is true, then [isActive] is also true.
   bool get isCurrent {
-    return _navigator != null && _navigator._history.last == this;
+    return _navigator != null && _navigator.m_history.last == this;
   }
 
   /// Whether this route is the bottom-most route on the navigator.
@@ -263,7 +263,7 @@ abstract class Route<T> {
   /// If [isFirst] and [isCurrent] are both true then this is the only route on
   /// the navigator (and [isActive] will also be true).
   bool get isFirst {
-    return _navigator != null && _navigator._history.first == this;
+    return _navigator != null && _navigator.m_history.first == this;
   }
 
   /// Whether this route is on the navigator.
@@ -276,7 +276,7 @@ abstract class Route<T> {
   /// rendered. It is even possible for the route to be active but for the stateful
   /// widgets within the route to not be instantiated. See [ModalRoute.maintainState].
   bool get isActive {
-    return _navigator != null && _navigator._history.contains(this);
+    return _navigator != null && _navigator.m_history.contains(this);
   }
 }
 
@@ -1287,14 +1287,14 @@ class Navigator extends StatefulWidget {
 
 /// The state for a [Navigator] widget.
 class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
-  final GlobalKey<OverlayState> _overlayKey = GlobalKey<OverlayState>();
-  final List<Route<dynamic>> _history = <Route<dynamic>>[];
-  final Set<Route<dynamic>> _poppedRoutes = Set<Route<dynamic>>();
+  final GlobalKey<OverlayState> m_overlayKey = GlobalKey<OverlayState>();
+  final List<Route<dynamic>> m_history = <Route<dynamic>>[];
+  final Set<Route<dynamic>> m_poppedRoutes = Set<Route<dynamic>>();
 
   /// The [FocusScopeNode] for the [FocusScope] that encloses the routes.
   final FocusScopeNode focusScopeNode = FocusScopeNode();
 
-  final List<OverlayEntry> _initialOverlayEntries = <OverlayEntry>[];
+  final List<OverlayEntry> m_initialOverlayEntries = <OverlayEntry>[];
 
   @override
   void initState() {
@@ -1350,8 +1350,8 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
       route ??= _routeNamed<Object>(Navigator.defaultRouteName);
       push(route);
     }
-    for (Route<dynamic> route in _history)
-      _initialOverlayEntries.addAll(route.overlayEntries);
+    for (Route<dynamic> route in m_history)
+      m_initialOverlayEntries.addAll(route.overlayEntries);
   }
 
   @override
@@ -1365,45 +1365,45 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
         observer._navigator = this;
       }
     }
-    for (Route<dynamic> route in _history)
+    for (Route<dynamic> route in m_history)
       route.changedExternalState();
   }
 
   @override
   void dispose() {
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
     for (NavigatorObserver observer in widget.observers)
       observer._navigator = null;
-    final List<Route<dynamic>> doomed = _poppedRoutes.toList()..addAll(_history);
+    final List<Route<dynamic>> doomed = m_poppedRoutes.toList()..addAll(m_history);
     for (Route<dynamic> route in doomed)
       route.dispose();
-    _poppedRoutes.clear();
-    _history.clear();
+    m_poppedRoutes.clear();
+    m_history.clear();
     focusScopeNode.detach();
     super.dispose();
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
   }
 
   /// The overlay this navigator uses for its visual presentation.
-  OverlayState get overlay => _overlayKey.currentState;
+  OverlayState get overlay => m_overlayKey.currentState;
 
-  OverlayEntry get _currentOverlayEntry {
-    for (Route<dynamic> route in _history.reversed) {
+  OverlayEntry get m_currentOverlayEntry {
+    for (Route<dynamic> route in m_history.reversed) {
       if (route.overlayEntries.isNotEmpty)
         return route.overlayEntries.last;
     }
     return null;
   }
 
-  bool _debugLocked = false; // used to prevent re-entrant calls to push, pop, and friends
+  bool m_debugLocked = false; // used to prevent re-entrant calls to push, pop, and friends
 
   Route<T> _routeNamed<T>(String name, { bool allowNull = false }) {
-    assert(!_debugLocked);
+    assert(!m_debugLocked);
     assert(name != null);
     final RouteSettings settings = RouteSettings(
       name: name,
-      isInitialRoute: _history.isEmpty,
+      isInitialRoute: m_history.isEmpty,
     );
     Route<T> route = widget.onGenerateRoute(settings);
     if (route == null && !allowNull) {
@@ -1528,14 +1528,14 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// ```
   @optionalTypeArgs
   Future<T> push<T extends Object>(Route<T> route) {
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
     assert(route != null);
     assert(route._navigator == null);
-    final Route<dynamic> oldRoute = _history.isNotEmpty ? _history.last : null;
+    final Route<dynamic> oldRoute = m_history.isNotEmpty ? m_history.last : null;
     route._navigator = this;
-    route.install(_currentOverlayEntry);
-    _history.add(route);
+    route.install(m_currentOverlayEntry);
+    m_history.add(route);
     route.didPush();
     route.didChangeNext(null);
     if (oldRoute != null) {
@@ -1544,7 +1544,7 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
     }
     for (NavigatorObserver observer in widget.observers)
       observer.didPush(route, oldRoute);
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
     _cancelActivePointers();
     return route.popped;
   }
@@ -1567,19 +1567,19 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// ```
   @optionalTypeArgs
   Future<T> pushReplacement<T extends Object, TO extends Object>(Route<T> newRoute, { TO result }) {
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
-    final Route<dynamic> oldRoute = _history.last;
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
+    final Route<dynamic> oldRoute = m_history.last;
     assert(oldRoute != null && oldRoute._navigator == this);
     assert(oldRoute.overlayEntries.isNotEmpty);
     assert(newRoute._navigator == null);
     assert(newRoute.overlayEntries.isEmpty);
-    final int index = _history.length - 1;
+    final int index = m_history.length - 1;
     assert(index >= 0);
-    assert(_history.indexOf(oldRoute) == index);
+    assert(m_history.indexOf(oldRoute) == index);
     newRoute._navigator = this;
-    newRoute.install(_currentOverlayEntry);
-    _history[index] = newRoute;
+    newRoute.install(m_currentOverlayEntry);
+    m_history[index] = newRoute;
     newRoute.didPush().whenCompleteOrCancel(() {
       // The old route's exit is not animated. We're assuming that the
       // new route completely obscures the old one.
@@ -1591,12 +1591,12 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
     });
     newRoute.didChangeNext(null);
     if (index > 0) {
-      _history[index - 1].didChangeNext(newRoute);
-      newRoute.didChangePrevious(_history[index - 1]);
+      m_history[index - 1].didChangeNext(newRoute);
+      newRoute.didChangePrevious(m_history[index - 1]);
     }
     for (NavigatorObserver observer in widget.observers)
       observer.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
     _cancelActivePointers();
     return newRoute.popped;
   }
@@ -1620,21 +1620,21 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// ```
   @optionalTypeArgs
   Future<T> pushAndRemoveUntil<T extends Object>(Route<T> newRoute, RoutePredicate predicate) {
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
     final List<Route<dynamic>> removedRoutes = <Route<dynamic>>[];
-    while (_history.isNotEmpty && !predicate(_history.last)) {
-      final Route<dynamic> removedRoute = _history.removeLast();
+    while (m_history.isNotEmpty && !predicate(m_history.last)) {
+      final Route<dynamic> removedRoute = m_history.removeLast();
       assert(removedRoute != null && removedRoute._navigator == this);
       assert(removedRoute.overlayEntries.isNotEmpty);
       removedRoutes.add(removedRoute);
     }
     assert(newRoute._navigator == null);
     assert(newRoute.overlayEntries.isEmpty);
-    final Route<dynamic> oldRoute = _history.isNotEmpty ? _history.last : null;
+    final Route<dynamic> oldRoute = m_history.isNotEmpty ? m_history.last : null;
     newRoute._navigator = this;
-    newRoute.install(_currentOverlayEntry);
-    _history.add(newRoute);
+    newRoute.install(m_currentOverlayEntry);
+    m_history.add(newRoute);
     newRoute.didPush().whenCompleteOrCancel(() {
       if (mounted) {
         for (Route<dynamic> route in removedRoutes)
@@ -1649,7 +1649,7 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
       for (Route<dynamic> removedRoute in removedRoutes)
         observer.didRemove(removedRoute, oldRoute);
     }
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
     _cancelActivePointers();
     return newRoute.popped;
   }
@@ -1664,37 +1664,37 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   ///    removed by reference to the route above it, rather than directly.
   @optionalTypeArgs
   void replace<T extends Object>({ @required Route<dynamic> oldRoute, @required Route<T> newRoute }) {
-    assert(!_debugLocked);
+    assert(!m_debugLocked);
     assert(oldRoute != null);
     assert(newRoute != null);
     if (oldRoute == newRoute) // ignore: unrelated_type_equality_checks, https://github.com/dart-lang/sdk/issues/32522
       return;
-    assert(() { _debugLocked = true; return true; }());
+    assert(() { m_debugLocked = true; return true; }());
     assert(oldRoute._navigator == this);
     assert(newRoute._navigator == null);
     assert(oldRoute.overlayEntries.isNotEmpty);
     assert(newRoute.overlayEntries.isEmpty);
     assert(!overlay.debugIsVisible(oldRoute.overlayEntries.last));
-    final int index = _history.indexOf(oldRoute);
+    final int index = m_history.indexOf(oldRoute);
     assert(index >= 0);
     newRoute._navigator = this;
     newRoute.install(oldRoute.overlayEntries.last);
-    _history[index] = newRoute;
+    m_history[index] = newRoute;
     newRoute.didReplace(oldRoute);
-    if (index + 1 < _history.length) {
-      newRoute.didChangeNext(_history[index + 1]);
-      _history[index + 1].didChangePrevious(newRoute);
+    if (index + 1 < m_history.length) {
+      newRoute.didChangeNext(m_history[index + 1]);
+      m_history[index + 1].didChangePrevious(newRoute);
     } else {
       newRoute.didChangeNext(null);
     }
     if (index > 0) {
-      _history[index - 1].didChangeNext(newRoute);
-      newRoute.didChangePrevious(_history[index - 1]);
+      m_history[index - 1].didChangeNext(newRoute);
+      newRoute.didChangePrevious(m_history[index - 1]);
     }
     for (NavigatorObserver observer in widget.observers)
       observer.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     oldRoute.dispose();
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
   }
 
   /// Replaces a route on the navigator with a new route. The route to be
@@ -1710,8 +1710,8 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   void replaceRouteBelow<T extends Object>({ @required Route<dynamic> anchorRoute, Route<T> newRoute }) {
     assert(anchorRoute != null);
     assert(anchorRoute._navigator == this);
-    assert(_history.indexOf(anchorRoute) > 0);
-    replace<T>(oldRoute: _history[_history.indexOf(anchorRoute) - 1], newRoute: newRoute);
+    assert(m_history.indexOf(anchorRoute) > 0);
+    replace<T>(oldRoute: m_history[m_history.indexOf(anchorRoute) - 1], newRoute: newRoute);
   }
 
   /// Whether the navigator can be popped.
@@ -1723,8 +1723,8 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   ///  * [Route.isFirst], which returns true for routes for which [canPop]
   ///    returns false.
   bool canPop() {
-    assert(_history.isNotEmpty);
-    return _history.length > 1 || _history[0].willHandlePopInternally;
+    assert(m_history.isNotEmpty);
+    return m_history.length > 1 || m_history[0].willHandlePopInternally;
   }
 
   /// Returns the value of the current route's [Route.willPop] method for the
@@ -1740,7 +1740,7 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   ///   to define the route's `willPop` method.
   @optionalTypeArgs
   Future<bool> maybePop<T extends Object>([ T result ]) async {
-    final Route<T> route = _history.last;
+    final Route<T> route = m_history.last;
     assert(route._navigator == this);
     final RoutePopDisposition disposition = await route.willPop();
     if (disposition != RoutePopDisposition.bubble && mounted) {
@@ -1774,32 +1774,32 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// ```
   @optionalTypeArgs
   bool pop<T extends Object>([ T result ]) {
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
-    final Route<dynamic> route = _history.last;
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
+    final Route<dynamic> route = m_history.last;
     assert(route._navigator == this);
     bool debugPredictedWouldPop;
     assert(() { debugPredictedWouldPop = !route.willHandlePopInternally; return true; }());
     if (route.didPop(result ?? route.currentResult)) {
       assert(debugPredictedWouldPop);
-      if (_history.length > 1) {
-        _history.removeLast();
+      if (m_history.length > 1) {
+        m_history.removeLast();
         // If route._navigator is null, the route called finalizeRoute from
         // didPop, which means the route has already been disposed and doesn't
         // need to be added to _poppedRoutes for later disposal.
         if (route._navigator != null)
-          _poppedRoutes.add(route);
-        _history.last.didPopNext(route);
+          m_poppedRoutes.add(route);
+        m_history.last.didPopNext(route);
         for (NavigatorObserver observer in widget.observers)
-          observer.didPop(route, _history.last);
+          observer.didPop(route, m_history.last);
       } else {
-        assert(() { _debugLocked = false; return true; }());
+        assert(() { m_debugLocked = false; return true; }());
         return false;
       }
     } else {
       assert(!debugPredictedWouldPop);
     }
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
     _cancelActivePointers();
     return true;
   }
@@ -1818,7 +1818,7 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// }
   /// ```
   void popUntil(RoutePredicate predicate) {
-    while (!predicate(_history.last))
+    while (!predicate(m_history.last))
       pop();
   }
 
@@ -1827,20 +1827,20 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// {@macro flutter.widgets.navigator.removeRoute}
   void removeRoute(Route<dynamic> route) {
     assert(route != null);
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
     assert(route._navigator == this);
-    final int index = _history.indexOf(route);
+    final int index = m_history.indexOf(route);
     assert(index != -1);
-    final Route<dynamic> previousRoute = index > 0 ? _history[index - 1] : null;
-    final Route<dynamic> nextRoute = (index + 1 < _history.length) ? _history[index + 1] : null;
-    _history.removeAt(index);
+    final Route<dynamic> previousRoute = index > 0 ? m_history[index - 1] : null;
+    final Route<dynamic> nextRoute = (index + 1 < m_history.length) ? m_history[index + 1] : null;
+    m_history.removeAt(index);
     previousRoute?.didChangeNext(nextRoute);
     nextRoute?.didChangePrevious(previousRoute);
     for (NavigatorObserver observer in widget.observers)
       observer.didRemove(route, previousRoute);
     route.dispose();
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
     _cancelActivePointers();
   }
 
@@ -1849,23 +1849,23 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   ///
   /// {@macro flutter.widgets.navigator.removeRouteBelow}
   void removeRouteBelow(Route<dynamic> anchorRoute) {
-    assert(!_debugLocked);
-    assert(() { _debugLocked = true; return true; }());
+    assert(!m_debugLocked);
+    assert(() { m_debugLocked = true; return true; }());
     assert(anchorRoute._navigator == this);
-    final int index = _history.indexOf(anchorRoute) - 1;
+    final int index = m_history.indexOf(anchorRoute) - 1;
     assert(index >= 0);
-    final Route<dynamic> targetRoute = _history[index];
+    final Route<dynamic> targetRoute = m_history[index];
     assert(targetRoute._navigator == this);
     assert(targetRoute.overlayEntries.isEmpty || !overlay.debugIsVisible(targetRoute.overlayEntries.last));
-    _history.removeAt(index);
-    final Route<dynamic> nextRoute = index < _history.length ? _history[index] : null;
-    final Route<dynamic> previousRoute = index > 0 ? _history[index - 1] : null;
+    m_history.removeAt(index);
+    final Route<dynamic> nextRoute = index < m_history.length ? m_history[index] : null;
+    final Route<dynamic> previousRoute = index > 0 ? m_history[index - 1] : null;
     if (previousRoute != null)
       previousRoute.didChangeNext(nextRoute);
     if (nextRoute != null)
       nextRoute.didChangePrevious(previousRoute);
     targetRoute.dispose();
-    assert(() { _debugLocked = false; return true; }());
+    assert(() { m_debugLocked = false; return true; }());
   }
 
   /// Complete the lifecycle for a route that has been popped off the navigator.
@@ -1880,7 +1880,7 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
   /// This function may be called directly from [Route.didPop] if [Route.didPop]
   /// will return true.
   void finalizeRoute(Route<dynamic> route) {
-    _poppedRoutes.remove(route);
+    m_poppedRoutes.remove(route);
     route.dispose();
   }
 
@@ -1931,7 +1931,7 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
       // If we're between frames (SchedulerPhase.idle) then absorb any
       // subsequent pointers from this frame. The absorbing flag will be
       // reset in the next frame, see build().
-      final RenderAbsorbPointer absorber = _overlayKey.currentContext?.ancestorRenderObjectOfType(const TypeMatcher<RenderAbsorbPointer>());
+      final RenderAbsorbPointer absorber = m_overlayKey.currentContext?.ancestorRenderObjectOfType(const TypeMatcher<RenderAbsorbPointer>());
       setState(() {
         absorber?.absorbing = true;
         // We do this in setState so that we'll reset the absorbing value back
@@ -1943,8 +1943,8 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    assert(!_debugLocked);
-    assert(_history.isNotEmpty);
+    assert(!m_debugLocked);
+    assert(m_history.isNotEmpty);
     return Listener(
       onPointerDown: _handlePointerDown,
       onPointerUp: _handlePointerUpOrCancel,
@@ -1955,8 +1955,8 @@ class NavigatorState extends State<Navigator> with TickerProviderStateMixin {
           node: focusScopeNode,
           autofocus: true,
           child: Overlay(
-            key: _overlayKey,
-            initialEntries: _initialOverlayEntries,
+            key: m_overlayKey,
+            initialEntries: m_initialOverlayEntries,
           ),
         ),
       ),

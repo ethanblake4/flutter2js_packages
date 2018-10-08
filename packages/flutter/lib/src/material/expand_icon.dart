@@ -64,28 +64,28 @@ class ExpandIcon extends StatefulWidget {
 }
 
 class _ExpandIconState extends State<ExpandIcon> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _iconTurns;
+  AnimationController mcontroller;
+  Animation<double> miconTurns;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: kThemeAnimationDuration, vsync: this);
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+    mcontroller = AnimationController(duration: kThemeAnimationDuration, vsync: this);
+    miconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: mcontroller,
         curve: Curves.fastOutSlowIn
       )
     );
     // If the widget is initially expanded, rotate the icon without animating it.
     if (widget.isExpanded) {
-      _controller.value = math.pi;
+      mcontroller.value = math.pi;
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    mcontroller.dispose();
     super.dispose();
   }
 
@@ -94,9 +94,9 @@ class _ExpandIconState extends State<ExpandIcon> with SingleTickerProviderStateM
     super.didUpdateWidget(oldWidget);
     if (widget.isExpanded != oldWidget.isExpanded) {
       if (widget.isExpanded) {
-        _controller.forward();
+        mcontroller.forward();
       } else {
-        _controller.reverse();
+        mcontroller.reverse();
       }
     }
   }
@@ -121,7 +121,7 @@ class _ExpandIconState extends State<ExpandIcon> with SingleTickerProviderStateM
         color: theme.brightness == Brightness.dark ? Colors.white54 : Colors.black54,
         onPressed: widget.onPressed == null ? null : _handlePressed,
         icon: RotationTransition(
-          turns: _iconTurns,
+          turns: miconTurns,
           child: const Icon(Icons.expand_more)
         ),
       ),

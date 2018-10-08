@@ -939,17 +939,17 @@ class SliverAppBar extends StatefulWidget {
 // This class is only Stateful because it owns the TickerProvider used
 // by the floating appbar snap animation (via FloatingHeaderSnapConfiguration).
 class _SliverAppBarState extends State<SliverAppBar> with TickerProviderStateMixin {
-  FloatingHeaderSnapConfiguration _snapConfiguration;
+  FloatingHeaderSnapConfiguration m_snapConfiguration;
 
   void _updateSnapConfiguration() {
     if (widget.snap && widget.floating) {
-      _snapConfiguration = FloatingHeaderSnapConfiguration(
+      m_snapConfiguration = FloatingHeaderSnapConfiguration(
         vsync: this,
         curve: Curves.easeOut,
         duration: const Duration(milliseconds: 200),
       );
     } else {
-      _snapConfiguration = null;
+      m_snapConfiguration = null;
     }
   }
 
@@ -1000,7 +1000,7 @@ class _SliverAppBarState extends State<SliverAppBar> with TickerProviderStateMix
           topPadding: topPadding,
           floating: widget.floating,
           pinned: widget.pinned,
-          snapConfiguration: _snapConfiguration,
+          snapConfiguration: m_snapConfiguration,
         ),
       ),
     );

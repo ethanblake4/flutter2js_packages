@@ -454,61 +454,61 @@ class _RenderSegmentedControl<T> extends RenderBox
     @required List<Color> backgroundColors,
     @required Color borderColor,
   })  : assert(textDirection != null),
-        _textDirection = textDirection,
-        _selectedIndex = selectedIndex,
-        _pressedIndex = pressedIndex,
-        _backgroundColors = backgroundColors,
-        _borderColor = borderColor {
+        m_textDirection = textDirection,
+        m_selectedIndex = selectedIndex,
+        m_pressedIndex = pressedIndex,
+        m_backgroundColors = backgroundColors,
+        m_borderColor = borderColor {
     addAll(children);
   }
 
-  int get selectedIndex => _selectedIndex;
-  int _selectedIndex;
+  int get selectedIndex => m_selectedIndex;
+  int m_selectedIndex;
   set selectedIndex(int value) {
-    if (_selectedIndex == value) {
+    if (m_selectedIndex == value) {
       return;
     }
-    _selectedIndex = value;
+    m_selectedIndex = value;
     markNeedsPaint();
   }
 
-  int get pressedIndex => _pressedIndex;
-  int _pressedIndex;
+  int get pressedIndex => m_pressedIndex;
+  int m_pressedIndex;
   set pressedIndex(int value) {
-    if (_pressedIndex == value) {
+    if (m_pressedIndex == value) {
       return;
     }
-    _pressedIndex = value;
+    m_pressedIndex = value;
     markNeedsPaint();
   }
 
-  TextDirection get textDirection => _textDirection;
-  TextDirection _textDirection;
+  TextDirection get textDirection => m_textDirection;
+  TextDirection m_textDirection;
   set textDirection(TextDirection value) {
-    if (_textDirection == value) {
+    if (m_textDirection == value) {
       return;
     }
-    _textDirection = value;
+    m_textDirection = value;
     markNeedsLayout();
   }
 
-  List<Color> get backgroundColors => _backgroundColors;
-  List<Color> _backgroundColors;
+  List<Color> get backgroundColors => m_backgroundColors;
+  List<Color> m_backgroundColors;
   set backgroundColors(List<Color> value) {
-    if (_backgroundColors == value) {
+    if (m_backgroundColors == value) {
       return;
     }
-    _backgroundColors = value;
+    m_backgroundColors = value;
     markNeedsPaint();
   }
 
-  Color get borderColor => _borderColor;
-  Color _borderColor;
+  Color get borderColor => m_borderColor;
+  Color m_borderColor;
   set borderColor(Color value) {
-    if (_borderColor == value) {
+    if (m_borderColor == value) {
       return;
     }
-    _borderColor = value;
+    m_borderColor = value;
     markNeedsPaint();
   }
 

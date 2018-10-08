@@ -179,19 +179,19 @@ class Stepper extends StatefulWidget {
 }
 
 class _StepperState extends State<Stepper> with TickerProviderStateMixin {
-  List<GlobalKey> _keys;
-  final Map<int, StepState> _oldStates = <int, StepState>{};
+  List<GlobalKey> m_keys;
+  final Map<int, StepState> m_oldStates = <int, StepState>{};
 
   @override
   void initState() {
     super.initState();
-    _keys = List<GlobalKey>.generate(
+    m_keys = List<GlobalKey>.generate(
       widget.steps.length,
       (int i) => GlobalKey(),
     );
 
     for (int i = 0; i < widget.steps.length; i += 1)
-      _oldStates[i] = widget.steps[i].state;
+      m_oldStates[i] = widget.steps[i].state;
   }
 
   @override
@@ -200,7 +200,7 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     assert(widget.steps.length == oldWidget.steps.length);
 
     for (int i = 0; i < oldWidget.steps.length; i += 1)
-      _oldStates[i] = oldWidget.steps[i].state;
+      m_oldStates[i] = oldWidget.steps[i].state;
   }
 
   bool _isFirst(int index) {
@@ -228,7 +228,7 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
   }
 
   Widget _buildCircleChild(int index, bool oldState) {
-    final StepState state = oldState ? _oldStates[index] : widget.steps[index].state;
+    final StepState state = oldState ? m_oldStates[index] : widget.steps[index].state;
     final bool isDarkActive = _isDark() && widget.steps[index].isActive;
     assert(state != null);
     switch (state) {
@@ -308,7 +308,7 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
   }
 
   Widget _buildIcon(int index) {
-    if (widget.steps[index].state != _oldStates[index]) {
+    if (widget.steps[index].state != m_oldStates[index]) {
       return AnimatedCrossFade(
         firstChild: _buildCircle(index, true),
         secondChild: _buildTriangle(index, true),
@@ -518,14 +518,14 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     for (int i = 0; i < widget.steps.length; i += 1) {
       children.add(
         Column(
-          key: _keys[i],
+          key: m_keys[i],
           children: <Widget>[
             InkWell(
               onTap: widget.steps[i].state != StepState.disabled ? () {
                 // In the vertical case we need to scroll to the newly tapped
                 // step.
                 Scrollable.ensureVisible(
-                  _keys[i].currentContext,
+                  m_keys[i].currentContext,
                   curve: Curves.fastOutSlowIn,
                   duration: kThemeAnimationDuration,
                 );

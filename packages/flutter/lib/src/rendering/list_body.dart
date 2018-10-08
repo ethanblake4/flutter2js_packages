@@ -33,7 +33,7 @@ class RenderListBody extends RenderBox
     List<RenderBox> children,
     AxisDirection axisDirection = AxisDirection.down,
   }) : assert(axisDirection != null),
-       _axisDirection = axisDirection {
+       m_axisDirection = axisDirection {
     addAll(children);
   }
 
@@ -47,13 +47,13 @@ class RenderListBody extends RenderBox
   ///
   /// For example, if the [axisDirection] is [AxisDirection.down], each child
   /// will be laid out below the next, vertically.
-  AxisDirection get axisDirection => _axisDirection;
-  AxisDirection _axisDirection;
+  AxisDirection get axisDirection => m_axisDirection;
+  AxisDirection m_axisDirection;
   set axisDirection(AxisDirection value) {
     assert(value != null);
-    if (_axisDirection == value)
+    if (m_axisDirection == value)
       return;
-    _axisDirection = value;
+    m_axisDirection = value;
     markNeedsLayout();
   }
 

@@ -347,14 +347,14 @@ class RenderStack extends RenderBox
   }) : assert(alignment != null),
        assert(fit != null),
        assert(overflow != null),
-       _alignment = alignment,
-       _textDirection = textDirection,
-       _fit = fit,
-       _overflow = overflow {
+       m_alignment = alignment,
+       m_textDirection = textDirection,
+       m_fit = fit,
+       m_overflow = overflow {
     addAll(children);
   }
 
-  bool _hasVisualOverflow = false;
+  bool m_hasVisualOverflow = false;
 
   @override
   void setupParentData(RenderBox child) {
@@ -362,16 +362,16 @@ class RenderStack extends RenderBox
       child.parentData = StackParentData();
   }
 
-  Alignment _resolvedAlignment;
+  Alignment m_resolvedAlignment;
 
   void _resolve() {
-    if (_resolvedAlignment != null)
+    if (m_resolvedAlignment != null)
       return;
-    _resolvedAlignment = alignment.resolve(textDirection);
+    m_resolvedAlignment = alignment.resolve(textDirection);
   }
 
   void _markNeedResolution() {
-    _resolvedAlignment = null;
+    m_resolvedAlignment = null;
     markNeedsLayout();
   }
 
@@ -390,13 +390,13 @@ class RenderStack extends RenderBox
   ///
   /// If this is set to an [AlignmentDirectional] object, then [textDirection]
   /// must not be null.
-  AlignmentGeometry get alignment => _alignment;
-  AlignmentGeometry _alignment;
+  AlignmentGeometry get alignment => m_alignment;
+  AlignmentGeometry m_alignment;
   set alignment(AlignmentGeometry value) {
     assert(value != null);
-    if (_alignment == value)
+    if (m_alignment == value)
       return;
-    _alignment = value;
+    m_alignment = value;
     _markNeedResolution();
   }
 
@@ -404,12 +404,12 @@ class RenderStack extends RenderBox
   ///
   /// This may be changed to null, but only after the [alignment] has been changed
   /// to a value that does not depend on the direction.
-  TextDirection get textDirection => _textDirection;
-  TextDirection _textDirection;
+  TextDirection get textDirection => m_textDirection;
+  TextDirection m_textDirection;
   set textDirection(TextDirection value) {
-    if (_textDirection == value)
+    if (m_textDirection == value)
       return;
-    _textDirection = value;
+    m_textDirection = value;
     _markNeedResolution();
   }
 
@@ -418,12 +418,12 @@ class RenderStack extends RenderBox
   /// The constraints passed into the [RenderStack] from its parent are either
   /// loosened ([StackFit.loose]) or tightened to their biggest size
   /// ([StackFit.expand]).
-  StackFit get fit => _fit;
-  StackFit _fit;
+  StackFit get fit => m_fit;
+  StackFit m_fit;
   set fit(StackFit value) {
     assert(value != null);
-    if (_fit != value) {
-      _fit = value;
+    if (m_fit != value) {
+      m_fit = value;
       markNeedsLayout();
     }
   }
@@ -432,12 +432,12 @@ class RenderStack extends RenderBox
   ///
   /// Some children in a stack might overflow its box. When this flag is set to
   /// [Overflow.clip], children cannot paint outside of the stack's box.
-  Overflow get overflow => _overflow;
-  Overflow _overflow;
+  Overflow get overflow => m_overflow;
+  Overflow m_overflow;
   set overflow(Overflow value) {
     assert(value != null);
-    if (_overflow != value) {
-      _overflow = value;
+    if (m_overflow != value) {
+      m_overflow = value;
       markNeedsPaint();
     }
   }
@@ -483,8 +483,8 @@ class RenderStack extends RenderBox
   @override
   void performLayout() {
     _resolve();
-    assert(_resolvedAlignment != null);
-    _hasVisualOverflow = false;
+    assert(m_resolvedAlignment != null);
+    m_hasVisualOverflow = false;
     bool hasNonPositionedChildren = false;
     if (childCount == 0) {
       size = constraints.biggest;
@@ -542,7 +542,7 @@ class RenderStack extends RenderBox
       final StackParentData childParentData = child.parentData;
 
       if (!childParentData.isPositioned) {
-        childParentData.offset = _resolvedAlignment.alongOffset(size - child.size);
+        childParentData.offset = m_resolvedAlignment.alongOffset(size - child.size);
       } else {
         BoxConstraints childConstraints = const BoxConstraints();
 
@@ -564,11 +564,11 @@ class RenderStack extends RenderBox
         } else if (childParentData.right != null) {
           x = size.width - childParentData.right - child.size.width;
         } else {
-          x = _resolvedAlignment.alongOffset(size - child.size).dx;
+          x = m_resolvedAlignment.alongOffset(size - child.size).dx;
         }
 
         if (x < 0.0 || x + child.size.width > size.width)
-          _hasVisualOverflow = true;
+          m_hasVisualOverflow = true;
 
         double y;
         if (childParentData.top != null) {
@@ -576,11 +576,11 @@ class RenderStack extends RenderBox
         } else if (childParentData.bottom != null) {
           y = size.height - childParentData.bottom - child.size.height;
         } else {
-          y = _resolvedAlignment.alongOffset(size - child.size).dy;
+          y = m_resolvedAlignment.alongOffset(size - child.size).dy;
         }
 
         if (y < 0.0 || y + child.size.height > size.height)
-          _hasVisualOverflow = true;
+          m_hasVisualOverflow = true;
 
         childParentData.offset = Offset(x, y);
       }
@@ -606,7 +606,7 @@ class RenderStack extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    if (_overflow == Overflow.clip && _hasVisualOverflow) {
+    if (m_overflow == Overflow.clip && m_hasVisualOverflow) {
       context.pushClipRect(needsCompositing, offset, Offset.zero & size, paintStack);
     } else {
       paintStack(context, offset);
@@ -614,7 +614,7 @@ class RenderStack extends RenderBox
   }
 
   @override
-  Rect describeApproximatePaintClip(RenderObject child) => _hasVisualOverflow ? Offset.zero & size : null;
+  Rect describeApproximatePaintClip(RenderObject child) => m_hasVisualOverflow ? Offset.zero & size : null;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {

@@ -37,24 +37,24 @@ abstract class Animatable<T> {
 }
 
 class _AnimatedEvaluation<T> extends Animation<T> with AnimationWithParentMixin<double> {
-  _AnimatedEvaluation(this.parent, this._evaluatable);
+  _AnimatedEvaluation(this.parent, this.m_evaluatable);
 
   @override
   final Animation<double> parent;
 
-  final Animatable<T> _evaluatable;
+  final Animatable<T> m_evaluatable;
 
   @override
-  T get value => _evaluatable.evaluate(parent);
+  T get value => m_evaluatable.evaluate(parent);
 
   @override
   String toString() {
-    return '$parent\u27A9$_evaluatable\u27A9$value';
+    return '$parent\u27A9$m_evaluatable\u27A9$value';
   }
 
   @override
   String toStringDetails() {
-    return '${super.toStringDetails()} $_evaluatable';
+    return '${super.toStringDetails()} $m_evaluatable';
   }
 }
 

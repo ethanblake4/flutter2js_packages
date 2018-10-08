@@ -352,33 +352,33 @@ class _ImageProviderResolver {
 }
 
 class _FadeInImageState extends State<FadeInImage> with TickerProviderStateMixin {
-  _ImageProviderResolver _imageResolver;
-  _ImageProviderResolver _placeholderResolver;
+  _ImageProviderResolver m_imageResolver;
+  _ImageProviderResolver m_placeholderResolver;
 
-  AnimationController _controller;
-  Animation<double> _animation;
+  AnimationController m_controller;
+  Animation<double> m_animation;
 
-  FadeInImagePhase _phase = FadeInImagePhase.start;
-  FadeInImagePhase get phase => _phase;
+  FadeInImagePhase m_phase = FadeInImagePhase.start;
+  FadeInImagePhase get phase => m_phase;
 
   @override
   void initState() {
-    _imageResolver = _ImageProviderResolver(state: this, listener: _updatePhase);
-    _placeholderResolver = _ImageProviderResolver(state: this, listener: () {
+    m_imageResolver = _ImageProviderResolver(state: this, listener: _updatePhase);
+    m_placeholderResolver = _ImageProviderResolver(state: this, listener: () {
       setState(() {
         // Trigger rebuild to display the placeholder image
       });
     });
-    _controller = AnimationController(
+    m_controller = AnimationController(
       value: 1.0,
       vsync: this,
     );
-    _controller.addListener(() {
+    m_controller.addListener(() {
       setState(() {
         // Trigger rebuild to update opacity value.
       });
     });
-    _controller.addStatusListener((AnimationStatus status) {
+    m_controller.addStatusListener((AnimationStatus status) {
       _updatePhase();
     });
     super.initState();
@@ -404,54 +404,54 @@ class _FadeInImageState extends State<FadeInImage> with TickerProviderStateMixin
   }
 
   void _resolveImage() {
-    _imageResolver.resolve(widget.image);
+    m_imageResolver.resolve(widget.image);
 
     // No need to resolve the placeholder if we are past the placeholder stage.
-    if (_isShowingPlaceholder)
-      _placeholderResolver.resolve(widget.placeholder);
+    if (m_isShowingPlaceholder)
+      m_placeholderResolver.resolve(widget.placeholder);
 
-    if (_phase == FadeInImagePhase.start)
+    if (m_phase == FadeInImagePhase.start)
       _updatePhase();
   }
 
   void _updatePhase() {
     setState(() {
-      switch (_phase) {
+      switch (m_phase) {
         case FadeInImagePhase.start:
-          if (_imageResolver._imageInfo != null)
-            _phase = FadeInImagePhase.completed;
+          if (m_imageResolver._imageInfo != null)
+            m_phase = FadeInImagePhase.completed;
           else
-            _phase = FadeInImagePhase.waiting;
+            m_phase = FadeInImagePhase.waiting;
           break;
         case FadeInImagePhase.waiting:
-          if (_imageResolver._imageInfo != null) {
+          if (m_imageResolver._imageInfo != null) {
             // Received image data. Begin placeholder fade-out.
-            _controller.duration = widget.fadeOutDuration;
-            _animation = CurvedAnimation(
-              parent: _controller,
+            m_controller.duration = widget.fadeOutDuration;
+            m_animation = CurvedAnimation(
+              parent: m_controller,
               curve: widget.fadeOutCurve,
             );
-            _phase = FadeInImagePhase.fadeOut;
-            _controller.reverse(from: 1.0);
+            m_phase = FadeInImagePhase.fadeOut;
+            m_controller.reverse(from: 1.0);
           }
           break;
         case FadeInImagePhase.fadeOut:
-          if (_controller.status == AnimationStatus.dismissed) {
+          if (m_controller.status == AnimationStatus.dismissed) {
             // Done fading out placeholder. Begin target image fade-in.
-            _controller.duration = widget.fadeInDuration;
-            _animation = CurvedAnimation(
-              parent: _controller,
+            m_controller.duration = widget.fadeInDuration;
+            m_animation = CurvedAnimation(
+              parent: m_controller,
               curve: widget.fadeInCurve,
             );
-            _phase = FadeInImagePhase.fadeIn;
-            _placeholderResolver.stopListening();
-            _controller.forward(from: 0.0);
+            m_phase = FadeInImagePhase.fadeIn;
+            m_placeholderResolver.stopListening();
+            m_controller.forward(from: 0.0);
           }
           break;
         case FadeInImagePhase.fadeIn:
-          if (_controller.status == AnimationStatus.completed) {
+          if (m_controller.status == AnimationStatus.completed) {
             // Done finding in new image.
-            _phase = FadeInImagePhase.completed;
+            m_phase = FadeInImagePhase.completed;
           }
           break;
         case FadeInImagePhase.completed:
@@ -463,15 +463,15 @@ class _FadeInImageState extends State<FadeInImage> with TickerProviderStateMixin
 
   @override
   void dispose() {
-    _imageResolver.stopListening();
-    _placeholderResolver.stopListening();
-    _controller.dispose();
+    m_imageResolver.stopListening();
+    m_placeholderResolver.stopListening();
+    m_controller.dispose();
     super.dispose();
   }
 
-  bool get _isShowingPlaceholder {
-    assert(_phase != null);
-    switch (_phase) {
+  bool get m_isShowingPlaceholder {
+    assert(m_phase != null);
+    switch (m_phase) {
       case FadeInImagePhase.start:
       case FadeInImagePhase.waiting:
       case FadeInImagePhase.fadeOut:
@@ -485,21 +485,21 @@ class _FadeInImageState extends State<FadeInImage> with TickerProviderStateMixin
   }
 
   ImageInfo get _imageInfo {
-    return _isShowingPlaceholder
-      ? _placeholderResolver._imageInfo
-      : _imageResolver._imageInfo;
+    return m_isShowingPlaceholder
+      ? m_placeholderResolver._imageInfo
+      : m_imageResolver._imageInfo;
   }
 
   @override
   Widget build(BuildContext context) {
-    assert(_phase != FadeInImagePhase.start);
+    assert(m_phase != FadeInImagePhase.start);
     final ImageInfo imageInfo = _imageInfo;
     return RawImage(
       image: imageInfo?.image,
       width: widget.width,
       height: widget.height,
       scale: imageInfo?.scale ?? 1.0,
-      color: Color.fromRGBO(255, 255, 255, _animation?.value ?? 1.0),
+      color: Color.fromRGBO(255, 255, 255, m_animation?.value ?? 1.0),
       colorBlendMode: BlendMode.modulate,
       fit: widget.fit,
       alignment: widget.alignment,
@@ -511,9 +511,9 @@ class _FadeInImageState extends State<FadeInImage> with TickerProviderStateMixin
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(EnumProperty<FadeInImagePhase>('phase', _phase));
+    description.add(EnumProperty<FadeInImagePhase>('phase', m_phase));
     description.add(DiagnosticsProperty<ImageInfo>('pixels', _imageInfo));
-    description.add(DiagnosticsProperty<ImageStream>('image stream', _imageResolver._imageStream));
-    description.add(DiagnosticsProperty<ImageStream>('placeholder stream', _placeholderResolver._imageStream));
+    description.add(DiagnosticsProperty<ImageStream>('image stream', m_imageResolver._imageStream));
+    description.add(DiagnosticsProperty<ImageStream>('placeholder stream', m_placeholderResolver._imageStream));
   }
 }

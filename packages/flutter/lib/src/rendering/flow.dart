@@ -183,7 +183,7 @@ class RenderFlow extends RenderBox
     List<RenderBox> children,
     @required FlowDelegate delegate
   }) : assert(delegate != null),
-       _delegate = delegate {
+       m_delegate = delegate {
     addAll(children);
   }
 
@@ -197,8 +197,8 @@ class RenderFlow extends RenderBox
   }
 
   /// The delegate that controls the transformation matrices of the children.
-  FlowDelegate get delegate => _delegate;
-  FlowDelegate _delegate;
+  FlowDelegate get delegate => m_delegate;
+  FlowDelegate m_delegate;
   /// When the delegate is changed to a new delegate with the same runtimeType
   /// as the old delegate, this object will call the delegate's
   /// [FlowDelegate.shouldRelayout] and [FlowDelegate.shouldRepaint] functions
@@ -206,10 +206,10 @@ class RenderFlow extends RenderBox
   /// layout or painting.
   set delegate(FlowDelegate newDelegate) {
     assert(newDelegate != null);
-    if (_delegate == newDelegate)
+    if (m_delegate == newDelegate)
       return;
-    final FlowDelegate oldDelegate = _delegate;
-    _delegate = newDelegate;
+    final FlowDelegate oldDelegate = m_delegate;
+    m_delegate = newDelegate;
 
     if (newDelegate.runtimeType != oldDelegate.runtimeType || newDelegate.shouldRelayout(oldDelegate))
       markNeedsLayout();
@@ -225,18 +225,18 @@ class RenderFlow extends RenderBox
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    _delegate._repaint?.addListener(markNeedsPaint);
+    m_delegate._repaint?.addListener(markNeedsPaint);
   }
 
   @override
   void detach() {
-    _delegate._repaint?.removeListener(markNeedsPaint);
+    m_delegate._repaint?.removeListener(markNeedsPaint);
     super.detach();
   }
 
   Size _getSize(BoxConstraints constraints) {
     assert(constraints.debugAssertIsValid());
-    return constraints.constrain(_delegate.getSize(constraints));
+    return constraints.constrain(m_delegate.getSize(constraints));
   }
 
   @override
@@ -286,7 +286,7 @@ class RenderFlow extends RenderBox
     RenderBox child = firstChild;
     while (child != null) {
       _randomAccessChildren.add(child);
-      final BoxConstraints innerConstraints = _delegate.getConstraintsForChild(i, constraints);
+      final BoxConstraints innerConstraints = m_delegate.getConstraintsForChild(i, constraints);
       child.layout(innerConstraints, parentUsesSize: true);
       final FlowParentData childParentData = child.parentData;
       childParentData.offset = Offset.zero;
@@ -321,7 +321,7 @@ class RenderFlow extends RenderBox
       if (childParentData._transform != null) {
         throw FlutterError(
           'Cannot call paintChild twice for the same child.\n'
-          'The flow delegate of type ${_delegate.runtimeType} attempted to '
+          'The flow delegate of type ${m_delegate.runtimeType} attempted to '
           'paint child $i multiple times, which is not permitted.'
         );
       }
@@ -356,7 +356,7 @@ class RenderFlow extends RenderBox
       childParentData._transform = null;
     }
     try {
-      _delegate.paintChildren(this);
+      m_delegate.paintChildren(this);
     } finally {
       _paintingContext = null;
       _paintingOffset = null;

@@ -130,54 +130,54 @@ class FocusNode extends ChangeNotifier {
 ///  * [FocusScope], which is a widget that associates a [FocusScopeNode] with
 ///    its location in the tree.
 class FocusScopeNode extends Object with DiagnosticableTreeMixin {
-  FocusManager _manager;
-  FocusScopeNode _parent;
+  FocusManager m_manager;
+  FocusScopeNode m_parent;
 
-  FocusScopeNode _nextSibling;
-  FocusScopeNode _previousSibling;
+  FocusScopeNode m_nextSibling;
+  FocusScopeNode m_previousSibling;
 
-  FocusScopeNode _firstChild;
-  FocusScopeNode _lastChild;
+  FocusScopeNode m_firstChild;
+  FocusScopeNode m_lastChild;
 
-  FocusNode _focus;
+  FocusNode m_focus;
 
   /// Whether this scope is currently active in its parent scope.
-  bool get isFirstFocus => _parent == null || _parent._firstChild == this;
+  bool get isFirstFocus => m_parent == null || m_parent.m_firstChild == this;
 
   void _prepend(FocusScopeNode child) {
     assert(child != this);
-    assert(child != _firstChild);
-    assert(child != _lastChild);
-    assert(child._parent == null);
-    assert(child._manager == null);
-    assert(child._nextSibling == null);
-    assert(child._previousSibling == null);
+    assert(child != m_firstChild);
+    assert(child != m_lastChild);
+    assert(child.m_parent == null);
+    assert(child.m_manager == null);
+    assert(child.m_nextSibling == null);
+    assert(child.m_previousSibling == null);
     assert(() {
       FocusScopeNode node = this;
-      while (node._parent != null)
-        node = node._parent;
+      while (node.m_parent != null)
+        node = node.m_parent;
       assert(node != child); // indicates we are about to create a cycle
       return true;
     }());
-    child._parent = this;
-    child._nextSibling = _firstChild;
-    if (_firstChild != null)
-      _firstChild._previousSibling = child;
-    _firstChild = child;
-    _lastChild ??= child;
-    child._updateManager(_manager);
+    child.m_parent = this;
+    child.m_nextSibling = m_firstChild;
+    if (m_firstChild != null)
+      m_firstChild.m_previousSibling = child;
+    m_firstChild = child;
+    m_lastChild ??= child;
+    child._updateManager(m_manager);
   }
 
   void _updateManager(FocusManager manager) {
     void update(FocusScopeNode child) {
-      if (child._manager == manager)
+      if (child.m_manager == manager)
         return;
-      child._manager = manager;
+      child.m_manager = manager;
       // We don't proactively null out the manager for FocusNodes because the
       // manager holds the currently active focus node until the end of the
       // microtask, even if that node is detached from the focus tree.
       if (manager != null)
-        child._focus?._manager = manager;
+        child.m_focus?._manager = manager;
       child._visitChildren(update);
     }
 
@@ -185,55 +185,55 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   }
 
   void _visitChildren(void visitor(FocusScopeNode child)) {
-    FocusScopeNode child = _firstChild;
+    FocusScopeNode child = m_firstChild;
     while (child != null) {
       visitor(child);
-      child = child._nextSibling;
+      child = child.m_nextSibling;
     }
   }
 
   bool _debugUltimatePreviousSiblingOf(FocusScopeNode child, { FocusScopeNode equals }) {
-    while (child._previousSibling != null) {
-      assert(child._previousSibling != child);
-      child = child._previousSibling;
+    while (child.m_previousSibling != null) {
+      assert(child.m_previousSibling != child);
+      child = child.m_previousSibling;
     }
     return child == equals;
   }
 
   bool _debugUltimateNextSiblingOf(FocusScopeNode child, { FocusScopeNode equals }) {
-    while (child._nextSibling != null) {
-      assert(child._nextSibling != child);
-      child = child._nextSibling;
+    while (child.m_nextSibling != null) {
+      assert(child.m_nextSibling != child);
+      child = child.m_nextSibling;
     }
     return child == equals;
   }
 
   void _remove(FocusScopeNode child) {
-    assert(child._parent == this);
-    assert(child._manager == _manager);
-    assert(_debugUltimatePreviousSiblingOf(child, equals: _firstChild));
-    assert(_debugUltimateNextSiblingOf(child, equals: _lastChild));
-    if (child._previousSibling == null) {
-      assert(_firstChild == child);
-      _firstChild = child._nextSibling;
+    assert(child.m_parent == this);
+    assert(child.m_manager == m_manager);
+    assert(_debugUltimatePreviousSiblingOf(child, equals: m_firstChild));
+    assert(_debugUltimateNextSiblingOf(child, equals: m_lastChild));
+    if (child.m_previousSibling == null) {
+      assert(m_firstChild == child);
+      m_firstChild = child.m_nextSibling;
     } else {
-      child._previousSibling._nextSibling = child._nextSibling;
+      child.m_previousSibling.m_nextSibling = child.m_nextSibling;
     }
-    if (child._nextSibling == null) {
-      assert(_lastChild == child);
-      _lastChild = child._previousSibling;
+    if (child.m_nextSibling == null) {
+      assert(m_lastChild == child);
+      m_lastChild = child.m_previousSibling;
     } else {
-      child._nextSibling._previousSibling = child._previousSibling;
+      child.m_nextSibling.m_previousSibling = child.m_previousSibling;
     }
-    child._previousSibling = null;
-    child._nextSibling = null;
-    child._parent = null;
+    child.m_previousSibling = null;
+    child.m_nextSibling = null;
+    child.m_parent = null;
     child._updateManager(null);
   }
 
   void _didChangeFocusChain() {
     if (isFirstFocus)
-      _manager?._markNeedsUpdate();
+      m_manager?._markNeedsUpdate();
   }
 
   /// Requests that the given node becomes the focus for this scope.
@@ -246,9 +246,9 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// has received the overall focus in a microtask.
   void requestFocus(FocusNode node) {
     assert(node != null);
-    if (_focus == node)
+    if (m_focus == node)
       return;
-    _focus?.unfocus();
+    m_focus?.unfocus();
     node._hasKeyboardToken = true;
     _setFocus(node);
   }
@@ -263,7 +263,7 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// microtask.
   void autofocus(FocusNode node) {
     assert(node != null);
-    if (_focus == null) {
+    if (m_focus == null) {
       node._hasKeyboardToken = true;
       _setFocus(node);
     }
@@ -280,28 +280,28 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
       return;
     node.unfocus();
     assert(node._parent == null);
-    if (_focus == null)
+    if (m_focus == null)
       _setFocus(node);
   }
 
   void _setFocus(FocusNode node) {
     assert(node != null);
     assert(node._parent == null);
-    assert(_focus == null);
-    _focus = node;
-    _focus._parent = this;
-    _focus._manager = _manager;
-    _focus._hasKeyboardToken = true;
+    assert(m_focus == null);
+    m_focus = node;
+    m_focus._parent = this;
+    m_focus._manager = m_manager;
+    m_focus._hasKeyboardToken = true;
     _didChangeFocusChain();
   }
 
   void _resignFocus(FocusNode node) {
     assert(node != null);
-    if (_focus != node)
+    if (m_focus != node)
       return;
-    _focus._parent = null;
-    _focus._manager = null;
-    _focus = null;
+    m_focus._parent = null;
+    m_focus._manager = null;
+    m_focus = null;
     _didChangeFocusChain();
   }
 
@@ -312,12 +312,12 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// the child.
   void setFirstFocus(FocusScopeNode child) {
     assert(child != null);
-    assert(child._parent == null || child._parent == this);
-    if (_firstChild == child)
+    assert(child.m_parent == null || child.m_parent == this);
+    if (m_firstChild == child)
       return;
     child.detach();
     _prepend(child);
-    assert(child._parent == this);
+    assert(child.m_parent == this);
     _didChangeFocusChain();
   }
 
@@ -332,7 +332,7 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// is simply detached from its old parent.
   void reparentScopeIfNeeded(FocusScopeNode child) {
     assert(child != null);
-    if (child._parent == null || child._parent == this)
+    if (child.m_parent == null || child.m_parent == this)
       return;
     if (child.isFirstFocus)
       setFirstFocus(child);
@@ -349,28 +349,28 @@ class FocusScopeNode extends Object with DiagnosticableTreeMixin {
   /// children in their parent scope.
   void detach() {
     _didChangeFocusChain();
-    _parent?._remove(this);
-    assert(_parent == null);
+    m_parent?._remove(this);
+    assert(m_parent == null);
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    if (_focus != null)
-      properties.add(DiagnosticsProperty<FocusNode>('focus', _focus));
+    if (m_focus != null)
+      properties.add(DiagnosticsProperty<FocusNode>('focus', m_focus));
   }
 
   @override
   List<DiagnosticsNode> debugDescribeChildren() {
     final List<DiagnosticsNode> children = <DiagnosticsNode>[];
-    if (_firstChild != null) {
-      FocusScopeNode child = _firstChild;
+    if (m_firstChild != null) {
+      FocusScopeNode child = m_firstChild;
       int count = 1;
       while (true) {
         children.add(child.toDiagnosticsNode(name: 'child $count'));
-        if (child == _lastChild)
+        if (child == m_lastChild)
           break;
-        child = child._nextSibling;
+        child = child.m_nextSibling;
         count += 1;
       }
     }
@@ -405,9 +405,9 @@ class FocusManager {
   /// This constructor is rarely called directly. To access the [FocusManager],
   /// consider using [WidgetsBinding.focusManager] instead.
   FocusManager() {
-    rootScope._manager = this;
-    assert(rootScope._firstChild == null);
-    assert(rootScope._lastChild == null);
+    rootScope.m_manager = this;
+    assert(rootScope.m_firstChild == null);
+    assert(rootScope.m_lastChild == null);
   }
 
   /// The root [FocusScopeNode] in the focus tree.
@@ -434,9 +434,9 @@ class FocusManager {
 
   FocusNode _findNextFocus() {
     FocusScopeNode scope = rootScope;
-    while (scope._firstChild != null)
-      scope = scope._firstChild;
-    return scope._focus;
+    while (scope.m_firstChild != null)
+      scope = scope.m_firstChild;
+    return scope.m_focus;
   }
 
   void _update() {

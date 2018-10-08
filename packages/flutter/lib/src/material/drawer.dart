@@ -201,15 +201,15 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: _kBaseSettleDuration, vsync: this)
+    m_controller = AnimationController(duration: _kBaseSettleDuration, vsync: this)
       ..addListener(_animationChanged)
       ..addStatusListener(_animationStatusChanged);
   }
 
   @override
   void dispose() {
-    _historyEntry?.remove();
-    _controller.dispose();
+    m_historyEntry?.remove();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -219,16 +219,16 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
     });
   }
 
-  LocalHistoryEntry _historyEntry;
-  final FocusScopeNode _focusScopeNode = FocusScopeNode();
+  LocalHistoryEntry m_historyEntry;
+  final FocusScopeNode m_focusScopeNode = FocusScopeNode();
 
   void _ensureHistoryEntry() {
-    if (_historyEntry == null) {
+    if (m_historyEntry == null) {
       final ModalRoute<dynamic> route = ModalRoute.of(context);
       if (route != null) {
-        _historyEntry = LocalHistoryEntry(onRemove: _handleHistoryEntryRemoved);
-        route.addLocalHistoryEntry(_historyEntry);
-        FocusScope.of(context).setFirstFocus(_focusScopeNode);
+        m_historyEntry = LocalHistoryEntry(onRemove: _handleHistoryEntryRemoved);
+        route.addLocalHistoryEntry(m_historyEntry);
+        FocusScope.of(context).setFirstFocus(m_focusScopeNode);
       }
     }
   }
@@ -239,8 +239,8 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
         _ensureHistoryEntry();
         break;
       case AnimationStatus.reverse:
-        _historyEntry?.remove();
-        _historyEntry = null;
+        m_historyEntry?.remove();
+        m_historyEntry = null;
         break;
       case AnimationStatus.dismissed:
         break;
@@ -250,21 +250,21 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
   }
 
   void _handleHistoryEntryRemoved() {
-    _historyEntry = null;
+    m_historyEntry = null;
     close();
   }
 
-  AnimationController _controller;
+  AnimationController m_controller;
 
   void _handleDragDown(DragDownDetails details) {
-    _controller.stop();
+    m_controller.stop();
     _ensureHistoryEntry();
   }
 
   void _handleDragCancel() {
-    if (_controller.isDismissed || _controller.isAnimating)
+    if (m_controller.isDismissed || m_controller.isAnimating)
       return;
-    if (_controller.value < 0.5) {
+    if (m_controller.value < 0.5) {
       close();
     } else {
       open();
@@ -293,21 +293,21 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
     }
     switch (Directionality.of(context)) {
       case TextDirection.rtl:
-        _controller.value -= delta;
+        m_controller.value -= delta;
         break;
       case TextDirection.ltr:
-        _controller.value += delta;
+        m_controller.value += delta;
         break;
     }
 
-    final bool opened = _controller.value > 0.5 ? true : false;
+    final bool opened = m_controller.value > 0.5 ? true : false;
     if (opened != _previouslyOpened && widget.drawerCallback != null)
       widget.drawerCallback(opened);
     _previouslyOpened = opened;
   }
 
   void _settle(DragEndDetails details) {
-    if (_controller.isDismissed)
+    if (m_controller.isDismissed)
       return;
     if (details.velocity.pixelsPerSecond.dx.abs() >= _kMinFlingVelocity) {
       double visualVelocity = details.velocity.pixelsPerSecond.dx / _width;
@@ -320,13 +320,13 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
       }
       switch (Directionality.of(context)) {
       case TextDirection.rtl:
-        _controller.fling(velocity: -visualVelocity);
+        m_controller.fling(velocity: -visualVelocity);
         break;
       case TextDirection.ltr:
-        _controller.fling(velocity: visualVelocity);
+        m_controller.fling(velocity: visualVelocity);
         break;
       }
-    } else if (_controller.value < 0.5) {
+    } else if (m_controller.value < 0.5) {
       close();
     } else {
       open();
@@ -337,14 +337,14 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
   ///
   /// Typically called by [ScaffoldState.openDrawer].
   void open() {
-    _controller.fling(velocity: 1.0);
+    m_controller.fling(velocity: 1.0);
     if (widget.drawerCallback != null)
       widget.drawerCallback(true);
   }
 
   /// Starts an animation to close the drawer.
   void close() {
-    _controller.fling(velocity: -1.0);
+    m_controller.fling(velocity: -1.0);
     if (widget.drawerCallback != null)
       widget.drawerCallback(false);
   }
@@ -375,7 +375,7 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
   }
 
   Widget _buildDrawer(BuildContext context) {
-    if (_controller.status == AnimationStatus.dismissed) {
+    if (m_controller.status == AnimationStatus.dismissed) {
       return Align(
         alignment: _drawerOuterAlignment,
         child: GestureDetector(
@@ -406,7 +406,7 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
                   child: Semantics(
                     label: MaterialLocalizations.of(context)?.modalBarrierDismissLabel,
                     child: Container(
-                      color: _color.evaluate(_controller),
+                      color: _color.evaluate(m_controller),
                     ),
                   ),
                 ),
@@ -415,11 +415,11 @@ class DrawerControllerState extends State<DrawerController> with SingleTickerPro
                 alignment: _drawerOuterAlignment,
                 child: Align(
                   alignment: _drawerInnerAlignment,
-                  widthFactor: _controller.value,
+                  widthFactor: m_controller.value,
                   child: RepaintBoundary(
                     child: FocusScope(
                       key: _drawerKey,
-                      node: _focusScopeNode,
+                      node: m_focusScopeNode,
                       child: widget.child
                     ),
                   ),

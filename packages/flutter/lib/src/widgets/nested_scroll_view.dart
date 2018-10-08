@@ -1368,7 +1368,7 @@ class RenderSliverOverlapAbsorber extends RenderSliver with RenderObjectWithChil
   RenderSliverOverlapAbsorber({
     @required SliverOverlapAbsorberHandle handle,
     RenderSliver child,
-  }) : assert(handle != null), _handle = handle {
+  }) : assert(handle != null), m_handle = handle {
     this.child = child;
   }
 
@@ -1376,8 +1376,8 @@ class RenderSliverOverlapAbsorber extends RenderSliver with RenderObjectWithChil
   ///
   /// A particular [SliverOverlapAbsorberHandle] can only be assigned to a
   /// single [RenderSliverOverlapAbsorber] at a time.
-  SliverOverlapAbsorberHandle get handle => _handle;
-  SliverOverlapAbsorberHandle _handle;
+  SliverOverlapAbsorberHandle get handle => m_handle;
+  SliverOverlapAbsorberHandle m_handle;
   set handle(SliverOverlapAbsorberHandle value) {
     assert(value != null);
     if (handle == value)
@@ -1387,7 +1387,7 @@ class RenderSliverOverlapAbsorber extends RenderSliver with RenderObjectWithChil
       value._writers += 1;
       value._setExtents(handle.layoutExtent, handle.scrollExtent);
     }
-    _handle = value;
+    m_handle = value;
   }
 
   @override

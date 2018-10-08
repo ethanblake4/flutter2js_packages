@@ -147,37 +147,37 @@ class TwoLevelSublist extends StatefulWidget {
 
 @deprecated
 class _TwoLevelSublistState extends State<TwoLevelSublist> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  CurvedAnimation _easeOutAnimation;
-  CurvedAnimation _easeInAnimation;
-  ColorTween _borderColor;
-  ColorTween _headerColor;
-  ColorTween _iconColor;
-  ColorTween _backgroundColor;
-  Animation<double> _iconTurns;
+  AnimationController mcontroller;
+  CurvedAnimation measeOutAnimation;
+  CurvedAnimation m_easeInAnimation;
+  ColorTween m_borderColor;
+  ColorTween m_headerColor;
+  ColorTween m_iconColor;
+  ColorTween m_backgroundColor;
+  Animation<double> m_iconTurns;
 
   bool _isExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: _kExpand, vsync: this);
-    _easeOutAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _easeInAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    _borderColor = ColorTween(begin: Colors.transparent);
-    _headerColor = ColorTween();
-    _iconColor = ColorTween();
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(_easeInAnimation);
-    _backgroundColor = ColorTween();
+    mcontroller = AnimationController(duration: _kExpand, vsync: this);
+    measeOutAnimation = CurvedAnimation(parent: mcontroller, curve: Curves.easeOut);
+    m_easeInAnimation = CurvedAnimation(parent: mcontroller, curve: Curves.easeIn);
+    m_borderColor = ColorTween(begin: Colors.transparent);
+    m_headerColor = ColorTween();
+    m_iconColor = ColorTween();
+    m_iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(m_easeInAnimation);
+    m_backgroundColor = ColorTween();
 
     _isExpanded = PageStorage.of(context)?.readState(context) ?? false;
     if (_isExpanded)
-      _controller.value = 1.0;
+      mcontroller.value = 1.0;
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    mcontroller.dispose();
     super.dispose();
   }
 
@@ -185,9 +185,9 @@ class _TwoLevelSublistState extends State<TwoLevelSublist> with SingleTickerProv
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded)
-        _controller.forward();
+        mcontroller.forward();
       else
-        _controller.reverse();
+        mcontroller.reverse();
       PageStorage.of(context)?.writeState(context, _isExpanded);
     });
     if (widget.onOpenChanged != null)
@@ -197,32 +197,32 @@ class _TwoLevelSublistState extends State<TwoLevelSublist> with SingleTickerProv
   Widget buildList(BuildContext context, Widget child) {
     return Container(
       decoration: BoxDecoration(
-        color: _backgroundColor.evaluate(_easeOutAnimation),
+        color: m_backgroundColor.evaluate(measeOutAnimation),
         border: Border(
-          top: BorderSide(color: _borderColor.evaluate(_easeOutAnimation)),
-          bottom: BorderSide(color: _borderColor.evaluate(_easeOutAnimation))
+          top: BorderSide(color: m_borderColor.evaluate(measeOutAnimation)),
+          bottom: BorderSide(color: m_borderColor.evaluate(measeOutAnimation))
         )
       ),
       child: Column(
         children: <Widget>[
           IconTheme.merge(
-            data: IconThemeData(color: _iconColor.evaluate(_easeInAnimation)),
+            data: IconThemeData(color: m_iconColor.evaluate(m_easeInAnimation)),
             child: TwoLevelListItem(
               onTap: _handleOnTap,
               leading: widget.leading,
               title: DefaultTextStyle(
-                style: Theme.of(context).textTheme.subhead.copyWith(color: _headerColor.evaluate(_easeInAnimation)),
+                style: Theme.of(context).textTheme.subhead.copyWith(color: m_headerColor.evaluate(m_easeInAnimation)),
                 child: widget.title
               ),
               trailing: RotationTransition(
-                turns: _iconTurns,
+                turns: m_iconTurns,
                 child: const Icon(Icons.expand_more)
               )
             )
           ),
           ClipRect(
             child: Align(
-              heightFactor: _easeInAnimation.value,
+              heightFactor: m_easeInAnimation.value,
               child: Column(children: widget.children)
             )
           )
@@ -234,19 +234,19 @@ class _TwoLevelSublistState extends State<TwoLevelSublist> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    _borderColor.end = theme.dividerColor;
-    _headerColor
+    m_borderColor.end = theme.dividerColor;
+    m_headerColor
       ..begin = theme.textTheme.subhead.color
       ..end = theme.accentColor;
-    _iconColor
+    m_iconColor
       ..begin = theme.unselectedWidgetColor
       ..end = theme.accentColor;
-    _backgroundColor
+    m_backgroundColor
       ..begin = Colors.transparent
       ..end = widget.backgroundColor ?? Colors.transparent;
 
     return AnimatedBuilder(
-      animation: _controller.view,
+      animation: mcontroller.view,
       builder: buildList
     );
   }

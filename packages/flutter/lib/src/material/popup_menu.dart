@@ -378,14 +378,14 @@ class CheckedPopupMenuItem<T> extends PopupMenuItem<T> {
 }
 
 class _CheckedPopupMenuItemState<T> extends PopupMenuItemState<T, CheckedPopupMenuItem<T>> with SingleTickerProviderStateMixin {
-  static const Duration _fadeDuration = Duration(milliseconds: 150);
-  AnimationController _controller;
-  Animation<double> get _opacity => _controller.view;
+  static const Duration m_fadeDuration = Duration(milliseconds: 150);
+  AnimationController m_controller;
+  Animation<double> get m_opacity => m_controller.view;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: _fadeDuration, vsync: this)
+    m_controller = AnimationController(duration: m_fadeDuration, vsync: this)
       ..value = widget.checked ? 1.0 : 0.0
       ..addListener(() => setState(() { /* animation changed */ }));
   }
@@ -394,9 +394,9 @@ class _CheckedPopupMenuItemState<T> extends PopupMenuItemState<T, CheckedPopupMe
   void handleTap() {
     // This fades the checkmark in or out when tapped.
     if (widget.checked)
-      _controller.reverse();
+      m_controller.reverse();
     else
-      _controller.forward();
+      m_controller.forward();
     super.handleTap();
   }
 
@@ -405,8 +405,8 @@ class _CheckedPopupMenuItemState<T> extends PopupMenuItemState<T, CheckedPopupMe
     return ListTile(
       enabled: widget.enabled,
       leading: FadeTransition(
-        opacity: _opacity,
-        child: Icon(_controller.isDismissed ? null : Icons.done)
+        opacity: m_opacity,
+        child: Icon(m_controller.isDismissed ? null : Icons.done)
       ),
       title: widget.child,
     );

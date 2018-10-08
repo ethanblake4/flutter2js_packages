@@ -112,10 +112,10 @@ class Radio<T> extends StatefulWidget {
 }
 
 class _RadioState<T> extends State<Radio<T>> with TickerProviderStateMixin {
-  bool get _enabled => widget.onChanged != null;
+  bool get m_enabled => widget.onChanged != null;
 
   Color _getInactiveColor(ThemeData themeData) {
-    return _enabled ? themeData.unselectedWidgetColor : themeData.disabledColor;
+    return m_enabled ? themeData.unselectedWidgetColor : themeData.disabledColor;
   }
 
   void _handleChanged(bool selected) {
@@ -141,7 +141,7 @@ class _RadioState<T> extends State<Radio<T>> with TickerProviderStateMixin {
       selected: widget.value == widget.groupValue,
       activeColor: widget.activeColor ?? themeData.toggleableActiveColor,
       inactiveColor: _getInactiveColor(themeData),
-      onChanged: _enabled ? _handleChanged : null,
+      onChanged: m_enabled ? _handleChanged : null,
       additionalConstraints: additionalConstraints,
       vsync: this,
     );

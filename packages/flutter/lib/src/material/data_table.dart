@@ -686,18 +686,18 @@ class _SortArrow extends StatefulWidget {
 class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
 
   AnimationController _opacityController;
-  Animation<double> _opacityAnimation;
+  Animation<double> m_opacityAnimation;
 
-  AnimationController _orientationController;
-  Animation<double> _orientationAnimation;
-  double _orientationOffset = 0.0;
+  AnimationController m_orientationController;
+  Animation<double> m_orientationAnimation;
+  double m_orientationOffset = 0.0;
 
   bool _down;
 
   @override
   void initState() {
     super.initState();
-    _opacityAnimation = CurvedAnimation(
+    m_opacityAnimation = CurvedAnimation(
       parent: _opacityController = AnimationController(
         duration: widget.duration,
         vsync: this,
@@ -706,11 +706,11 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
     )
     ..addListener(_rebuild);
     _opacityController.value = widget.visible ? 1.0 : 0.0;
-    _orientationAnimation = Tween<double>(
+    m_orientationAnimation = Tween<double>(
       begin: 0.0,
       end: math.pi,
     ).animate(CurvedAnimation(
-      parent: _orientationController = AnimationController(
+      parent: m_orientationController = AnimationController(
         duration: widget.duration,
         vsync: this,
       ),
@@ -719,7 +719,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
     ..addListener(_rebuild)
     ..addStatusListener(_resetOrientationAnimation);
     if (widget.visible)
-      _orientationOffset = widget.down ? 0.0 : math.pi;
+      m_orientationOffset = widget.down ? 0.0 : math.pi;
   }
 
   void _rebuild() {
@@ -730,9 +730,9 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
 
   void _resetOrientationAnimation(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
-      assert(_orientationAnimation.value == math.pi);
-      _orientationOffset += math.pi;
-      _orientationController.value = 0.0; // TODO(ianh): This triggers a pointless rebuild.
+      assert(m_orientationAnimation.value == math.pi);
+      m_orientationOffset += math.pi;
+      m_orientationController.value = 0.0; // TODO(ianh): This triggers a pointless rebuild.
     }
   }
 
@@ -743,9 +743,9 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
     final bool newDown = widget.down != null ? widget.down : _down;
     if (oldWidget.visible != widget.visible) {
       if (widget.visible && (_opacityController.status == AnimationStatus.dismissed)) {
-        _orientationController.stop();
-        _orientationController.value = 0.0;
-        _orientationOffset = newDown ? 0.0 : math.pi;
+        m_orientationController.stop();
+        m_orientationController.value = 0.0;
+        m_orientationOffset = newDown ? 0.0 : math.pi;
         skipArrow = true;
       }
       if (widget.visible) {
@@ -755,10 +755,10 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
       }
     }
     if ((_down != newDown) && !skipArrow) {
-      if (_orientationController.status == AnimationStatus.dismissed) {
-        _orientationController.forward();
+      if (m_orientationController.status == AnimationStatus.dismissed) {
+        m_orientationController.forward();
       } else {
-        _orientationController.reverse();
+        m_orientationController.reverse();
       }
     }
     _down = newDown;
@@ -767,7 +767,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   @override
   void dispose() {
     _opacityController.dispose();
-    _orientationController.dispose();
+    m_orientationController.dispose();
     super.dispose();
   }
 
@@ -777,9 +777,9 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: _opacityAnimation.value,
+      opacity: m_opacityAnimation.value,
       child: Transform(
-        transform: Matrix4.rotationZ(_orientationOffset + _orientationAnimation.value)
+        transform: Matrix4.rotationZ(m_orientationOffset + m_orientationAnimation.value)
                              ..setTranslationRaw(0.0, _arrowIconBaselineOffset, 0.0),
         alignment: Alignment.center,
         child: Icon(

@@ -191,31 +191,31 @@ class LinearProgressIndicator extends ProgressIndicator {
 }
 
 class _LinearProgressIndicatorState extends State<LinearProgressIndicator> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  AnimationController m_controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    m_controller = AnimationController(
       duration: const Duration(milliseconds: _kIndeterminateLinearDuration),
       vsync: this,
     );
     if (widget.value == null)
-      _controller.repeat();
+      m_controller.repeat();
   }
 
   @override
   void didUpdateWidget(LinearProgressIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.value == null && !_controller.isAnimating)
-      _controller.repeat();
-    else if (widget.value != null && _controller.isAnimating)
-      _controller.stop();
+    if (widget.value == null && !m_controller.isAnimating)
+      m_controller.repeat();
+    else if (widget.value != null && m_controller.isAnimating)
+      m_controller.stop();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -242,12 +242,12 @@ class _LinearProgressIndicatorState extends State<LinearProgressIndicator> with 
     final TextDirection textDirection = Directionality.of(context);
 
     if (widget.value != null)
-      return _buildIndicator(context, _controller.value, textDirection);
+      return _buildIndicator(context, m_controller.value, textDirection);
 
     return AnimatedBuilder(
-      animation: _controller.view,
+      animation: m_controller.view,
       builder: (BuildContext context, Widget child) {
-        return _buildIndicator(context, _controller.value, textDirection);
+        return _buildIndicator(context, m_controller.value, textDirection);
       },
     );
   }
@@ -368,31 +368,31 @@ final Animatable<int> _kStepTween = StepTween(begin: 0, end: 5);
 final Animatable<double> _kRotationTween = CurveTween(curve: const SawTooth(5));
 
 class _CircularProgressIndicatorState extends State<CircularProgressIndicator> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  AnimationController m_controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    m_controller = AnimationController(
       duration: const Duration(seconds: 5),
       vsync: this,
     );
     if (widget.value == null)
-      _controller.repeat();
+      m_controller.repeat();
   }
 
   @override
   void didUpdateWidget(CircularProgressIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.value == null && !_controller.isAnimating)
-      _controller.repeat();
-    else if (widget.value != null && _controller.isAnimating)
-      _controller.stop();
+    if (widget.value == null && !m_controller.isAnimating)
+      m_controller.repeat();
+    else if (widget.value != null && m_controller.isAnimating)
+      m_controller.stop();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    m_controller.dispose();
     super.dispose();
   }
 
@@ -418,14 +418,14 @@ class _CircularProgressIndicatorState extends State<CircularProgressIndicator> w
 
   Widget _buildAnimation() {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: m_controller,
       builder: (BuildContext context, Widget child) {
         return _buildIndicator(
           context,
-          _kStrokeHeadTween.evaluate(_controller),
-          _kStrokeTailTween.evaluate(_controller),
-          _kStepTween.evaluate(_controller),
-          _kRotationTween.evaluate(_controller),
+          _kStrokeHeadTween.evaluate(m_controller),
+          _kStrokeTailTween.evaluate(m_controller),
+          _kStepTween.evaluate(m_controller),
+          _kRotationTween.evaluate(m_controller),
         );
       },
     );
@@ -538,9 +538,9 @@ class _RefreshProgressIndicatorState extends _CircularProgressIndicatorState {
   @override
   Widget build(BuildContext context) {
     if (widget.value != null)
-      _controller.value = widget.value / 10.0;
-    else if (!_controller.isAnimating)
-      _controller.repeat();
+      m_controller.value = widget.value / 10.0;
+    else if (!m_controller.isAnimating)
+      m_controller.repeat();
     return _buildAnimation();
   }
 

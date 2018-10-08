@@ -1005,13 +1005,13 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _updateDialRingFromWidget();
-    _thetaController = AnimationController(
+    m_thetaController = AnimationController(
       duration: _kDialAnimateDuration,
       vsync: this,
     );
-    _thetaTween = Tween<double>(begin: _getThetaForTime(widget.selectedTime));
-    _theta = _thetaTween.animate(CurvedAnimation(
-      parent: _thetaController,
+    m_thetaTween = Tween<double>(begin: _getThetaForTime(widget.selectedTime));
+    m_theta = m_thetaTween.animate(CurvedAnimation(
+      parent: m_thetaController,
       curve: Curves.fastOutSlowIn
     ))..addListener(() => setState(() { }));
   }
@@ -1034,44 +1034,44 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     _updateDialRingFromWidget();
     if (widget.mode != oldWidget.mode || widget.selectedTime != oldWidget.selectedTime) {
-      if (!_dragging)
+      if (!m_dragging)
         _animateTo(_getThetaForTime(widget.selectedTime));
     }
   }
 
   void _updateDialRingFromWidget() {
     if (widget.mode == _TimePickerMode.hour && widget.use24HourDials) {
-      _activeRing = widget.selectedTime.hour >= 1 && widget.selectedTime.hour <= 12
+      m_activeRing = widget.selectedTime.hour >= 1 && widget.selectedTime.hour <= 12
           ? _DialRing.inner
           : _DialRing.outer;
     } else {
-      _activeRing = _DialRing.outer;
+      m_activeRing = _DialRing.outer;
     }
   }
 
   @override
   void dispose() {
-    _thetaController.dispose();
+    m_thetaController.dispose();
     super.dispose();
   }
 
-  Tween<double> _thetaTween;
-  Animation<double> _theta;
-  AnimationController _thetaController;
-  bool _dragging = false;
+  Tween<double> m_thetaTween;
+  Animation<double> m_theta;
+  AnimationController m_thetaController;
+  bool m_dragging = false;
 
   static double _nearest(double target, double a, double b) {
     return ((target - a).abs() < (target - b).abs()) ? a : b;
   }
 
   void _animateTo(double targetTheta) {
-    final double currentTheta = _theta.value;
+    final double currentTheta = m_theta.value;
     double beginTheta = _nearest(targetTheta, currentTheta, currentTheta + _kTwoPi);
     beginTheta = _nearest(targetTheta, beginTheta, currentTheta - _kTwoPi);
-    _thetaTween
+    m_thetaTween
       ..begin = beginTheta
       ..end = targetTheta;
-    _thetaController
+    m_thetaController
       ..value = 0.0
       ..forward();
   }
@@ -1088,7 +1088,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     if (widget.mode == _TimePickerMode.hour) {
       int newHour = (fraction * TimeOfDay.hoursPerPeriod).round() % TimeOfDay.hoursPerPeriod;
       if (widget.use24HourDials) {
-        if (_activeRing == _DialRing.outer) {
+        if (m_activeRing == _DialRing.outer) {
           if (newHour != 0)
             newHour = (newHour + TimeOfDay.hoursPerPeriod) % TimeOfDay.hoursPerDay;
         } else if (newHour == 0) {
@@ -1106,7 +1106,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   TimeOfDay _notifyOnChangedIfNeeded() {
-    final TimeOfDay current = _getTimeForTheta(_theta.value);
+    final TimeOfDay current = _getTimeForTheta(m_theta.value);
     if (widget.onChanged == null)
       return current;
     if (current != widget.selectedTime)
@@ -1116,54 +1116,54 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
 
   void _updateThetaForPan() {
     setState(() {
-      final Offset offset = _position - _center;
+      final Offset offset = m_position - m_center;
       final double angle = (math.atan2(offset.dx, offset.dy) - math.pi / 2.0) % _kTwoPi;
-      _thetaTween
+      m_thetaTween
         ..begin = angle
         ..end = angle; // The controller doesn't animate during the pan gesture.
       final RenderBox box = context.findRenderObject();
       final double radius = box.size.shortestSide / 2.0;
       if (widget.mode == _TimePickerMode.hour && widget.use24HourDials) {
         if (offset.distance * 1.5 < radius)
-          _activeRing = _DialRing.inner;
+          m_activeRing = _DialRing.inner;
         else
-          _activeRing = _DialRing.outer;
+          m_activeRing = _DialRing.outer;
       }
     });
   }
 
-  Offset _position;
-  Offset _center;
-  _DialRing _activeRing = _DialRing.outer;
+  Offset m_position;
+  Offset m_center;
+  _DialRing m_activeRing = _DialRing.outer;
 
   void _handlePanStart(DragStartDetails details) {
-    assert(!_dragging);
-    _dragging = true;
+    assert(!m_dragging);
+    m_dragging = true;
     final RenderBox box = context.findRenderObject();
-    _position = box.globalToLocal(details.globalPosition);
-    _center = box.size.center(Offset.zero);
+    m_position = box.globalToLocal(details.globalPosition);
+    m_center = box.size.center(Offset.zero);
     _updateThetaForPan();
     _notifyOnChangedIfNeeded();
   }
 
   void _handlePanUpdate(DragUpdateDetails details) {
-    _position += details.delta;
+    m_position += details.delta;
     _updateThetaForPan();
     _notifyOnChangedIfNeeded();
   }
 
   void _handlePanEnd(DragEndDetails details) {
-    assert(_dragging);
-    _dragging = false;
-    _position = null;
-    _center = null;
+    assert(m_dragging);
+    m_dragging = false;
+    m_position = null;
+    m_center = null;
     _animateTo(_getThetaForTime(widget.selectedTime));
   }
 
   void _handleTapUp(TapUpDetails details) {
     final RenderBox box = context.findRenderObject();
-    _position = box.globalToLocal(details.globalPosition);
-    _center = box.size.center(Offset.zero);
+    m_position = box.globalToLocal(details.globalPosition);
+    m_center = box.size.center(Offset.zero);
     _updateThetaForPan();
     final TimeOfDay newTime = _notifyOnChangedIfNeeded();
     if (widget.mode == _TimePickerMode.hour) {
@@ -1175,22 +1175,22 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     } else {
       _announceToAccessibility(context, localizations.formatDecimal(newTime.minute));
     }
-    _animateTo(_getThetaForTime(_getTimeForTheta(_theta.value)));
-    _dragging = false;
-    _position = null;
-    _center = null;
+    _animateTo(_getThetaForTime(_getTimeForTheta(m_theta.value)));
+    m_dragging = false;
+    m_position = null;
+    m_center = null;
   }
 
   void _selectHour(int hour) {
     _announceToAccessibility(context, localizations.formatDecimal(hour));
     TimeOfDay time;
     if (widget.mode == _TimePickerMode.hour && widget.use24HourDials) {
-      _activeRing = hour >= 1 && hour <= 12
+      m_activeRing = hour >= 1 && hour <= 12
           ? _DialRing.inner
           : _DialRing.outer;
       time = TimeOfDay(hour: hour, minute: widget.selectedTime.minute);
     } else {
-      _activeRing = _DialRing.outer;
+      m_activeRing = _DialRing.outer;
       if (widget.selectedTime.period == DayPeriod.am) {
         time = TimeOfDay(hour: hour, minute: widget.selectedTime.minute);
       } else {
@@ -1198,7 +1198,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
       }
     }
     final double angle = _getThetaForTime(time);
-    _thetaTween
+    m_thetaTween
       ..begin = angle
       ..end = angle;
     _notifyOnChangedIfNeeded();
@@ -1211,7 +1211,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
       minute: minute,
     );
     final double angle = _getThetaForTime(time);
-    _thetaTween
+    m_thetaTween
       ..begin = angle
       ..end = angle;
     _notifyOnChangedIfNeeded();
@@ -1393,8 +1393,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
           secondaryInnerLabels: secondaryInnerLabels,
           backgroundColor: backgroundColor,
           accentColor: themeData.accentColor,
-          theta: _theta.value,
-          activeRing: _activeRing,
+          theta: m_theta.value,
+          activeRing: m_activeRing,
           textDirection: Directionality.of(context),
         ),
       )

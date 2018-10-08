@@ -129,26 +129,26 @@ class GlowingOverscrollIndicator extends StatefulWidget {
 }
 
 class _GlowingOverscrollIndicatorState extends State<GlowingOverscrollIndicator> with TickerProviderStateMixin {
-  _GlowController _leadingController;
-  _GlowController _trailingController;
-  Listenable _leadingAndTrailingListener;
+  _GlowController m_leadingController;
+  _GlowController m_trailingController;
+  Listenable m_leadingAndTrailingListener;
 
   @override
   void initState() {
     super.initState();
-    _leadingController = _GlowController(vsync: this, color: widget.color, axis: widget.axis);
-    _trailingController = _GlowController(vsync: this, color: widget.color, axis: widget.axis);
-    _leadingAndTrailingListener = Listenable.merge(<Listenable>[_leadingController, _trailingController]);
+    m_leadingController = _GlowController(vsync: this, color: widget.color, axis: widget.axis);
+    m_trailingController = _GlowController(vsync: this, color: widget.color, axis: widget.axis);
+    m_leadingAndTrailingListener = Listenable.merge(<Listenable>[m_leadingController, m_trailingController]);
   }
 
   @override
   void didUpdateWidget(GlowingOverscrollIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.color != widget.color || oldWidget.axis != widget.axis) {
-      _leadingController.color = widget.color;
-      _leadingController.axis = widget.axis;
-      _trailingController.color = widget.color;
-      _trailingController.axis = widget.axis;
+      m_leadingController.color = widget.color;
+      m_leadingController.axis = widget.axis;
+      m_trailingController.color = widget.color;
+      m_trailingController.axis = widget.axis;
     }
   }
 
@@ -161,17 +161,17 @@ class _GlowingOverscrollIndicatorState extends State<GlowingOverscrollIndicator>
     if (notification is OverscrollNotification) {
       _GlowController controller;
       if (notification.overscroll < 0.0) {
-        controller = _leadingController;
+        controller = m_leadingController;
       } else if (notification.overscroll > 0.0) {
-        controller = _trailingController;
+        controller = m_trailingController;
       } else {
         assert(false);
       }
-      final bool isLeading = controller == _leadingController;
+      final bool isLeading = controller == m_leadingController;
       if (_lastNotificationType != OverscrollNotification) {
         final OverscrollIndicatorNotification confirmationNotification = OverscrollIndicatorNotification(leading: isLeading);
         confirmationNotification.dispatch(context);
-        _accepted[isLeading] = confirmationNotification._accepted;
+        _accepted[isLeading] = confirmationNotification.m_accepted;
       }
       assert(controller != null);
       assert(notification.metrics.axis == widget.axis);
@@ -201,8 +201,8 @@ class _GlowingOverscrollIndicatorState extends State<GlowingOverscrollIndicator>
       }
     } else if (notification is ScrollEndNotification || notification is ScrollUpdateNotification) {
       if ((notification as dynamic).dragDetails != null) {
-        _leadingController.scrollEnd();
-        _trailingController.scrollEnd();
+        m_leadingController.scrollEnd();
+        m_trailingController.scrollEnd();
       }
     }
     _lastNotificationType = notification.runtimeType;
@@ -211,8 +211,8 @@ class _GlowingOverscrollIndicatorState extends State<GlowingOverscrollIndicator>
 
   @override
   void dispose() {
-    _leadingController.dispose();
-    _trailingController.dispose();
+    m_leadingController.dispose();
+    m_trailingController.dispose();
     super.dispose();
   }
 
@@ -223,10 +223,10 @@ class _GlowingOverscrollIndicatorState extends State<GlowingOverscrollIndicator>
       child: RepaintBoundary(
         child: CustomPaint(
           foregroundPainter: _GlowingOverscrollIndicatorPainter(
-            leadingController: widget.showLeading ? _leadingController : null,
-            trailingController: widget.showTrailing ? _trailingController : null,
+            leadingController: widget.showLeading ? m_leadingController : null,
+            trailingController: widget.showTrailing ? m_trailingController : null,
             axisDirection: widget.axisDirection,
-            repaint: _leadingAndTrailingListener,
+            repaint: m_leadingAndTrailingListener,
           ),
           child: RepaintBoundary(
             child: widget.child,
@@ -547,11 +547,11 @@ class OverscrollIndicatorNotification extends Notification with ViewportNotifica
   /// view.
   final bool leading;
 
-  bool _accepted = true;
+  bool m_accepted = true;
 
   /// Call this method if the glow should be prevented.
   void disallowGlow() {
-    _accepted = false;
+    m_accepted = false;
   }
 
   @override

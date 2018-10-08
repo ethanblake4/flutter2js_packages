@@ -329,46 +329,46 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
   }) : assert(axisDirection != null),
        assert(offset != null),
        assert(cacheExtent != null),
-       _axisDirection = axisDirection,
-       _offset = offset,
-       _cacheExtent = cacheExtent {
+       m_axisDirection = axisDirection,
+       m_offset = offset,
+       m_cacheExtent = cacheExtent {
     this.child = child;
   }
 
-  AxisDirection get axisDirection => _axisDirection;
-  AxisDirection _axisDirection;
+  AxisDirection get axisDirection => m_axisDirection;
+  AxisDirection m_axisDirection;
   set axisDirection(AxisDirection value) {
     assert(value != null);
-    if (value == _axisDirection)
+    if (value == m_axisDirection)
       return;
-    _axisDirection = value;
+    m_axisDirection = value;
     markNeedsLayout();
   }
 
   Axis get axis => axisDirectionToAxis(axisDirection);
 
-  ViewportOffset get offset => _offset;
-  ViewportOffset _offset;
+  ViewportOffset get offset => m_offset;
+  ViewportOffset m_offset;
   set offset(ViewportOffset value) {
     assert(value != null);
-    if (value == _offset)
+    if (value == m_offset)
       return;
     if (attached)
-      _offset.removeListener(_hasScrolled);
-    _offset = value;
+      m_offset.removeListener(_hasScrolled);
+    m_offset = value;
     if (attached)
-      _offset.addListener(_hasScrolled);
+      m_offset.addListener(_hasScrolled);
     markNeedsLayout();
   }
 
   /// {@macro flutter.rendering.viewport.cacheExtent}
-  double get cacheExtent => _cacheExtent;
-  double _cacheExtent;
+  double get cacheExtent => m_cacheExtent;
+  double m_cacheExtent;
   set cacheExtent(double value) {
     assert(value != null);
-    if (value == _cacheExtent)
+    if (value == m_cacheExtent)
       return;
-    _cacheExtent = value;
+    m_cacheExtent = value;
     markNeedsLayout();
   }
 
@@ -388,19 +388,19 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    _offset.addListener(_hasScrolled);
+    m_offset.addListener(_hasScrolled);
   }
 
   @override
   void detach() {
-    _offset.removeListener(_hasScrolled);
+    m_offset.removeListener(_hasScrolled);
     super.detach();
   }
 
   @override
   bool get isRepaintBoundary => true;
 
-  double get _viewportExtent {
+  double get m_viewportExtent {
     assert(hasSize);
     switch (axis) {
       case Axis.horizontal:
@@ -411,12 +411,12 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
     return null;
   }
 
-  double get _minScrollExtent {
+  double get m_minScrollExtent {
     assert(hasSize);
     return 0.0;
   }
 
-  double get _maxScrollExtent {
+  double get m_maxScrollExtent {
     assert(hasSize);
     if (child == null)
       return 0.0;
@@ -481,11 +481,11 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
       size = constraints.constrain(child.size);
     }
 
-    offset.applyViewportDimension(_viewportExtent);
-    offset.applyContentDimensions(_minScrollExtent, _maxScrollExtent);
+    offset.applyViewportDimension(m_viewportExtent);
+    offset.applyContentDimensions(m_minScrollExtent, m_maxScrollExtent);
   }
 
-  Offset get _paintOffset => _paintOffsetForPosition(offset.pixels);
+  Offset get m_paintOffset => _paintOffsetForPosition(offset.pixels);
 
   Offset _paintOffsetForPosition(double position) {
     assert(axisDirection != null);
@@ -510,7 +510,7 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
   @override
   void paint(PaintingContext context, Offset offset) {
     if (child != null) {
-      final Offset paintOffset = _paintOffset;
+      final Offset paintOffset = m_paintOffset;
 
       void paintContents(PaintingContext context, Offset offset) {
         context.paintChild(child, offset + paintOffset);
@@ -526,13 +526,13 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
 
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
-    final Offset paintOffset = _paintOffset;
+    final Offset paintOffset = m_paintOffset;
     transform.translate(paintOffset.dx, paintOffset.dy);
   }
 
   @override
   Rect describeApproximatePaintClip(RenderObject child) {
-    if (child != null && _shouldClipAtPaintOffset(_paintOffset))
+    if (child != null && _shouldClipAtPaintOffset(m_paintOffset))
       return Offset.zero & size;
     return null;
   }
@@ -540,7 +540,7 @@ class _RenderSingleChildViewport extends RenderBox with RenderObjectWithChildMix
   @override
   bool hitTestChildren(HitTestResult result, { Offset position }) {
     if (child != null) {
-      final Offset transformed = position + -_paintOffset;
+      final Offset transformed = position + -m_paintOffset;
       return child.hitTest(result, position: transformed);
     }
     return false;

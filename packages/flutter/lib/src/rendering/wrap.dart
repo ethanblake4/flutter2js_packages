@@ -123,14 +123,14 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
        assert(runAlignment != null),
        assert(runSpacing != null),
        assert(crossAxisAlignment != null),
-       _direction = direction,
-       _alignment = alignment,
-       _spacing = spacing,
-       _runAlignment = runAlignment,
-       _runSpacing = runSpacing,
-       _crossAxisAlignment = crossAxisAlignment,
-       _textDirection = textDirection,
-       _verticalDirection = verticalDirection {
+       m_direction = direction,
+       m_alignment = alignment,
+       m_spacing = spacing,
+       m_runAlignment = runAlignment,
+       m_runSpacing = runSpacing,
+       m_crossAxisAlignment = crossAxisAlignment,
+       m_textDirection = textDirection,
+       m_verticalDirection = verticalDirection {
     addAll(children);
   }
 
@@ -140,13 +140,13 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   /// children are placed adjacent to one another in a horizontal run until the
   /// available horizontal space is consumed, at which point a subsequent
   /// children are placed in a new run vertically adjacent to the previous run.
-  Axis get direction => _direction;
-  Axis _direction;
+  Axis get direction => m_direction;
+  Axis m_direction;
   set direction (Axis value) {
     assert(value != null);
-    if (_direction == value)
+    if (m_direction == value)
       return;
-    _direction = value;
+    m_direction = value;
     markNeedsLayout();
   }
 
@@ -163,13 +163,13 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   ///    other in the cross axis.
   ///  * [crossAxisAlignment], which controls how the children within each run
   ///    are placed relative to each other in the cross axis.
-  WrapAlignment get alignment => _alignment;
-  WrapAlignment _alignment;
+  WrapAlignment get alignment => m_alignment;
+  WrapAlignment m_alignment;
   set alignment (WrapAlignment value) {
     assert(value != null);
-    if (_alignment == value)
+    if (m_alignment == value)
       return;
-    _alignment = value;
+    m_alignment = value;
     markNeedsLayout();
   }
 
@@ -184,13 +184,13 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   /// [alignment].
   ///
   /// Defaults to 0.0.
-  double get spacing => _spacing;
-  double _spacing;
+  double get spacing => m_spacing;
+  double m_spacing;
   set spacing (double value) {
     assert(value != null);
-    if (_spacing == value)
+    if (m_spacing == value)
       return;
-    _spacing = value;
+    m_spacing = value;
     markNeedsLayout();
   }
 
@@ -208,13 +208,13 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   ///    relative to each other in the main axis.
   ///  * [crossAxisAlignment], which controls how the children within each run
   ///    are placed relative to each other in the cross axis.
-  WrapAlignment get runAlignment => _runAlignment;
-  WrapAlignment _runAlignment;
+  WrapAlignment get runAlignment => m_runAlignment;
+  WrapAlignment m_runAlignment;
   set runAlignment (WrapAlignment value) {
     assert(value != null);
-    if (_runAlignment == value)
+    if (m_runAlignment == value)
       return;
-    _runAlignment = value;
+    m_runAlignment = value;
     markNeedsLayout();
   }
 
@@ -228,13 +228,13 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   /// free space will be allocated according to the [runAlignment].
   ///
   /// Defaults to 0.0.
-  double get runSpacing => _runSpacing;
-  double _runSpacing;
+  double get runSpacing => m_runSpacing;
+  double m_runSpacing;
   set runSpacing (double value) {
     assert(value != null);
-    if (_runSpacing == value)
+    if (m_runSpacing == value)
       return;
-    _runSpacing = value;
+    m_runSpacing = value;
     markNeedsLayout();
   }
 
@@ -253,13 +253,13 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   ///    relative to each other in the main axis.
   ///  * [runAlignment], which controls how the runs are placed relative to each
   ///    other in the cross axis.
-  WrapCrossAlignment get crossAxisAlignment => _crossAxisAlignment;
-  WrapCrossAlignment _crossAxisAlignment;
+  WrapCrossAlignment get crossAxisAlignment => m_crossAxisAlignment;
+  WrapCrossAlignment m_crossAxisAlignment;
   set crossAxisAlignment (WrapCrossAlignment value) {
     assert(value != null);
-    if (_crossAxisAlignment == value)
+    if (m_crossAxisAlignment == value)
       return;
-    _crossAxisAlignment = value;
+    m_crossAxisAlignment = value;
     markNeedsLayout();
   }
 
@@ -286,11 +286,11 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   /// [crossAxisAlignment] is either [WrapCrossAlignment.start] or
   /// [WrapCrossAlignment.end], or there's more than one child, then the
   /// [textDirection] must not be null.
-  TextDirection get textDirection => _textDirection;
-  TextDirection _textDirection;
+  TextDirection get textDirection => m_textDirection;
+  TextDirection m_textDirection;
   set textDirection(TextDirection value) {
-    if (_textDirection != value) {
-      _textDirection = value;
+    if (m_textDirection != value) {
+      m_textDirection = value;
       markNeedsLayout();
     }
   }
@@ -317,16 +317,16 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   /// [crossAxisAlignment] is either [WrapCrossAlignment.start] or
   /// [WrapCrossAlignment.end], or there's more than one child, then the
   /// [verticalDirection] must not be null.
-  VerticalDirection get verticalDirection => _verticalDirection;
-  VerticalDirection _verticalDirection;
+  VerticalDirection get verticalDirection => m_verticalDirection;
+  VerticalDirection m_verticalDirection;
   set verticalDirection(VerticalDirection value) {
-    if (_verticalDirection != value) {
-      _verticalDirection = value;
+    if (m_verticalDirection != value) {
+      m_verticalDirection = value;
       markNeedsLayout();
     }
   }
 
-  bool get _debugHasNecessaryDirections {
+  bool get m_debugHasNecessaryDirections {
     assert(direction != null);
     assert(alignment != null);
     assert(runAlignment != null);
@@ -561,12 +561,12 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
     return 0.0;
   }
 
-  bool _hasVisualOverflow = false;
+  bool m_hasVisualOverflow = false;
 
   @override
   void performLayout() {
-    assert(_debugHasNecessaryDirections);
-    _hasVisualOverflow = false;
+    assert(m_debugHasNecessaryDirections);
+    m_hasVisualOverflow = false;
     RenderBox child = firstChild;
     if (child == null) {
       size = constraints.smallest;
@@ -654,7 +654,7 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
         break;
     }
 
-    _hasVisualOverflow = containerMainAxisExtent < mainAxisExtent || containerCrossAxisExtent < crossAxisExtent;
+    m_hasVisualOverflow = containerMainAxisExtent < mainAxisExtent || containerCrossAxisExtent < crossAxisExtent;
 
     final double crossAxisFreeSpace = math.max(0.0, containerCrossAxisExtent - crossAxisExtent);
     double runLeadingSpace = 0.0;
@@ -756,7 +756,7 @@ class RenderWrap extends RenderBox with ContainerRenderObjectMixin<RenderBox, Wr
   void paint(PaintingContext context, Offset offset) {
     // TODO(ianh): move the debug flex overflow paint logic somewhere common so
     // it can be reused here
-    if (_hasVisualOverflow)
+    if (m_hasVisualOverflow)
       context.pushClipRect(needsCompositing, offset, Offset.zero & size, defaultPaint);
     else
       defaultPaint(context, offset);

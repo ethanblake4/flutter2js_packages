@@ -206,21 +206,21 @@ class AnimatedList extends StatefulWidget {
 /// [AnimatedList] item input handlers can also refer to their [AnimatedListState]
 /// with the static [AnimatedList.of] method.
 class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixin {
-  final List<_ActiveItem> _incomingItems = <_ActiveItem>[];
-  final List<_ActiveItem> _outgoingItems = <_ActiveItem>[];
-  int _itemsCount = 0;
+  final List<_ActiveItem> m_incomingItems = <_ActiveItem>[];
+  final List<_ActiveItem> m_outgoingItems = <_ActiveItem>[];
+  int m_itemsCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _itemsCount = widget.initialItemCount;
+    m_itemsCount = widget.initialItemCount;
   }
 
   @override
   void dispose() {
-    for (_ActiveItem item in _incomingItems)
+    for (_ActiveItem item in m_incomingItems)
       item.controller.dispose();
-    for (_ActiveItem item in _outgoingItems)
+    for (_ActiveItem item in m_outgoingItems)
       item.controller.dispose();
     super.dispose();
   }
@@ -243,7 +243,7 @@ class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixi
 
   int _indexToItemIndex(int index) {
     int itemIndex = index;
-    for (_ActiveItem item in _outgoingItems) {
+    for (_ActiveItem item in m_outgoingItems) {
       if (item.itemIndex <= itemIndex)
         itemIndex += 1;
       else
@@ -254,7 +254,7 @@ class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixi
 
   int _itemIndexToIndex(int itemIndex) {
     int index = itemIndex;
-    for (_ActiveItem item in _outgoingItems) {
+    for (_ActiveItem item in m_outgoingItems) {
       assert(item.itemIndex != itemIndex);
       if (item.itemIndex < itemIndex)
         index -= 1;
@@ -275,15 +275,15 @@ class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixi
     assert(duration != null);
 
     final int itemIndex = _indexToItemIndex(index);
-    assert(itemIndex >= 0 && itemIndex <= _itemsCount);
+    assert(itemIndex >= 0 && itemIndex <= m_itemsCount);
 
     // Increment the incoming and outgoing item indices to account
     // for the insertion.
-    for (_ActiveItem item in _incomingItems) {
+    for (_ActiveItem item in m_incomingItems) {
       if (item.itemIndex >= itemIndex)
         item.itemIndex += 1;
     }
-    for (_ActiveItem item in _outgoingItems) {
+    for (_ActiveItem item in m_outgoingItems) {
       if (item.itemIndex >= itemIndex)
         item.itemIndex += 1;
     }
@@ -291,14 +291,14 @@ class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixi
     final AnimationController controller = AnimationController(duration: duration, vsync: this);
     final _ActiveItem incomingItem = _ActiveItem.incoming(controller, itemIndex);
     setState(() {
-      _incomingItems
+      m_incomingItems
         ..add(incomingItem)
         ..sort();
-      _itemsCount += 1;
+      m_itemsCount += 1;
     });
 
     controller.forward().then<void>((Null value) {
-      _removeActiveItemAt(_incomingItems, incomingItem.itemIndex).controller.dispose();
+      _removeActiveItemAt(m_incomingItems, incomingItem.itemIndex).controller.dispose();
     });
   }
 
@@ -319,45 +319,45 @@ class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixi
     assert(duration != null);
 
     final int itemIndex = _indexToItemIndex(index);
-    assert(itemIndex >= 0 && itemIndex < _itemsCount);
-    assert(_activeItemAt(_outgoingItems, itemIndex) == null);
+    assert(itemIndex >= 0 && itemIndex < m_itemsCount);
+    assert(_activeItemAt(m_outgoingItems, itemIndex) == null);
 
-    final _ActiveItem incomingItem = _removeActiveItemAt(_incomingItems, itemIndex);
+    final _ActiveItem incomingItem = _removeActiveItemAt(m_incomingItems, itemIndex);
     final AnimationController controller = incomingItem?.controller
       ?? AnimationController(duration: duration, value: 1.0, vsync: this);
     final _ActiveItem outgoingItem = _ActiveItem.outgoing(controller, itemIndex, builder);
     setState(() {
-      _outgoingItems
+      m_outgoingItems
         ..add(outgoingItem)
         ..sort();
     });
 
     controller.reverse().then<void>((Null value) {
-      _removeActiveItemAt(_outgoingItems, outgoingItem.itemIndex).controller.dispose();
+      _removeActiveItemAt(m_outgoingItems, outgoingItem.itemIndex).controller.dispose();
 
       // Decrement the incoming and outgoing item indices to account
       // for the removal.
-      for (_ActiveItem item in _incomingItems) {
+      for (_ActiveItem item in m_incomingItems) {
         if (item.itemIndex > outgoingItem.itemIndex)
           item.itemIndex -= 1;
       }
-      for (_ActiveItem item in _outgoingItems) {
+      for (_ActiveItem item in m_outgoingItems) {
         if (item.itemIndex > outgoingItem.itemIndex)
           item.itemIndex -= 1;
       }
 
       setState(() {
-        _itemsCount -= 1;
+        m_itemsCount -= 1;
       });
     });
   }
 
   Widget _itemBuilder(BuildContext context, int itemIndex) {
-    final _ActiveItem outgoingItem = _activeItemAt(_outgoingItems, itemIndex);
+    final _ActiveItem outgoingItem = _activeItemAt(m_outgoingItems, itemIndex);
     if (outgoingItem != null)
       return outgoingItem.removedItemBuilder(context, outgoingItem.controller.view);
 
-    final _ActiveItem incomingItem = _activeItemAt(_incomingItems, itemIndex);
+    final _ActiveItem incomingItem = _activeItemAt(m_incomingItems, itemIndex);
     final Animation<double> animation = incomingItem?.controller?.view ?? kAlwaysCompleteAnimation;
     return widget.itemBuilder(context, _itemIndexToIndex(itemIndex), animation);
   }
@@ -366,7 +366,7 @@ class AnimatedListState extends State<AnimatedList> with TickerProviderStateMixi
   Widget build(BuildContext context) {
     return ListView.builder(
       itemBuilder: _itemBuilder,
-      itemCount: _itemsCount,
+      itemCount: m_itemsCount,
       scrollDirection: widget.scrollDirection,
       reverse: widget.reverse,
       controller: widget.controller,

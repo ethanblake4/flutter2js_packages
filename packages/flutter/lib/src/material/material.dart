@@ -285,7 +285,7 @@ class Material extends StatefulWidget {
 }
 
 class _MaterialState extends State<Material> with TickerProviderStateMixin {
-  final GlobalKey _inkFeatureRenderer = GlobalKey(debugLabel: 'ink renderer');
+  final GlobalKey m_inkFeatureRenderer = GlobalKey(debugLabel: 'ink renderer');
 
   Color _getBackgroundColor(BuildContext context) {
     if (widget.color != null)
@@ -314,12 +314,12 @@ class _MaterialState extends State<Material> with TickerProviderStateMixin {
     }
     contents = NotificationListener<LayoutChangedNotification>(
       onNotification: (LayoutChangedNotification notification) {
-        final _RenderInkFeatures renderer = _inkFeatureRenderer.currentContext.findRenderObject();
+        final _RenderInkFeatures renderer = m_inkFeatureRenderer.currentContext.findRenderObject();
         renderer._didChangeLayout();
         return true;
       },
       child: _InkFeatures(
-        key: _inkFeatureRenderer,
+        key: m_inkFeatureRenderer,
         color: backgroundColor,
         child: contents,
         vsync: this,

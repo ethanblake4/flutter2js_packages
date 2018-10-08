@@ -306,40 +306,40 @@ class _BottomNavigationTile extends StatelessWidget {
 }
 
 class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerProviderStateMixin {
-  List<AnimationController> _controllers = <AnimationController>[];
-  List<CurvedAnimation> _animations;
+  List<AnimationController> m_controllers = <AnimationController>[];
+  List<CurvedAnimation> m_animations;
 
   // A queue of color splashes currently being animated.
-  final Queue<_Circle> _circles = Queue<_Circle>();
+  final Queue<_Circle> m_circles = Queue<_Circle>();
 
   // Last splash circle's color, and the final color of the control after
   // animation is complete.
-  Color _backgroundColor;
+  Color m_backgroundColor;
 
-  static final Tween<double> _flexTween = Tween<double>(begin: 1.0, end: 1.5);
+  static final Tween<double> m_flexTween = Tween<double>(begin: 1.0, end: 1.5);
 
   void _resetState() {
-    for (AnimationController controller in _controllers)
+    for (AnimationController controller in m_controllers)
       controller.dispose();
-    for (_Circle circle in _circles)
+    for (_Circle circle in m_circles)
       circle.dispose();
-    _circles.clear();
+    m_circles.clear();
 
-    _controllers = List<AnimationController>.generate(widget.items.length, (int index) {
+    m_controllers = List<AnimationController>.generate(widget.items.length, (int index) {
       return AnimationController(
         duration: kThemeAnimationDuration,
         vsync: this,
       )..addListener(_rebuild);
     });
-    _animations = List<CurvedAnimation>.generate(widget.items.length, (int index) {
+    m_animations = List<CurvedAnimation>.generate(widget.items.length, (int index) {
       return CurvedAnimation(
-        parent: _controllers[index],
+        parent: m_controllers[index],
         curve: Curves.fastOutSlowIn,
         reverseCurve: Curves.fastOutSlowIn.flipped
       );
     });
-    _controllers[widget.currentIndex].value = 1.0;
-    _backgroundColor = widget.items[widget.currentIndex].backgroundColor;
+    m_controllers[widget.currentIndex].value = 1.0;
+    m_backgroundColor = widget.items[widget.currentIndex].backgroundColor;
   }
 
   @override
@@ -357,18 +357,18 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
 
   @override
   void dispose() {
-    for (AnimationController controller in _controllers)
+    for (AnimationController controller in m_controllers)
       controller.dispose();
-    for (_Circle circle in _circles)
+    for (_Circle circle in m_circles)
       circle.dispose();
     super.dispose();
   }
 
-  double _evaluateFlex(Animation<double> animation) => _flexTween.evaluate(animation);
+  double _evaluateFlex(Animation<double> animation) => m_flexTween.evaluate(animation);
 
   void _pushCircle(int index) {
     if (widget.items[index].backgroundColor != null) {
-      _circles.add(
+      m_circles.add(
         _Circle(
           state: this,
           index: index,
@@ -379,8 +379,8 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
             switch (status) {
               case AnimationStatus.completed:
                 setState(() {
-                  final _Circle circle = _circles.removeFirst();
-                  _backgroundColor = circle.color;
+                  final _Circle circle = m_circles.removeFirst();
+                  m_backgroundColor = circle.color;
                   circle.dispose();
                 });
                 break;
@@ -413,12 +413,12 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
           _pushCircle(widget.currentIndex);
           break;
       }
-      _controllers[oldWidget.currentIndex].reverse();
-      _controllers[widget.currentIndex].forward();
+      m_controllers[oldWidget.currentIndex].reverse();
+      m_controllers[widget.currentIndex].forward();
     }
 
-    if (_backgroundColor != widget.items[widget.currentIndex].backgroundColor)
-      _backgroundColor = widget.items[widget.currentIndex].backgroundColor;
+    if (m_backgroundColor != widget.items[widget.currentIndex].backgroundColor)
+      m_backgroundColor = widget.items[widget.currentIndex].backgroundColor;
   }
 
   List<Widget> _createTiles() {
@@ -447,7 +447,7 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
             _BottomNavigationTile(
               widget.type,
               widget.items[i],
-              _animations[i],
+              m_animations[i],
               widget.iconSize,
               onTap: () {
                 if (widget.onTap != null)
@@ -466,13 +466,13 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
             _BottomNavigationTile(
               widget.type,
               widget.items[i],
-              _animations[i],
+              m_animations[i],
               widget.iconSize,
               onTap: () {
                 if (widget.onTap != null)
                   widget.onTap(i);
               },
-              flex: _evaluateFlex(_animations[i]),
+              flex: _evaluateFlex(m_animations[i]),
               selected: i == widget.currentIndex,
               indexLabel: localizations.tabLabel(tabIndex: i + 1, tabCount: widget.items.length),
             )
@@ -505,7 +505,7 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
       case BottomNavigationBarType.fixed:
         break;
       case BottomNavigationBarType.shifting:
-        backgroundColor = _backgroundColor;
+        backgroundColor = m_backgroundColor;
         break;
     }
     return Semantics(
@@ -526,7 +526,7 @@ class _BottomNavigationBarState extends State<BottomNavigationBar> with TickerPr
                 Positioned.fill(
                   child: CustomPaint(
                     painter: _RadialPainter(
-                      circles: _circles.toList(),
+                      circles: m_circles.toList(),
                       textDirection: Directionality.of(context),
                     ),
                   ),
@@ -585,12 +585,12 @@ class _Circle {
       return animations.map(state._evaluateFlex).fold(0.0, (double sum, double value) => sum + value);
     }
 
-    final double allWeights = weightSum(state._animations);
+    final double allWeights = weightSum(state.m_animations);
     // These weights sum to the start edge of the indexed item.
-    final double leadingWeights = weightSum(state._animations.sublist(0, index));
+    final double leadingWeights = weightSum(state.m_animations.sublist(0, index));
 
     // Add half of its flex value in order to get to the center.
-    return (leadingWeights + state._evaluateFlex(state._animations[index]) / 2.0) / allWeights;
+    return (leadingWeights + state._evaluateFlex(state.m_animations[index]) / 2.0) / allWeights;
   }
 
   void dispose() {

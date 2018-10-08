@@ -52,22 +52,22 @@ class CupertinoScrollbar extends StatefulWidget {
 }
 
 class _CupertinoScrollbarState extends State<CupertinoScrollbar> with TickerProviderStateMixin {
-  ScrollbarPainter _painter;
-  TextDirection _textDirection;
+  ScrollbarPainter m_painter;
+  TextDirection m_textDirection;
 
-  AnimationController _fadeoutAnimationController;
-  Animation<double> _fadeoutOpacityAnimation;
-  Timer _fadeoutTimer;
+  AnimationController m_fadeoutAnimationController;
+  Animation<double> m_fadeoutOpacityAnimation;
+  Timer m_fadeoutTimer;
 
   @override
   void initState() {
     super.initState();
-    _fadeoutAnimationController = AnimationController(
+    m_fadeoutAnimationController = AnimationController(
       vsync: this,
       duration: _kScrollbarFadeDuration,
     );
-    _fadeoutOpacityAnimation = CurvedAnimation(
-      parent: _fadeoutAnimationController,
+    m_fadeoutOpacityAnimation = CurvedAnimation(
+      parent: m_fadeoutAnimationController,
       curve: Curves.fastOutSlowIn
     );
   }
@@ -75,17 +75,17 @@ class _CupertinoScrollbarState extends State<CupertinoScrollbar> with TickerProv
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _textDirection = Directionality.of(context);
-    _painter = _buildCupertinoScrollbarPainter();
+    m_textDirection = Directionality.of(context);
+    m_painter = _buildCupertinoScrollbarPainter();
   }
 
   /// Returns a [ScrollbarPainter] visually styled like the iOS scrollbar.
   ScrollbarPainter _buildCupertinoScrollbarPainter() {
     return ScrollbarPainter(
       color: _kScrollbarColor,
-      textDirection: _textDirection,
+      textDirection: m_textDirection,
       thickness: _kScrollbarThickness,
-      fadeoutOpacityAnimation: _fadeoutOpacityAnimation,
+      fadeoutOpacityAnimation: m_fadeoutOpacityAnimation,
       mainAxisMargin: _kScrollbarMainAxisMargin,
       crossAxisMargin: _kScrollbarCrossAxisMargin,
       radius: _kScrollbarRadius,
@@ -98,19 +98,19 @@ class _CupertinoScrollbarState extends State<CupertinoScrollbar> with TickerProv
     if (notification is ScrollUpdateNotification ||
         notification is OverscrollNotification) {
       // Any movements always makes the scrollbar start showing up.
-      if (_fadeoutAnimationController.status != AnimationStatus.forward) {
-        _fadeoutAnimationController.forward();
+      if (m_fadeoutAnimationController.status != AnimationStatus.forward) {
+        m_fadeoutAnimationController.forward();
       }
 
-      _fadeoutTimer?.cancel();
-      _painter.update(notification.metrics, notification.metrics.axisDirection);
+      m_fadeoutTimer?.cancel();
+      m_painter.update(notification.metrics, notification.metrics.axisDirection);
     } else if (notification is ScrollEndNotification) {
       // On iOS, the scrollbar can only go away once the user lifted the finger.
 
-      _fadeoutTimer?.cancel();
-      _fadeoutTimer = Timer(_kScrollbarTimeToFade, () {
-        _fadeoutAnimationController.reverse();
-        _fadeoutTimer = null;
+      m_fadeoutTimer?.cancel();
+      m_fadeoutTimer = Timer(_kScrollbarTimeToFade, () {
+        m_fadeoutAnimationController.reverse();
+        m_fadeoutTimer = null;
       });
     }
     return false;
@@ -118,9 +118,9 @@ class _CupertinoScrollbarState extends State<CupertinoScrollbar> with TickerProv
 
   @override
   void dispose() {
-    _fadeoutAnimationController.dispose();
-    _fadeoutTimer?.cancel();
-    _painter.dispose();
+    m_fadeoutAnimationController.dispose();
+    m_fadeoutTimer?.cancel();
+    m_painter.dispose();
     super.dispose();
   }
 
@@ -130,7 +130,7 @@ class _CupertinoScrollbarState extends State<CupertinoScrollbar> with TickerProv
       onNotification: _handleScrollNotification,
       child: RepaintBoundary(
         child: CustomPaint(
-          foregroundPainter: _painter,
+          foregroundPainter: m_painter,
           child: RepaintBoundary(
             child: widget.child,
           ),

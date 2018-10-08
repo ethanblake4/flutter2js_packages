@@ -286,7 +286,7 @@ class RenderCustomMultiChildLayoutBox extends RenderBox
     List<RenderBox> children,
     @required MultiChildLayoutDelegate delegate
   }) : assert(delegate != null),
-       _delegate = delegate {
+       m_delegate = delegate {
     addAll(children);
   }
 
@@ -297,20 +297,20 @@ class RenderCustomMultiChildLayoutBox extends RenderBox
   }
 
   /// The delegate that controls the layout of the children.
-  MultiChildLayoutDelegate get delegate => _delegate;
-  MultiChildLayoutDelegate _delegate;
+  MultiChildLayoutDelegate get delegate => m_delegate;
+  MultiChildLayoutDelegate m_delegate;
   set delegate(MultiChildLayoutDelegate value) {
     assert(value != null);
-    if (_delegate == value)
+    if (m_delegate == value)
       return;
-    if (value.runtimeType != _delegate.runtimeType || value.shouldRelayout(_delegate))
+    if (value.runtimeType != m_delegate.runtimeType || value.shouldRelayout(m_delegate))
       markNeedsLayout();
-    _delegate = value;
+    m_delegate = value;
   }
 
   Size _getSize(BoxConstraints constraints) {
     assert(constraints.debugAssertIsValid());
-    return constraints.constrain(_delegate.getSize(constraints));
+    return constraints.constrain(m_delegate.getSize(constraints));
   }
 
   // TODO(ianh): It's a bit dubious to be using the getSize function from the delegate to
