@@ -594,7 +594,7 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
       child: Offstage(
         offstage: widget.route.offstage, // _routeSetState is called if this updates
         child: PageStorage(
-          bucket: widget.route._storageBucket, // immutable
+          bucket: widget.route.m_storageBucket, // immutable
           child: FocusScope(
             node: widget.route.focusScopeNode, // immutable
             child: RepaintBoundary(
@@ -612,7 +612,7 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
                   );
                 },
                 child: _page ??= RepaintBoundary(
-                  key: widget.route._subtreeKey, // immutable
+                  key: widget.route.m_subtreeKey, // immutable
                   child: Builder(
                     builder: (BuildContext context) {
                       return widget.route.buildPage(
@@ -679,8 +679,8 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   /// will not be updated.
   @protected
   void setState(VoidCallback fn) {
-    if (_scopeKey.currentState != null) {
-      _scopeKey.currentState._routeSetState(fn);
+    if (m_scopeKey.currentState != null) {
+      m_scopeKey.currentState._routeSetState(fn);
     } else {
       // The route isn't currently visible, so we don't have to call its setState
       // method, but we do still need to call the fn callback, otherwise the state
@@ -859,8 +859,8 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   @override
   void install(OverlayEntry insertionPoint) {
     super.install(insertionPoint);
-    _animationProxy = ProxyAnimation(super.animation);
-    _secondaryAnimationProxy = ProxyAnimation(super.secondaryAnimation);
+    m_animationProxy = ProxyAnimation(super.animation);
+    m_secondaryAnimationProxy = ProxyAnimation(super.secondaryAnimation);
   }
 
   @override
@@ -992,30 +992,30 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   ///
   /// The modal barrier, if any, is not rendered if [offstage] is true (see
   /// [barrierColor]).
-  bool get offstage => _offstage;
-  bool _offstage = false;
+  bool get offstage => m_offstage;
+  bool m_offstage = false;
   set offstage(bool value) {
-    if (_offstage == value)
+    if (m_offstage == value)
       return;
     setState(() {
-      _offstage = value;
+      m_offstage = value;
     });
-    _animationProxy.parent = _offstage ? kAlwaysCompleteAnimation : super.animation;
-    _secondaryAnimationProxy.parent = _offstage ? kAlwaysDismissedAnimation : super.secondaryAnimation;
+    m_animationProxy.parent = m_offstage ? kAlwaysCompleteAnimation : super.animation;
+    m_secondaryAnimationProxy.parent = m_offstage ? kAlwaysDismissedAnimation : super.secondaryAnimation;
   }
 
   /// The build context for the subtree containing the primary content of this route.
-  BuildContext get subtreeContext => _subtreeKey.currentContext;
+  BuildContext get subtreeContext => m_subtreeKey.currentContext;
 
   @override
-  Animation<double> get animation => _animationProxy;
-  ProxyAnimation _animationProxy;
+  Animation<double> get animation => m_animationProxy;
+  ProxyAnimation m_animationProxy;
 
   @override
-  Animation<double> get secondaryAnimation => _secondaryAnimationProxy;
-  ProxyAnimation _secondaryAnimationProxy;
+  Animation<double> get secondaryAnimation => m_secondaryAnimationProxy;
+  ProxyAnimation m_secondaryAnimationProxy;
 
-  final List<WillPopCallback> _willPopCallbacks = <WillPopCallback>[];
+  final List<WillPopCallback> m_willPopCallbacks = <WillPopCallback>[];
 
   /// Returns the value of the first callback added with
   /// [addScopedWillPopCallback] that returns false. If they all return true,
@@ -1035,9 +1035,9 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   ///   this method checks.
   @override
   Future<RoutePopDisposition> willPop() async {
-    final _ModalScopeState<T> scope = _scopeKey.currentState;
+    final _ModalScopeState<T> scope = m_scopeKey.currentState;
     assert(scope != null);
-    for (WillPopCallback callback in List<WillPopCallback>.from(_willPopCallbacks)) {
+    for (WillPopCallback callback in List<WillPopCallback>.from(m_willPopCallbacks)) {
       if (!await callback())
         return RoutePopDisposition.doNotPop;
     }
@@ -1105,8 +1105,8 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   ///  * [removeScopedWillPopCallback], which removes a callback from the list
   ///    that [willPop] checks.
   void addScopedWillPopCallback(WillPopCallback callback) {
-    assert(_scopeKey.currentState != null, 'Tried to add a willPop callback to a route that is not currently in the tree.');
-    _willPopCallbacks.add(callback);
+    assert(m_scopeKey.currentState != null, 'Tried to add a willPop callback to a route that is not currently in the tree.');
+    m_willPopCallbacks.add(callback);
   }
 
   /// Remove one of the callbacks run by [willPop].
@@ -1117,8 +1117,8 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   ///  * [addScopedWillPopCallback], which adds callback to the list
   ///    checked by [willPop].
   void removeScopedWillPopCallback(WillPopCallback callback) {
-    assert(_scopeKey.currentState != null, 'Tried to remove a willPop callback from a route that is not currently in the tree.');
-    _willPopCallbacks.remove(callback);
+    assert(m_scopeKey.currentState != null, 'Tried to remove a willPop callback from a route that is not currently in the tree.');
+    m_willPopCallbacks.remove(callback);
   }
 
   /// True if one or more [WillPopCallback] callbacks exist.
@@ -1139,7 +1139,7 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   ///    a pop might be vetoed.
   @protected
   bool get hasScopedWillPopCallback {
-    return _willPopCallbacks.isNotEmpty;
+    return m_willPopCallbacks.isNotEmpty;
   }
 
   @override
@@ -1152,14 +1152,14 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   void changedInternalState() {
     super.changedInternalState();
     setState(() { /* internal state already changed */ });
-    _modalBarrier.markNeedsBuild();
+    m_modalBarrier.markNeedsBuild();
   }
 
   @override
   void changedExternalState() {
     super.changedExternalState();
-    if (_scopeKey.currentState != null)
-      _scopeKey.currentState._forceRebuildPage();
+    if (m_scopeKey.currentState != null)
+      m_scopeKey.currentState._forceRebuildPage();
   }
 
   /// Whether this route can be popped.
@@ -1170,12 +1170,12 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
 
   // Internals
 
-  final GlobalKey<_ModalScopeState<T>> _scopeKey = GlobalKey<_ModalScopeState<T>>();
-  final GlobalKey _subtreeKey = GlobalKey();
-  final PageStorageBucket _storageBucket = PageStorageBucket();
+  final GlobalKey<_ModalScopeState<T>> m_scopeKey = GlobalKey<_ModalScopeState<T>>();
+  final GlobalKey m_subtreeKey = GlobalKey();
+  final PageStorageBucket m_storageBucket = PageStorageBucket();
 
   // one of the builders
-  OverlayEntry _modalBarrier;
+  OverlayEntry m_modalBarrier;
   Widget _buildModalBarrier(BuildContext context) {
     Widget barrier;
     if (barrierColor != null && !offstage) { // changedInternalState is called if these update
@@ -1209,12 +1209,12 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
 
   // We cache the part of the modal scope that doesn't change from frame to
   // frame so that we minimize the amount of building that happens.
-  Widget _modalScopeCache;
+  Widget m_modalScopeCache;
 
   // one of the builders
   Widget _buildModalScope(BuildContext context) {
-    return _modalScopeCache ??= _ModalScope<T>(
-      key: _scopeKey,
+    return m_modalScopeCache ??= _ModalScope<T>(
+      key: m_scopeKey,
       route: this,
       // _ModalScope calls buildTransitions() and buildChild(), defined above
     );
@@ -1222,7 +1222,7 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
 
   @override
   Iterable<OverlayEntry> createOverlayEntries() sync* {
-    yield _modalBarrier = OverlayEntry(builder: _buildModalBarrier);
+    yield m_modalBarrier = OverlayEntry(builder: _buildModalBarrier);
     yield OverlayEntry(builder: _buildModalScope, maintainState: maintainState);
   }
 
