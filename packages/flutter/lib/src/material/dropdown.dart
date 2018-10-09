@@ -99,7 +99,7 @@ class _DropdownMenu<T> extends StatefulWidget {
     this.route,
   }) : super(key: key);
 
-  final _DropdownRoute<T> route;
+  final C_DropdownRoute<T> route;
   final EdgeInsets padding;
 
   @override
@@ -141,7 +141,7 @@ class _DropdownMenuState<T> extends State<_DropdownMenu<T>> {
     // in the first 0.25s.
     assert(debugCheckHasMaterialLocalizations(context));
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
-    final _DropdownRoute<T> route = widget.route;
+    final C_DropdownRoute<T> route = widget.route;
     final double unit = 0.5 / (route.items.length + 1.5);
     final List<Widget> children = <Widget>[];
     for (int itemIndex = 0; itemIndex < route.items.length; ++itemIndex) {
@@ -290,8 +290,8 @@ class _DropdownRouteResult<T> {
   int get hashCode => result.hashCode;
 }
 
-class _DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
-  _DropdownRoute({
+class C_DropdownRoute<T> extends PopupRoute<_DropdownRouteResult<T>> {
+  C_DropdownRoute({
     this.items,
     this.padding,
     this.buttonRect,
@@ -544,7 +544,7 @@ class DropdownButton<T> extends StatefulWidget {
 
 class _DropdownButtonState<T> extends State<DropdownButton<T>> with WidgetsBindingObserver {
   int _selectedIndex;
-  _DropdownRoute<T> _dropdownRoute;
+  C_DropdownRoute<T> _dropdownRoute;
 
   @override
   void initState() {
@@ -601,7 +601,7 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>> with WidgetsBindi
       : _kUnalignedMenuMargin;
 
     assert(_dropdownRoute == null);
-    _dropdownRoute = _DropdownRoute<T>(
+    _dropdownRoute = C_DropdownRoute<T>(
       items: widget.items,
       buttonRect: menuMargin.resolve(textDirection).inflateRect(itemRect),
       padding: _kMenuItemPadding.resolve(textDirection),

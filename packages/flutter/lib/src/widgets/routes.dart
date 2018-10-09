@@ -1400,8 +1400,8 @@ abstract class RouteAware {
   void didPushNext() { }
 }
 
-class _DialogRoute<T> extends PopupRoute<T> {
-  _DialogRoute({
+class C_DialogRoute<T> extends PopupRoute<T> {
+  C_DialogRoute({
     @required RoutePageBuilder pageBuilder,
     bool barrierDismissible = true,
     String barrierLabel,
@@ -1518,7 +1518,7 @@ Future<T> showGeneralDialog<T>({
 }) {
   assert(pageBuilder != null);
   assert(!barrierDismissible || barrierLabel != null);
-  return Navigator.of(context, rootNavigator: true).push(_DialogRoute<T>(
+  return Navigator.of(context, rootNavigator: true).push(C_DialogRoute<T>(
     pageBuilder: pageBuilder,
     barrierDismissible: barrierDismissible,
     barrierLabel: barrierLabel,

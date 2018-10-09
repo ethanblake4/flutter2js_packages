@@ -184,7 +184,7 @@ class _ModalBottomSheetLayout extends SingleChildLayoutDelegate {
 class _ModalBottomSheet<T> extends StatefulWidget {
   const _ModalBottomSheet({ Key key, this.route }) : super(key: key);
 
-  final _ModalBottomSheetRoute<T> route;
+  final C_ModalBottomSheetRoute<T> route;
 
   @override
   _ModalBottomSheetState<T> createState() => _ModalBottomSheetState<T>();
@@ -237,8 +237,8 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
   }
 }
 
-class _ModalBottomSheetRoute<T> extends PopupRoute<T> {
-  _ModalBottomSheetRoute({
+class C_ModalBottomSheetRoute<T> extends PopupRoute<T> {
+  C_ModalBottomSheetRoute({
     this.builder,
     this.theme,
     this.barrierLabel,
@@ -317,7 +317,7 @@ Future<T> showModalBottomSheet<T>({
   assert(context != null);
   assert(builder != null);
   assert(debugCheckHasMaterialLocalizations(context));
-  return Navigator.push(context, _ModalBottomSheetRoute<T>(
+  return Navigator.push(context, C_ModalBottomSheetRoute<T>(
     builder: builder,
     theme: Theme.of(context, shadowThemeOnly: true),
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,

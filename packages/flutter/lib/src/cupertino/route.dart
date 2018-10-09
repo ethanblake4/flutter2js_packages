@@ -763,8 +763,8 @@ class _CupertinoEdgeShadowPainter extends BoxPainter {
   }
 }
 
-class _CupertinoModalPopupRoute<T> extends PopupRoute<T> {
-  _CupertinoModalPopupRoute({
+class C_CupertinoModalPopupRoute<T> extends PopupRoute<T> {
+  C_CupertinoModalPopupRoute({
     this.builder,
     this.barrierLabel,
     RouteSettings settings,
@@ -852,7 +852,7 @@ Future<T> showCupertinoModalPopup<T>({
   @required WidgetBuilder builder,
 }) {
   return Navigator.of(context, rootNavigator: true).push(
-    _CupertinoModalPopupRoute<T>(
+    C_CupertinoModalPopupRoute<T>(
       builder: builder,
       barrierLabel: 'Dismiss',
     ),

@@ -420,7 +420,7 @@ class _PopupMenu<T> extends StatelessWidget {
     this.semanticLabel,
   }) : super(key: key);
 
-  final _PopupMenuRoute<T> route;
+  final C_PopupMenuRoute<T> route;
   final String semanticLabel;
 
   @override
@@ -576,8 +576,8 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
   }
 }
 
-class _PopupMenuRoute<T> extends PopupRoute<T> {
-  _PopupMenuRoute({
+class C_PopupMenuRoute<T> extends PopupRoute<T> {
+  C_PopupMenuRoute({
     this.position,
     this.items,
     this.initialValue,
@@ -725,7 +725,7 @@ Future<T> showMenu<T>({
       label = semanticLabel ?? MaterialLocalizations.of(context)?.popupMenuLabel;
   }
 
-  return Navigator.push(context, _PopupMenuRoute<T>(
+  return Navigator.push(context, C_PopupMenuRoute<T>(
     position: position,
     items: items,
     initialValue: initialValue,
