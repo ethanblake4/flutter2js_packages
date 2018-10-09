@@ -105,8 +105,8 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
 
   /// The animation that drives the route's transition and the previous route's
   /// forward transition.
-  Animation<double> get animation => _animation;
-  Animation<double> _animation;
+  Animation<double> get animation => m_animation;
+  Animation<double> m_animation;
 
   /// The animation controller that the route uses to drive the transitions.
   ///
@@ -177,8 +177,8 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     assert(!_transitionCompleter.isCompleted, 'Cannot install a $runtimeType after disposing it.');
     _controller = createAnimationController();
     assert(_controller != null, '$runtimeType.createAnimationController() returned null.');
-    _animation = createAnimation();
-    assert(_animation != null, '$runtimeType.createAnimation() returned null.');
+    m_animation = createAnimation();
+    assert(m_animation != null, '$runtimeType.createAnimation() returned null.');
     super.install(insertionPoint);
   }
 
@@ -186,7 +186,7 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
   TickerFuture didPush() {
     assert(_controller != null, '$runtimeType.didPush called before calling install() or after calling dispose().');
     assert(!_transitionCompleter.isCompleted, 'Cannot reuse a $runtimeType after disposing it.');
-    _animation.addStatusListener(_handleStatusChanged);
+    m_animation.addStatusListener(_handleStatusChanged);
     return _controller.forward();
   }
 
@@ -196,7 +196,7 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     assert(!_transitionCompleter.isCompleted, 'Cannot reuse a $runtimeType after disposing it.');
     if (oldRoute is TransitionRoute)
       _controller.value = oldRoute._controller.value;
-    _animation.addStatusListener(_handleStatusChanged);
+    m_animation.addStatusListener(_handleStatusChanged);
     super.didReplace(oldRoute);
   }
 
@@ -233,10 +233,10 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
           TrainHoppingAnimation newAnimation;
           newAnimation = TrainHoppingAnimation(
             current.currentTrain,
-            nextRoute._animation,
+            nextRoute.m_animation,
             onSwitchedTrain: () {
               assert(_secondaryAnimation.parent == newAnimation);
-              assert(newAnimation.currentTrain == nextRoute._animation);
+              assert(newAnimation.currentTrain == nextRoute.m_animation);
               _secondaryAnimation.parent = newAnimation.currentTrain;
               newAnimation.dispose();
             }
@@ -244,10 +244,10 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
           _secondaryAnimation.parent = newAnimation;
           current.dispose();
         } else {
-          _secondaryAnimation.parent = TrainHoppingAnimation(current, nextRoute._animation);
+          _secondaryAnimation.parent = TrainHoppingAnimation(current, nextRoute.m_animation);
         }
       } else {
-        _secondaryAnimation.parent = nextRoute._animation;
+        _secondaryAnimation.parent = nextRoute.m_animation;
       }
     } else {
       _secondaryAnimation.parent = kAlwaysDismissedAnimation;
@@ -1227,7 +1227,7 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   }
 
   @override
-  String toString() => '$runtimeType($settings, animation: $_animation)';
+  String toString() => '$runtimeType($settings, animation: $m_animation)';
 }
 
 /// A modal route that overlays a widget over the current route.

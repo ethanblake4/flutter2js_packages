@@ -95,21 +95,21 @@ class MaterialPageRoute<T> extends PageRoute<T> {
 
   /// A delegate PageRoute to which iOS themed page operations are delegated to.
   /// It's lazily created on first use.
-  CupertinoPageRoute<T> get _cupertinoPageRoute {
-    assert(_useCupertinoTransitions);
-    _internalCupertinoPageRoute ??= CupertinoPageRoute<T>(
+  CupertinoPageRoute<T> get m_cupertinoPageRoute {
+    assert(m_useCupertinoTransitions);
+    m_internalCupertinoPageRoute ??= CupertinoPageRoute<T>(
       builder: builder, // Not used.
       fullscreenDialog: fullscreenDialog,
       hostRoute: this,
     );
-    return _internalCupertinoPageRoute;
+    return m_internalCupertinoPageRoute;
   }
-  CupertinoPageRoute<T> _internalCupertinoPageRoute;
+  CupertinoPageRoute<T> m_internalCupertinoPageRoute;
 
   /// Whether we should currently be using Cupertino transitions. This is true
   /// if the theme says we're on iOS, or if we're in an active gesture.
-  bool get _useCupertinoTransitions {
-    return _internalCupertinoPageRoute?.popGestureInProgress == true
+  bool get m_useCupertinoTransitions {
+    return m_internalCupertinoPageRoute?.popGestureInProgress == true
         || Theme.of(navigator.context).platform == TargetPlatform.iOS;
   }
 
@@ -136,7 +136,7 @@ class MaterialPageRoute<T> extends PageRoute<T> {
 
   @override
   void dispose() {
-    _internalCupertinoPageRoute?.dispose();
+    m_internalCupertinoPageRoute?.dispose();
     super.dispose();
   }
 
@@ -161,8 +161,8 @@ class MaterialPageRoute<T> extends PageRoute<T> {
 
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
-    if (_useCupertinoTransitions) {
-      return _cupertinoPageRoute.buildTransitions(context, animation, secondaryAnimation, child);
+    if (m_useCupertinoTransitions) {
+      return m_cupertinoPageRoute.buildTransitions(context, animation, secondaryAnimation, child);
     } else {
       return _MountainViewPageTransition(
         routeAnimation: animation,

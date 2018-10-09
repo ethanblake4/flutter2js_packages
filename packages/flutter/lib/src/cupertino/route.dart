@@ -111,7 +111,7 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
   /// one is not manually supplied.
   final String title;
 
-  ValueNotifier<String> _previousTitle;
+  ValueNotifier<String> m_previousTitle;
 
   /// The title string of the previous [CupertinoPageRoute].
   ///
@@ -129,10 +129,10 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
   ///    widgets based on a ValueListenable.
   ValueListenable<String> get previousTitle {
     assert(
-      _previousTitle != null,
+      m_previousTitle != null,
       'Cannot read the previousTitle for a route that has not yet been installed',
     );
-    return _previousTitle;
+    return m_previousTitle;
   }
 
   @override
@@ -140,10 +140,10 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
     final String previousTitleString = previousRoute is CupertinoPageRoute
         ? previousRoute.title
         : null;
-    if (_previousTitle == null) {
-      _previousTitle = ValueNotifier<String>(previousTitleString);
+    if (m_previousTitle == null) {
+      m_previousTitle = ValueNotifier<String>(previousTitleString);
     } else {
-      _previousTitle.value = previousTitleString;
+      m_previousTitle.value = previousTitleString;
     }
     super.didChangePrevious(previousRoute);
   }
@@ -196,12 +196,12 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
 
   @override
   void dispose() {
-    _backGestureController?.dispose();
-    _backGestureController = null;
+    m_backGestureController?.dispose();
+    m_backGestureController = null;
     super.dispose();
   }
 
-  _CupertinoBackGestureController<T> _backGestureController;
+  _CupertinoBackGestureController<T> m_backGestureController;
 
   /// Whether a pop gesture is currently underway.
   ///
@@ -213,7 +213,7 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
   ///
   ///  * [popGestureEnabled], which returns whether a pop gesture is appropriate
   ///    in the first place.
-  bool get popGestureInProgress => _backGestureController != null;
+  bool get popGestureInProgress => m_backGestureController != null;
 
   /// Whether a pop gesture can be started by the user.
   ///
@@ -273,19 +273,19 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
     assert(!popGestureInProgress);
     assert(popGestureEnabled);
     final PageRoute<T> route = hostRoute ?? this;
-    _backGestureController = _CupertinoBackGestureController<T>(
+    m_backGestureController = _CupertinoBackGestureController<T>(
       navigator: route.navigator,
       controller: route.controller,
       onEnded: _endPopGesture,
     );
-    return _backGestureController;
+    return m_backGestureController;
   }
 
   void _endPopGesture() {
     // In practice this only gets called if for some reason popping the route
     // did not cause this route to get disposed.
-    _backGestureController?.dispose();
-    _backGestureController = null;
+    m_backGestureController?.dispose();
+    m_backGestureController = null;
   }
 
   @override
@@ -787,23 +787,23 @@ class _CupertinoModalPopupRoute<T> extends PopupRoute<T> {
   @override
   Duration get transitionDuration => _kModalPopupTransitionDuration;
 
-  Animation<double> _animation;
+  Animation<double> m_animation;
 
-  Tween<Offset> _offsetTween;
+  Tween<Offset> m_offsetTween;
 
   @override
   Animation<double> createAnimation() {
-    assert(_animation == null);
-    _animation = CurvedAnimation(
+    assert(m_animation == null);
+    m_animation = CurvedAnimation(
       parent: super.createAnimation(),
       curve: Curves.ease,
       reverseCurve: Curves.ease.flipped,
     );
-    _offsetTween = Tween<Offset>(
+    m_offsetTween = Tween<Offset>(
       begin: const Offset(0.0, 1.0),
       end: const Offset(0.0, 0.0),
     );
-    return _animation;
+    return m_animation;
   }
 
   @override
@@ -816,7 +816,7 @@ class _CupertinoModalPopupRoute<T> extends PopupRoute<T> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: FractionalTranslation(
-        translation: _offsetTween.evaluate(_animation),
+        translation: m_offsetTween.evaluate(m_animation),
         child: child,
       ),
     );
