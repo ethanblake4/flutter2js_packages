@@ -36,7 +36,9 @@ export 'package:flutter/gestures.dart' show
 /// the proxy box with its child. However, RenderProxyBox is a useful base class
 /// for render objects that wish to mimic most, but not all, of the properties
 /// of their child.
-class RenderProxyBox extends RenderBox with RenderObjectWithChildMixin<RenderBox>, RenderProxyBoxMixin<RenderBox> {
+/// flutter2js removed mixins
+/// 
+class RenderProxyBox extends RenderBox {
   /// Creates a proxy render box.
   ///
   /// Proxy render boxes are rarely created directly because they simply proxy
@@ -48,11 +50,137 @@ class RenderProxyBox extends RenderBox with RenderObjectWithChildMixin<RenderBox
     this.child = child;
   }
 
-  /// IMPORTANT: Flutter2js-only
+  bool debugValidateChild(RenderObject child) {
+    assert(() {
+      if (child is! RenderBox) {
+        throw FlutterError(
+            'A $runtimeType expected a child of type RenderBox but received a '
+                'child of type ${child.runtimeType}.\n'
+                'RenderObjects expect specific types of children because they '
+                'coordinate with their children during layout and paint. For '
+                'example, a RenderSliver cannot be the child of a RenderBox because '
+                'a RenderSliver does not understand the RenderBox layout protocol.\n'
+                '\n'
+                'The $runtimeType that expected a RenderBox child was created by:\n'
+                '  $debugCreator\n'
+                '\n'
+                'The ${child.runtimeType} that did not match the expected child type '
+                'was created by:\n'
+                '  ${child.debugCreator}\n'
+        );
+      }
+      return true;
+    }());
+    return true;
+  }
+
+  RenderBox m_child;
+  /// The render object's unique child
+  RenderBox get child => m_child;
+  set child(RenderBox value) {
+    if (m_child != null)
+      dropChild(m_child);
+    m_child = value;
+    if (m_child != null)
+      adoptChild(m_child);
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (m_child != null)
+      m_child.attach(owner);
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    if (m_child != null)
+      m_child.detach();
+  }
+
+  @override
+  void redepthChildren() {
+    if (m_child != null)
+      redepthChild(m_child);
+  }
+
+  @override
+  void visitChildren(RenderObjectVisitor visitor) {
+    if (m_child != null)
+      visitor(m_child);
+  }
+
+  @override
+  List<DiagnosticsNode> debugDescribeChildren() {
+    return child != null ? <DiagnosticsNode>[child.toDiagnosticsNode(name: 'child')] : <DiagnosticsNode>[];
+  }
+
+  @override
+  void setupParentData(RenderObject child) {
+    // We don't actually use the offset argument in BoxParentData, so let's
+    // avoid allocating it at all.
+    if (child.parentData is! ParentData)
+      child.parentData = ParentData();
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    if (child != null)
+      return child.getMinIntrinsicWidth(height);
+    return 0.0;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    if (child != null)
+      return child.getMaxIntrinsicWidth(height);
+    return 0.0;
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    if (child != null)
+      return child.getMinIntrinsicHeight(width);
+    return 0.0;
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    if (child != null)
+      return child.getMaxIntrinsicHeight(width);
+    return 0.0;
+  }
+
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
-    if (child != null) return child.getDistanceToActualBaseline(baseline);
+    if (child != null)
+      return child.getDistanceToActualBaseline(baseline);
     return super.computeDistanceToActualBaseline(baseline);
+  }
+
+  @override
+  void performLayout() {
+    if (child != null) {
+      child.layout(constraints, parentUsesSize: true);
+      size = child.size;
+    } else {
+      performResize();
+    }
+  }
+
+  @override
+  bool hitTestChildren(HitTestResult result, { Offset position }) {
+    return child?.hitTest(result, position: position) ?? false;
+  }
+
+  @override
+  void applyPaintTransform(RenderObject child, Matrix4 transform) { }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child != null)
+      context.paintChild(child, offset);
   }
 }
 
@@ -205,72 +333,72 @@ class RenderConstrainedBox extends RenderProxyBox {
     @required BoxConstraints additionalConstraints,
   }) : assert(additionalConstraints != null),
        assert(additionalConstraints.debugAssertIsValid()),
-       _additionalConstraints = additionalConstraints,
+       m_additionalConstraints = additionalConstraints,
        super(child);
 
   /// Additional constraints to apply to [child] during layout
-  BoxConstraints get additionalConstraints => _additionalConstraints;
-  BoxConstraints _additionalConstraints;
+  BoxConstraints get additionalConstraints => m_additionalConstraints;
+  BoxConstraints m_additionalConstraints;
   set additionalConstraints(BoxConstraints value) {
     assert(value != null);
     assert(value.debugAssertIsValid());
-    if (_additionalConstraints == value)
+    if (m_additionalConstraints == value)
       return;
-    _additionalConstraints = value;
+    m_additionalConstraints = value;
     markNeedsLayout();
   }
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    if (_additionalConstraints.hasBoundedWidth && _additionalConstraints.hasTightWidth)
-      return _additionalConstraints.minWidth;
+    if (m_additionalConstraints.hasBoundedWidth && m_additionalConstraints.hasTightWidth)
+      return m_additionalConstraints.minWidth;
     final double width = super.computeMinIntrinsicWidth(height);
     assert(width.isFinite);
-    if (!_additionalConstraints.hasInfiniteWidth)
-      return _additionalConstraints.constrainWidth(width);
+    if (!m_additionalConstraints.hasInfiniteWidth)
+      return m_additionalConstraints.constrainWidth(width);
     return width;
   }
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    if (_additionalConstraints.hasBoundedWidth && _additionalConstraints.hasTightWidth)
-      return _additionalConstraints.minWidth;
+    if (m_additionalConstraints.hasBoundedWidth && m_additionalConstraints.hasTightWidth)
+      return m_additionalConstraints.minWidth;
     final double width = super.computeMaxIntrinsicWidth(height);
     assert(width.isFinite);
-    if (!_additionalConstraints.hasInfiniteWidth)
-      return _additionalConstraints.constrainWidth(width);
+    if (!m_additionalConstraints.hasInfiniteWidth)
+      return m_additionalConstraints.constrainWidth(width);
     return width;
   }
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    if (_additionalConstraints.hasBoundedHeight && _additionalConstraints.hasTightHeight)
-      return _additionalConstraints.minHeight;
+    if (m_additionalConstraints.hasBoundedHeight && m_additionalConstraints.hasTightHeight)
+      return m_additionalConstraints.minHeight;
     final double height = super.computeMinIntrinsicHeight(width);
     assert(height.isFinite);
-    if (!_additionalConstraints.hasInfiniteHeight)
-      return _additionalConstraints.constrainHeight(height);
+    if (!m_additionalConstraints.hasInfiniteHeight)
+      return m_additionalConstraints.constrainHeight(height);
     return height;
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    if (_additionalConstraints.hasBoundedHeight && _additionalConstraints.hasTightHeight)
-      return _additionalConstraints.minHeight;
+    if (m_additionalConstraints.hasBoundedHeight && m_additionalConstraints.hasTightHeight)
+      return m_additionalConstraints.minHeight;
     final double height = super.computeMaxIntrinsicHeight(width);
     assert(height.isFinite);
-    if (!_additionalConstraints.hasInfiniteHeight)
-      return _additionalConstraints.constrainHeight(height);
+    if (!m_additionalConstraints.hasInfiniteHeight)
+      return m_additionalConstraints.constrainHeight(height);
     return height;
   }
 
   @override
   void performLayout() {
     if (child != null) {
-      child.layout(_additionalConstraints.enforce(constraints), parentUsesSize: true);
+      child.layout(m_additionalConstraints.enforce(constraints), parentUsesSize: true);
       size = child.size;
     } else {
-      size = _additionalConstraints.enforce(constraints).constrain(Size.zero);
+      size = m_additionalConstraints.enforce(constraints).constrain(Size.zero);
     }
   }
 
