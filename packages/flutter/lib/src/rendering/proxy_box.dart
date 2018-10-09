@@ -37,7 +37,7 @@ export 'package:flutter/gestures.dart' show
 /// for render objects that wish to mimic most, but not all, of the properties
 /// of their child.
 /// flutter2js removed mixins
-/// 
+///
 class RenderProxyBox extends RenderBox {
   /// Creates a proxy render box.
   ///
