@@ -38,7 +38,7 @@ export 'package:flutter/gestures.dart' show
 /// of their child.
 /// flutter2js removed mixins
 ///
-class RenderProxyBox extends RenderBox {
+class RenderProxyBox extends RenderBox implements RenderObjectWithChildMixin<RenderBox> {
   /// Creates a proxy render box.
   ///
   /// Proxy render boxes are rarely created directly because they simply proxy
